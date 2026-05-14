@@ -10,6 +10,9 @@ services:
         volumes:
             - .:/var/www/app
 
+        depends_on:
+            - db
+
     nginx:
         container_name: wf_nginx
         build: ./dockerfiles/nginx
@@ -20,24 +23,23 @@ services:
         depends_on:
             - php
 
-#    db:
-#        image: postgres:18
-#        container_name: whale_fishing_db
-#        ports:
-#            - "5433:5432"
-#        environment:
-#            POSTGRES_USER: '${DB_USERNAME}'
-#            POSTGRES_PASSWORD: '${DB_PASSWORD}'
-#            POSTGRES_DB: '${DB_DATABASE}'
-#
-#    pgadmin:
-#        image: dpage/pgadmin4:9.12
-#        container_name: whale_fishing_pgadmin
-#        ports:
-#            - "5434:80"
-#        environment:
-#            PGADMIN_DEFAULT_EMAIL: '${PGADMIN_EMAIL}'
-#            PGADMIN_DEFAULT_PASSWORD: '${PGADMIN_DEFAULT_PASSWORD}'
-#            PMA_HOST: db
-#        depends_on:
-#            - db
+    db:
+        image: postgres:18
+        container_name: wf_db
+        ports:
+            - "5433:5432"
+        environment:
+            POSTGRES_USER: '${DB_USERNAME}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD}'
+            POSTGRES_DB: '${DB_DATABASE}'
+    pgadmin:
+        image: dpage/pgadmin4:9.12
+        container_name: wf_pgadmin
+        ports:
+            - "5434:80"
+        environment:
+            PGADMIN_DEFAULT_EMAIL: '${PGADMIN_EMAIL}'
+            PGADMIN_DEFAULT_PASSWORD: '${PGADMIN_DEFAULT_PASSWORD}'
+            PMA_HOST: db
+        depends_on:
+            - db
