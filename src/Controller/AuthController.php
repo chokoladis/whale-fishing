@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\UserRepository;
 use App\Request\User\RegisterRequest;
 use Doctrine\DBAL\Schema\Exception\ColumnAlreadyExists;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -14,18 +15,22 @@ final class AuthController extends AbstractController
 {
     function __construct(
         private UserRepository $userRepository,
+        private JWTTokenManagerInterface $JWTTokenManager,
     )
     {
     }
 
     #[Route('/api/v1/auth/register', name: 'auth.register', methods: ['POST'])]
-    public function index(
+    public function register(
         #[MapRequestPayload] RegisterRequest $request,
     ): Response
     {
         try {
+            $user = $this->userRepository->add($request);
+
             return $this->json([
-                'user' => $this->userRepository->add($request),
+                'user' => $user,
+                'token' => $this->JWTTokenManager->create($user),
             ]);
         } catch (ColumnAlreadyExists $e) {
             return $this->json([
@@ -34,6 +39,5 @@ final class AuthController extends AbstractController
                 ]
             ], Response::HTTP_BAD_REQUEST);
         }
-
     }
 }
