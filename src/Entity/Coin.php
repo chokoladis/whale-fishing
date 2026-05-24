@@ -30,9 +30,16 @@ class Coin
     #[ORM\OneToMany(targetEntity: CoinLink::class, mappedBy: 'coin')]
     private Collection $links;
 
+    /**
+     * @var Collection<int, Wallet>
+     */
+    #[ORM\OneToMany(targetEntity: Wallet::class, mappedBy: 'coin')]
+    private Collection $wallets;
+
     public function __construct()
     {
         $this->links = new ArrayCollection();
+        $this->wallets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -100,6 +107,36 @@ class Coin
             // set the owning side to null (unless already changed)
             if ($link->getCoin() === $this) {
                 $link->setCoin(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Wallet>
+     */
+    public function getWallets(): Collection
+    {
+        return $this->wallets;
+    }
+
+    public function addWallet(Wallet $wallet): static
+    {
+        if (!$this->wallets->contains($wallet)) {
+            $this->wallets->add($wallet);
+            $wallet->setCoin($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWallet(Wallet $wallet): static
+    {
+        if ($this->wallets->removeElement($wallet)) {
+            // set the owning side to null (unless already changed)
+            if ($wallet->getCoin() === $this) {
+                $wallet->setCoin(null);
             }
         }
 

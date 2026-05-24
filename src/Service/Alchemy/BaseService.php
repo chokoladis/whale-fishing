@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class BaseService
 {
-    const BASE_URL = 'https://api.g.alchemy.com';
+    protected const BASE_URL = 'https://api.g.alchemy.com';
 
     public function __construct(
         #[Autowire(env: 'ALCHEMY_API_KEY')]

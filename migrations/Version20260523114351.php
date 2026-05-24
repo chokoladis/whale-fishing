@@ -14,7 +14,7 @@ final class Version20260523114351 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Coin, coin_link';
     }
 
     public function up(Schema $schema): void
