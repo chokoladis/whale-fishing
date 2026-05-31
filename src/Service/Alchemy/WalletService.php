@@ -4,22 +4,16 @@ declare(strict_types=1);
 
 namespace App\Service\Alchemy;
 
+use App\Config\External\AlchemyConfig;
 use App\Exception\Coin\InvalidCoinSymbolException;
-use Doctrine\ORM\Query\Expr\Base;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
 
 class WalletService extends BaseService
 {
-    protected const BASE_URL = 'https://eth-mainnet.g.alchemy.com';
+    protected const BASE_URL = 'https://'.AlchemyConfig::ETH_MAINNET_DOMAIN;
 
     const ITEMS_PER_PAGE = 10;
-
-    public function __construct(
-    )
-    {
-    }
 
     public function getTopHolders(string $coinName)
     {

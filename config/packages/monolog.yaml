@@ -1,6 +1,12 @@
 monolog:
     channels:
-        - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
+        - alchemy
+    handlers:
+        alchemy:
+            type: stream
+            path: '%kernel.logs_dir%/alchemy.log'
+            level: debug
+            channels: [ alchemy ]
 
 when@dev:
     monolog:

@@ -25,7 +25,7 @@ final class Version20260523140840 extends AbstractMigration
         $this->addSql('ALTER TABLE coin_link ADD url VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE coin_link DROP name');
         $this->addSql('ALTER TABLE coin_link ADD CONSTRAINT FK_B57623384BBDA7 FOREIGN KEY (coin_id) REFERENCES coin (id) ON DELETE CASCADE NOT DEFERRABLE');
-        $this->addSql('CREATE INDEX IDX_coin_link_unique_coin_type ON coin_link UNIQUE (coin_id, type)');
+        $this->addSql('CREATE UNIQUE INDEX IDX_coin_link_unique_coin_type ON coin_link (coin_id, type)');
     }
 
     public function down(Schema $schema): void

@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\DTO\Http\Response\CoinPriceResponse;
 use App\Entity\Coin;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

@@ -28,7 +28,7 @@ final class CoinController extends AbstractController
         ]);
     }
 
-    #[Route('/coin/{symbol}/price', name: 'app_coin_price', methods: ['GET'])]
+    #[Route('/api/v1/coin/{symbol}/price', name: 'app_coin_price', methods: ['GET'])]
     public function getPrice(
         string $symbol,
     )

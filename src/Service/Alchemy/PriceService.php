@@ -19,7 +19,7 @@ class PriceService extends BaseService
 
         $httpRequest = HttpClient::create();
         $response = $httpRequest->request('GET',
-            sprintf('%s/prices/v1/%s/tokens/by-symbol?symbols=%s', static::BASE_URL, $this->alchemyApiKey, $symbol)
+            sprintf('%s/prices/v1/%s/tokens/by-symbol?symbols=%s', self::BASE_URL, $this->alchemyApiKey, $symbol)
         );
 
         $responseBody = json_decode($response->getContent(), true);

@@ -31,13 +31,18 @@ class WalletRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Wallet
-//    {
-//        return $this->createQueryBuilder('w')
-//            ->andWhere('w.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findByMinValue(string $symbol, float $value)
+    {
+        return $this->createQueryBuilder('w')
+            ->addSelect('(w.qty * w.priceAvg) as HIDDEN totalValue')
+            ->join('w.coin', 'c')
+            ->andWhere('(w.qty * w.priceAvg) >= :val')
+            ->andWhere('c.name = :coin')
+            ->setParameter('coin', $symbol)
+            ->setParameter('val', $value)
+
+            ->orderBy('totalValue', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

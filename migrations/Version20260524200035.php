@@ -31,13 +31,7 @@ final class Version20260524200035 extends AbstractMigration
         $this->addSql('ALTER TABLE transaction ADD CONSTRAINT FK_723705D1A76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE');
         $this->addSql('ALTER TABLE transaction ADD CONSTRAINT FK_723705D184BBDA7 FOREIGN KEY (coin_id) REFERENCES coin (id) NOT DEFERRABLE');
         $this->addSql('ALTER TABLE wallet ADD CONSTRAINT FK_7C68921FA76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE');
-        $this->addSql('ALTER TABLE wallet ADD CONSTRAINT FK_7C68921F84BBDA7 FOREIGN KEY (coin_id) REFERENCES coin (id) NOT DEFERRABLE');
-        $this->addSql('ALTER TABLE coin_link DROP CONSTRAINT fk_b57623384bbda7');
-        $this->addSql('ALTER TABLE coin_link ADD type VARCHAR(32) NOT NULL');
-        $this->addSql('ALTER TABLE coin_link ADD url VARCHAR(255) NOT NULL');
-        $this->addSql('ALTER TABLE coin_link DROP name');
-        $this->addSql('ALTER TABLE coin_link ADD CONSTRAINT FK_B57623384BBDA7 FOREIGN KEY (coin_id) REFERENCES coin (id) ON DELETE CASCADE NOT DEFERRABLE');
-    }
+        $this->addSql('ALTER TABLE wallet ADD CONSTRAINT FK_7C68921F84BBDA7 FOREIGN KEY (coin_id) REFERENCES coin (id) NOT DEFERRABLE');}
 
     public function down(Schema $schema): void
     {
@@ -49,10 +43,5 @@ final class Version20260524200035 extends AbstractMigration
         $this->addSql('ALTER TABLE wallet DROP CONSTRAINT FK_7C68921F84BBDA7');
         $this->addSql('DROP TABLE transaction');
         $this->addSql('DROP TABLE wallet');
-        $this->addSql('ALTER TABLE coin_link DROP CONSTRAINT FK_B57623384BBDA7');
-        $this->addSql('ALTER TABLE coin_link ADD name VARCHAR(64) NOT NULL');
-        $this->addSql('ALTER TABLE coin_link DROP type');
-        $this->addSql('ALTER TABLE coin_link DROP url');
-        $this->addSql('ALTER TABLE coin_link ADD CONSTRAINT fk_b57623384bbda7 FOREIGN KEY (coin_id) REFERENCES coin (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
 }

@@ -15,6 +15,12 @@ class Coin
     #[ORM\Column]
     private ?int $id = null;
 
+//    #[ORM\Column(nullable: true)]
+//    private ?string $contractAddress = null; // 0x...
+//
+//    #[ORM\Column(length: 50)]
+//    private string $network; //'eth-mainnet'
+
     #[ORM\Column(length: 20)]
     private ?string $symbol = null;
 
