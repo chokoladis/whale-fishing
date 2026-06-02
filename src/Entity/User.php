@@ -39,7 +39,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Wallet>
      */
-    #[ORM\OneToMany(targetEntity: Wallet::class, mappedBy: '–user')]
+    #[ORM\OneToMany(targetEntity: Wallet::class, mappedBy: 'user')]
     private Collection $wallets;
 
     public function __construct()
@@ -121,41 +121,41 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $data;
     }
 
-//    #[ORM\PrePersist]
-//    public function beforeAddSetDefalutRoles()
-//    {
-//        if (empty($this->roles)) {
-//            $this->roles = [Role::USER->value];
-//        }
-//    }
+    //    #[ORM\PrePersist]
+    //    public function beforeAddSetDefalutRoles()
+    //    {
+    //        if (empty($this->roles)) {
+    //            $this->roles = [Role::USER->value];
+    //        }
+    //    }
 
-/**
- * @return Collection<int, Wallet>
- */
-public function getWallets(): Collection
-{
-    return $this->wallets;
-}
-
-public function addWallet(Wallet $wallet): static
-{
-    if (!$this->wallets->contains($wallet)) {
-        $this->wallets->add($wallet);
-        $wallet->set–user($this);
+    /**
+     * @return Collection<int, Wallet>
+     */
+    public function getWallets(): Collection
+    {
+        return $this->wallets;
     }
 
-    return $this;
-}
-
-public function removeWallet(Wallet $wallet): static
-{
-    if ($this->wallets->removeElement($wallet)) {
-        // set the owning side to null (unless already changed)
-        if ($wallet->get–user() === $this) {
-            $wallet->set–user(null);
+    public function addWallet(Wallet $wallet): static
+    {
+        if (!$this->wallets->contains($wallet)) {
+            $this->wallets->add($wallet);
+            $wallet->setUser($this);
         }
+
+        return $this;
     }
 
-    return $this;
-}
+    public function removeWallet(Wallet $wallet): static
+    {
+        if ($this->wallets->removeElement($wallet)) {
+            // set the owning side to null (unless already changed)
+            if ($wallet->getUser() === $this) {
+                $wallet->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 }

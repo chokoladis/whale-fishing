@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Coin;
+use App\Request\Coin\ListRequest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -11,6 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CoinRepository extends ServiceEntityRepository
 {
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Coin::class);
@@ -36,7 +39,24 @@ class CoinRepository extends ServiceEntityRepository
     {
         $this->getEntityManager()->persist($coin);
         $this->getEntityManager()->flush();
+    }
 
-        return;
+    public function getList(?ListRequest $listRequest): Paginator
+    {
+        $query = $this->createQueryBuilder('coin')
+            ->orderBy('coin.price', 'DESC');
+
+        return $this->paginate($query, $listRequest?->page, $listRequest?->perPage);
+    }
+
+    public function paginate($dql, $page = 1, $limit = 5)
+    {
+        $paginator = new Paginator($dql);
+
+        $paginator->getQuery()
+            ->setFirstResult($limit * ($page - 1))
+            ->setMaxResults($limit);
+
+        return $paginator;
     }
 }

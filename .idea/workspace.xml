@@ -1,37 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b6068752-5aea-4000-ab92-fbb30473ecb2" name="Changes" comment="added entity wallets and transaction, added todo, fix readme, added description for migrations">
-      <change afterPath="$PROJECT_DIR$/src/Config/External/AlchemyConfig.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Service/TokenService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env.dev" beforeDir="false" afterPath="$PROJECT_DIR$/.env.dev" afterDir="false" />
+    <list default="true" id="b6068752-5aea-4000-ab92-fbb30473ecb2" name="Changes" comment="rework alchemy urls, init mercure, wss lachemy, fix migrations, prepared wallet - findByMinValue">
+      <change afterPath="$PROJECT_DIR$/src/Request/Coin/ListRequest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Controller/BaseControllerTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.test" beforeDir="false" afterPath="$PROJECT_DIR$/.env.test" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compose.override.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/compose.override.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/controllers.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/controllers.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/bundles.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/bundles.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/packages/messenger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/messenger.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/packages/monolog.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/monolog.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/reference.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/reference.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/packages/lexik_jwt_authentication.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/lexik_jwt_authentication.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/packages/security.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/security.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/routes.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/routes.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/services.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/services.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dockerfiles/php/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/dockerfiles/php/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/importmap.php" beforeDir="false" afterPath="$PROJECT_DIR$/importmap.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20260523140840.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20260523140840.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20260524200035.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20260524200035.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phpunit.dist.xml" beforeDir="false" afterPath="$PROJECT_DIR$/phpunit.dist.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/AuthController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/AuthController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Controller/CoinController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/CoinController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Entity/Coin.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/Coin.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entity/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/User.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Repository/CoinRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/CoinRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/WalletRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/WalletRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Service/Alchemy/BaseService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Alchemy/BaseService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Service/Alchemy/PriceService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Alchemy/PriceService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Service/Alchemy/WalletService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Alchemy/WalletService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Service/Coin/WalletService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Coin/WalletService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Tools/Logger.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/Coin/CoinService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Coin/CoinService.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/symfony.lock" beforeDir="false" afterPath="$PROJECT_DIR$/symfony.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Controller/AuthControllerTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Controller/AuthControllerTest.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -199,6 +191,8 @@
       <path value="$PROJECT_DIR$/vendor/symfony/messenger" />
       <path value="$PROJECT_DIR$/vendor/symfony/process" />
       <path value="$PROJECT_DIR$/vendor/symfony/dotenv" />
+      <path value="$PROJECT_DIR$/vendor/phpstan/phpstan" />
+      <path value="$PROJECT_DIR$/vendor/phpstan/phpstan-symfony" />
     </include_path>
   </component>
   <component name="ProjectColorInfo">{
@@ -263,6 +257,7 @@
     <MESSAGE value="added register, enum role, custom exception" />
     <MESSAGE value="added jwttoken for register, added Alchemy requests, added coin and coinLink, logger, small fixs for auth" />
     <MESSAGE value="added entity wallets and transaction, added todo, fix readme, added description for migrations" />
-    <option name="LAST_COMMIT_MESSAGE" value="added entity wallets and transaction, added todo, fix readme, added description for migrations" />
+    <MESSAGE value="rework alchemy urls, init mercure, wss lachemy, fix migrations, prepared wallet - findByMinValue" />
+    <option name="LAST_COMMIT_MESSAGE" value="rework alchemy urls, init mercure, wss lachemy, fix migrations, prepared wallet - findByMinValue" />
   </component>
 </project>

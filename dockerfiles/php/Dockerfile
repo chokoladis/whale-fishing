@@ -1,9 +1,14 @@
 FROM php:8.5-fpm-alpine
 
-RUN apk add --no-cache curl git build-base zlib-dev oniguruma-dev autoconf bash
+RUN apk add --no-cache curl git \
+    build-base zlib-dev oniguruma-dev \
+    autoconf bash libpq-dev \
+    libsodium-dev libxml2-dev linux-headers \
+    argon2-dev
 
-RUN apk add --no-cache libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql
+RUN docker-php-ext-install pdo pdo_pgsql sodium
+
+RUN pecl install redis && docker-php-ext-enable redis
 
 ARG PUID=1000
 ARG PGID=1000

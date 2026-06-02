@@ -20,7 +20,7 @@ final class AuthController extends AbstractController
     {
     }
 
-    #[Route('/api/v1/auth/register', name: 'auth.register', methods: ['POST'])]
+    #[Route('/api/v1/auth/register', name: 'api.v1.auth.register', methods: ['POST'])]
     public function register(
         #[MapRequestPayload] RegisterRequest $request,
     ): Response

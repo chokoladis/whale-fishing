@@ -2,12 +2,15 @@
 
 namespace App\Controller;
 
+use App\Request\Coin\ListRequest;
 use App\Service\Coin\CoinService;
 use App\Service\Coin\PriceService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/api/v1/coin/', name: 'api_coin_')]
 final class CoinController extends AbstractController
 {
 
@@ -18,17 +21,25 @@ final class CoinController extends AbstractController
     {
     }
 
-    #[Route('/coin', name: 'app_coin')]
-    public function index(): Response
+//    todo разрешить без входа
+    #[Route('', name: 'list', methods: ['GET'])]
+    public function index(
+        #[MapQueryString] ?ListRequest $listRequest,
+    ): Response
     {
-        $this->coinService->getCoins('');
-
-        return $this->render('coin/index.html.twig', [
-            'controller_name' => 'CoinController',
-        ]);
+        $result = $this->coinService->getCoins($listRequest);
+        if ($result->count()) {
+            return $this->json([
+                'data' => $result
+            ], Response::HTTP_OK);
+        } else {
+            return $this->json([
+                'data' => []
+            ], Response::HTTP_NOT_FOUND);
+        }
     }
 
-    #[Route('/api/v1/coin/{symbol}/price', name: 'app_coin_price', methods: ['GET'])]
+    #[Route('{symbol}/price', name: 'app_coin_price', methods: ['GET'])]
     public function getPrice(
         string $symbol,
     )
