@@ -59,4 +59,11 @@ class CoinRepository extends ServiceEntityRepository
 
         return $paginator;
     }
+
+    public function findByContractAddress(string $address): ?Coin
+    {
+        return $this->findOneBy([
+            'contractAddress' => strtolower($address)
+        ]);
+    }
 }

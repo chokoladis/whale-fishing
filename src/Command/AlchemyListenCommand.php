@@ -3,6 +3,9 @@
 namespace App\Command;
 
 use App\Config\External\AlchemyConfig;
+use App\DTO\Http\Response\TransactionDTO;
+use App\Message\WSSTransaction;
+use App\Tool\Alchemy\TransactionParser;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -17,6 +20,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 )]
 class AlchemyListenCommand extends Command
 {
+    const CHECKER_RANGE_FROM = 50000;
+
     public function __construct(
         #[Autowire(env: 'ALCHEMY_API_KEY')]
         protected string $alchemyApiKey,
@@ -43,27 +48,28 @@ class AlchemyListenCommand extends Command
                     'jsonrpc' => '2.0',
                     'id'      => 1,
                     'method'  => 'eth_subscribe',
-                    'params'  => ['alchemy_pendingTransactions'],
+                    'params'  => ['alchemy_minedTransactions'],
                 ]));
 
                 $conn->on('message', function ($msg) use ($output) {
                     $data = json_decode($msg, true);
-                    $this->logger->info('result', $data);
 
                     if (isset($data['result']) && !isset($data['params'])) {
                         $output->writeln("<info>Subscribed: {$data['result']}</info>");
                         return;
                     }
 
-                    $tx = $data['params']['result'] ?? null;
-                    if (!$tx) return;
+                    $transferInfo = $data['params']['result']['transaction'] ?? null;
+                    if (!$transferInfo) return;
 
-                    $output->writeln(sprintf(
-                        'TX: %s | from: %s | to: %s',
-                        $tx['hash'],
-                        $tx['from'] ?? 'unknown',
-                        $tx['to']   ?? 'unknown',
-                    ));
+                    $this->logger->info('simple data ', $transferInfo);
+                    $transactionDTO = TransactionParser::parse($transferInfo);
+                    $this->logger->info('parsed data ', ['dto' => $transactionDTO]);
+                    if ($transactionDTO && $transactionDTO->amount >= self::CHECKER_RANGE_FROM) {
+//                        new WSSTransaction(
+
+//                        );
+                    }
                 });
 
                 $conn->on('close', function () use ($output) {
@@ -79,4 +85,13 @@ class AlchemyListenCommand extends Command
 
         return Command::SUCCESS;
     }
+
+//    private function getAmount(array $data): int
+//    {
+//        'amount_raw'   => $amountRaw,
+//        'amount_human' => $amountHuman,  // 10.020000
+//        'decimals'     => $decimals,
+//
+//        $data['token_transfer']['ampunt']
+//    }
 }

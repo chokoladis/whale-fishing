@@ -15,11 +15,11 @@ class Coin
     #[ORM\Column]
     private ?int $id = null;
 
-//    #[ORM\Column(nullable: true)]
-//    private ?string $contractAddress = null; // 0x...
-//
-//    #[ORM\Column(length: 50)]
-//    private string $network; //'eth-mainnet'
+    #[ORM\Column(nullable: true)]
+    private ?string $contractAddress = 'native';
+
+    #[ORM\Column(length: 50)]
+    private string $network; //'eth-mainnet'
 
     #[ORM\Column(length: 20)]
     private ?string $symbol = null;
@@ -147,5 +147,25 @@ class Coin
         }
 
         return $this;
+    }
+
+    public function getContractAddress(): ?string
+    {
+        return $this->contractAddress;
+    }
+
+    public function setContractAddress(?string $contractAddress): void
+    {
+        $this->contractAddress = $contractAddress;
+    }
+
+    public function getNetwork(): string
+    {
+        return $this->network;
+    }
+
+    public function setNetwork(string $network): void
+    {
+        $this->network = $network;
     }
 }

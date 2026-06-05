@@ -71,12 +71,16 @@ services:
         - .:/var/www/app
       depends_on:
         - db
-        - redis
-    redis:
-      image: redis:8.4.0
-      container_name: wf_redis
+
+    rabbitmq:
+      image: rabbitmq:3-management
+      container_name: wf_rabbitmq
       ports:
-        - "6379:6379"
+          - "5672:5672"   # AMQP
+          - "15672:15672" # UI панель
+      environment:
+          RABBITMQ_DEFAULT_USER: '${RABBITMQ_USER:-guest}'
+          RABBITMQ_DEFAULT_PASS: '${RABBITMQ_PASS:-guest}'
 
 volumes:
   mercure_data:

@@ -1,29 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b6068752-5aea-4000-ab92-fbb30473ecb2" name="Changes" comment="rework alchemy urls, init mercure, wss lachemy, fix migrations, prepared wallet - findByMinValue">
-      <change afterPath="$PROJECT_DIR$/src/Request/Coin/ListRequest.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/Controller/BaseControllerTest.php" afterDir="false" />
+    <list default="true" id="b6068752-5aea-4000-ab92-fbb30473ecb2" name="Changes" comment="added tests, phpstan, init argon2 in docker, fix get coin list, fix auth">
+      <change afterPath="$PROJECT_DIR$/src/DTO/Http/Response/TransactionDTO.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Helper/StrHelper.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Message/WSSTransaction.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/MessageHandler/TransactionHandler.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Service/Alchemy/CoinService.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Tool/Alchemy/TransactionParser.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.env.test" beforeDir="false" afterPath="$PROJECT_DIR$/.env.test" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/controllers.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/controllers.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/packages/lexik_jwt_authentication.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/lexik_jwt_authentication.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/packages/security.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/security.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/routes.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/routes.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/packages/messenger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/messenger.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/reference.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/reference.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dockerfiles/php/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/dockerfiles/php/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/importmap.php" beforeDir="false" afterPath="$PROJECT_DIR$/importmap.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/phpunit.dist.xml" beforeDir="false" afterPath="$PROJECT_DIR$/phpunit.dist.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/AuthController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/AuthController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/CoinController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/CoinController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Entity/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Command/AlchemyListenCommand.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Command/AlchemyListenCommand.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entity/Coin.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/Coin.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Repository/CoinRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/CoinRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Service/Coin/CoinService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/Coin/CoinService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony.lock" beforeDir="false" afterPath="$PROJECT_DIR$/symfony.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Controller/AuthControllerTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Controller/AuthControllerTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/todo" beforeDir="false" afterPath="$PROJECT_DIR$/todo" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -258,6 +254,7 @@
     <MESSAGE value="added jwttoken for register, added Alchemy requests, added coin and coinLink, logger, small fixs for auth" />
     <MESSAGE value="added entity wallets and transaction, added todo, fix readme, added description for migrations" />
     <MESSAGE value="rework alchemy urls, init mercure, wss lachemy, fix migrations, prepared wallet - findByMinValue" />
-    <option name="LAST_COMMIT_MESSAGE" value="rework alchemy urls, init mercure, wss lachemy, fix migrations, prepared wallet - findByMinValue" />
+    <MESSAGE value="added tests, phpstan, init argon2 in docker, fix get coin list, fix auth" />
+    <option name="LAST_COMMIT_MESSAGE" value="added tests, phpstan, init argon2 in docker, fix get coin list, fix auth" />
   </component>
 </project>

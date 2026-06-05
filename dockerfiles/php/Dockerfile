@@ -10,6 +10,8 @@ RUN docker-php-ext-install pdo pdo_pgsql sodium
 
 RUN pecl install redis && docker-php-ext-enable redis
 
+RUN docker-php-ext-install -j$(nproc) bcmath
+
 ARG PUID=1000
 ARG PGID=1000
 RUN apk --no-cache add shadow && \
