@@ -3,6 +3,7 @@
 
 ###> symfony/framework-bundle ###
 .env
+.env.dev
 .env.test
 /.env.local.php
 /.env.*.local
@@ -21,7 +22,3 @@
 /.phpunit.cache/
 
 /config/jwt/*.pem
-
-###> phpstan/phpstan ###
-phpstan.neon
-###< phpstan/phpstan ###

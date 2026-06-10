@@ -11,7 +11,10 @@ services:
             - .:/var/www/app
 
         depends_on:
-            - db
+            db:
+                condition: service_started
+            rabbitmq:
+                condition: service_healthy
 
     nginx:
         container_name: wf_nginx
@@ -61,17 +64,6 @@ services:
         - mercure_data:/data
         - mercure_config:/config
 
-    messenger_worker:
-      container_name: wf_messenger
-      build:
-        context: .
-        dockerfile: dockerfiles/php/Dockerfile
-      command: php bin/console messenger:consume async -vv
-      volumes:
-        - .:/var/www/app
-      depends_on:
-        - db
-
     rabbitmq:
       image: rabbitmq:3-management
       container_name: wf_rabbitmq
@@ -81,7 +73,26 @@ services:
       environment:
           RABBITMQ_DEFAULT_USER: '${RABBITMQ_USER:-guest}'
           RABBITMQ_DEFAULT_PASS: '${RABBITMQ_PASS:-guest}'
+      healthcheck:
+          test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+          interval: 5s
+          timeout: 5s
+          retries: 5
 
+    messenger_worker:
+        container_name: wf_messenger
+        build:
+            context: .
+            dockerfile: dockerfiles/php/Dockerfile
+        command: php bin/console messenger:consume async -vv
+        restart: on-failure
+        volumes:
+            - .:/var/www/app
+        depends_on:
+            db:
+                condition: service_started
+            rabbitmq:
+                condition: service_healthy
 volumes:
   mercure_data:
   mercure_config:

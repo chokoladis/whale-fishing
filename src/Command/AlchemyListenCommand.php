@@ -3,8 +3,6 @@
 namespace App\Command;
 
 use App\Config\External\AlchemyConfig;
-use App\DTO\Http\Response\TransactionDTO;
-use App\Message\WSSTransaction;
 use App\Tool\Alchemy\TransactionParser;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -12,6 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsCommand(
     name: 'app:alchemy.listen',
@@ -27,6 +26,7 @@ class AlchemyListenCommand extends Command
         protected string $alchemyApiKey,
         #[Autowire(service: 'monolog.logger.alchemy')]
         protected LoggerInterface $logger,
+        private MessageBusInterface $bus,
     )
     {
         parent::__construct();
@@ -62,18 +62,11 @@ class AlchemyListenCommand extends Command
                     $transferInfo = $data['params']['result']['transaction'] ?? null;
                     if (!$transferInfo) return;
 
-                    $this->logger->info('simple data ', $transferInfo);
                     $transactionDTO = TransactionParser::parse($transferInfo);
                     $this->logger->info('parsed data ', ['dto' => $transactionDTO]);
-                    if ($transactionDTO && $transactionDTO->amount >= self::CHECKER_RANGE_FROM) {
-//                        new WSSTransaction(
-
-//                        );
+                    if ($transactionDTO && bccomp($transactionDTO->amount, (string) self::CHECKER_RANGE_FROM) >= 0) {
+                        $this->bus->dispatch($transactionDTO);
                     }
-                });
-
-                $conn->on('close', function () use ($output) {
-                    $output->writeln('<error>Connection closed!</error>');
                 });
             },
             function (\Exception $e) use ($output) {
@@ -85,13 +78,4 @@ class AlchemyListenCommand extends Command
 
         return Command::SUCCESS;
     }
-
-//    private function getAmount(array $data): int
-//    {
-//        'amount_raw'   => $amountRaw,
-//        'amount_human' => $amountHuman,  // 10.020000
-//        'decimals'     => $decimals,
-//
-//        $data['token_transfer']['ampunt']
-//    }
 }

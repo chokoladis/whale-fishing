@@ -10,7 +10,7 @@ readonly class TransactionDTO
         public string $from,
         public string $to,
         public string $contractAddress,
-        public string $amount,
+        public string $amountRaw,
     )
     {
     }

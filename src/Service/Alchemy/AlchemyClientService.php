@@ -7,14 +7,16 @@ use App\Repository\CoinRepository;
 use App\Resource\CoinResource;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class BaseService
+class AlchemyClientService
 {
     protected const BASE_URL = AlchemyConfig::BASE_URL;
 
     public function __construct(
         #[Autowire(env: 'ALCHEMY_API_KEY')]
         protected string $alchemyApiKey,
+        protected HttpClientInterface $httpClient,
         protected CoinResource $coinResource,
         protected CoinRepository $coinRepository,
         protected LoggerInterface $logger,

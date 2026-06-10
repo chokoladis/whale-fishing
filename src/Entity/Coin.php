@@ -15,11 +15,11 @@ class Coin
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?string $contractAddress = 'native';
+    #[ORM\Column]
+    private string $contractAddress ;
 
-    #[ORM\Column(length: 50)]
-    private string $network; //'eth-mainnet'
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $network = 'native'; //'eth-mainnet'
 
     #[ORM\Column(length: 20)]
     private ?string $symbol = null;

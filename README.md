@@ -4,12 +4,12 @@
 <br>
 <b>Техническое ТЗ:</b>
 1. Интеграция с Blockchain:
-* Alchemy/Infura (Free Tier): RPC-запросы к Ethereum/Polygon/L2.
-* Etherscan/BscScan API: Для получения истории транзакций.
-* DEX Screener / GeckoTerminal API: Чтобы подтягивать актуальные цены токенов-щиткоинов, которых нет на Coingecko.
+* Alchemy/Infura (Free Tier): RPC-запросы к Ethereum/Polygon/L2:
+- - WebSockets - Получение новых блоков
+- - JSON-RPC - Для получения детальной транзакции
+* DEX Screener / GeckoTerminal API: Актуальные цены токенов-щиткоинов, которых нет на Coingecko. // todo
 2. Компонент "Watcher" (Backend Engine):
 * Messenger + Redis: (создание TransactionWatcherHandler).
-* Scheduler (Symfony 6.3+): (настройка периодического опроса пула «подозрительных» адресов).
 * HttpClient: rate limiting бесплатных API (через очереди и задержки).
 3. Логика "Profit & Loss" (P&L) Calculator:
 * посчитать: за сколько купил, за сколько продал, какая нереализованная прибыль.
@@ -18,16 +18,10 @@
 * Telegram Notifier: Когда "кит" закупает новый токен на сумму > X, пользователю летит сообщение с кнопкой-ссылкой на контракт.
 * Strategy Pattern: Разные типы алертов (на покупку, на продажу, на перевод на биржу — "Dump warning").
 
-
-* DB: PostgreSQL (для истории) + Redis (для очередей и кэша цен).
-* API: Alchemy (Free tier) + DEX Screener (Free).
-* Deployment: Какой-нибудь Oracle Cloud Free Tier или минимальный VPS за $5.
-
 Конкретный функционал для реализации (MVP):
 1. Dashboard: Список отслеживаемых кошельков с их текущим балансом в USD.
 2. Feed: Лента последних транзакций этих кошельков с пометками: BUY, SELL, TRANSFER.
-3. Smart Filter: Возможность скрыть "пылевые" транзакции (меньше $100).
-4. Telegram Bot: Команда /add 0x... для добавления кошелька в трекер прямо из телеги.
+3. Telegram Bot: Команда /add 0x... для добавления кошелька в трекер прямо из телеги.
 
 ---
 ## Что готово

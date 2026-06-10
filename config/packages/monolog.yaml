@@ -8,7 +8,7 @@ monolog:
             level: debug
             channels: [ alchemy ]
 
-when@dev:
+when@dev: &monolog_dev
     monolog:
         handlers:
             main:
@@ -20,6 +20,8 @@ when@dev:
                 type: console
                 process_psr_3_messages: false
                 channels: ["!event", "!doctrine", "!console"]
+
+when@local: *monolog_dev
 
 when@test:
     monolog:

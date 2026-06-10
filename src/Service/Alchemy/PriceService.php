@@ -7,7 +7,7 @@ use App\Exception\Coin\InvalidCoinSymbolException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
 
-class PriceService extends BaseService
+class PriceService extends AlchemyClientService
 {
 
     public function getPriceBySymbol(string $symbol) : Coin

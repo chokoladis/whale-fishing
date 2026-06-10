@@ -3,12 +3,12 @@ FROM php:8.5-fpm-alpine
 RUN apk add --no-cache curl git \
     build-base zlib-dev oniguruma-dev \
     autoconf bash libpq-dev \
-    libsodium-dev libxml2-dev linux-headers \
-    argon2-dev
+    libsodium-dev libxml2-dev linux-headers
+RUN apk add --no-cache argon2-dev rabbitmq-c-dev
 
 RUN docker-php-ext-install pdo pdo_pgsql sodium
 
-RUN pecl install redis && docker-php-ext-enable redis
+RUN pecl install redis amqp && docker-php-ext-enable redis amqp
 
 RUN docker-php-ext-install -j$(nproc) bcmath
 

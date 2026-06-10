@@ -9,7 +9,7 @@ use App\Exception\Coin\InvalidCoinSymbolException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
 
-class WalletService extends BaseService
+class WalletService extends AlchemyClientService
 {
     protected const BASE_URL = 'https://'.AlchemyConfig::ETH_MAINNET_DOMAIN;
 
