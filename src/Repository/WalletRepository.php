@@ -16,33 +16,39 @@ class WalletRepository extends ServiceEntityRepository
         parent::__construct($registry, Wallet::class);
     }
 
-//    /**
-//     * @return Wallet[] Returns an array of Wallet objects
-//     */
-//    public function findByExampleField($value): array
+//    todo rework
+//    public function findByMinValue(string $symbol, float $value)
 //    {
 //        return $this->createQueryBuilder('w')
-//            ->andWhere('w.exampleField = :val')
+//            ->addSelect('(w.qty * w.priceAvg) as HIDDEN totalValue')
+//            ->join('w.coin', 'c')
+//            ->andWhere('(w.qty * w.priceAvg) >= :val')
+//            ->andWhere('c.name = :coin')
+//            ->setParameter('coin', $symbol)
 //            ->setParameter('val', $value)
-//            ->orderBy('w.id', 'ASC')
-//            ->setMaxResults(10)
+//
+//            ->orderBy('totalValue', 'DESC')
 //            ->getQuery()
-//            ->getResult()
-//        ;
+//            ->getResult();
 //    }
 
-    public function findByMinValue(string $symbol, float $value)
+    public function findOrCreateByAddress(string $address): ?Wallet
     {
-        return $this->createQueryBuilder('w')
-            ->addSelect('(w.qty * w.priceAvg) as HIDDEN totalValue')
-            ->join('w.coin', 'c')
-            ->andWhere('(w.qty * w.priceAvg) >= :val')
-            ->andWhere('c.name = :coin')
-            ->setParameter('coin', $symbol)
-            ->setParameter('val', $value)
+        if ($wallet = $this->findOneBy(['address' => $address])) {
+            return $wallet;
+        }
 
-            ->orderBy('totalValue', 'DESC')
-            ->getQuery()
-            ->getResult();
+        return $this->save($address);
+    }
+
+    public function save(string $address): Wallet
+    {
+        $wallet = new Wallet();
+        $wallet->setAddress($address);
+
+        $this->getEntityManager()->persist($wallet);
+        $this->getEntityManager()->flush();
+
+        return $wallet;
     }
 }

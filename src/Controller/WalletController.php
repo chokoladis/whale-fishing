@@ -15,7 +15,7 @@ final class WalletController extends AbstractController
     {
     }
 
-    #[Route('/api/v1/wallets/{symbol}', name: 'api_wallets', methods: ['GET'])]
+    #[Route('/api/v1/wallets/topHoldersCoin/{symbol}', name: 'api.v1.wallets.top_holders_coin', methods: ['GET'])]
     public function index(
         string $symbol,
     ): Response
@@ -23,8 +23,6 @@ final class WalletController extends AbstractController
         $result = $this->walletService->getTopHolders($symbol);
         dd($result);
 
-        return $this->json([
-
-        ]);
+        return $this->json([]);
     }
 }

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Service\Coin;
 
+use App\DTO\CoinDTO;
 use App\DTO\Http\Response\TransactionDTO;
 use App\Entity\Coin;
+use App\Helper\StrHelper;
 use App\Repository\CoinRepository;
 use App\Request\Coin\ListRequest;
 use App\Service\Alchemy\TransactionService;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class CoinService
@@ -19,6 +22,7 @@ class CoinService
         private string $alchemyApiKey,
         private CoinRepository $coinRepository,
         private TransactionService $transactionService,
+        private LoggerInterface $logger,
     )
     {
     }
@@ -41,34 +45,29 @@ class CoinService
      */
     public function createOrFindByTransaction(TransactionDTO $transactionDTO): ?Coin
     {
-//        todo mb find by network too ?
+        // todo mb find by network too ?
         if ($coin = $this->coinRepository->findByContractAddress($transactionDTO->contractAddress)){
             return $coin;
         }
 
         if ($transfer = $this->transactionService->getAssetTransferByTransactionDTO($transactionDTO)){
 
-//            todo save transaction
+            $this->logger->debug('transaction dto and transfer', [$transactionDTO, $transfer]);
 
-//            $transfer['value']; // for transaction
-//
-//            $transfer['category']; //"category":"erc20"
-//            $transfer['rawContract']['decimal']; //","decimal":"0x6"
-
-
-//            todo fix save coin
-            $coin = new Coin();
-            $coin->setNetwork('eth-mainnet');
-            $coin->setContractAddress($transactionDTO->contractAddress);
-            $coin->setSymbol($transfer['asset']);
-            $coin->setName($transfer['asset']);
-            $coin->setPrice(0.0);    // Цену обновит отдельный крон-сервис по символу
-
-            $this->coinRepository->saveFromAlchemy($coin);
-
-            return $coin;
+            try {
+                return $this->coinRepository->save(
+                    new CoinDTO(
+                        $transfer['category'] ?? 'native',
+                        $transactionDTO->contractAddress,
+                        $transfer['asset'],
+                        (int)StrHelper::bchexdec($transfer['rawContract']['decimal'])
+                    )
+                );
+            } catch (\Throwable $e) {
+                $this->logger->error('error in coinService' , [$e->getMessage(), $e->getFile(), $e->getLine()]);
+            }
         }
 
-        return null; // mb throw error
+        return null;
     }
 }

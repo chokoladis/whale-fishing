@@ -8,7 +8,7 @@ use App\Helper\StrHelper;
 class TransactionParser
 {
 
-    public static function parse(array $data) : ?TransactionDTO
+    public static function parse(mixed $data) : ?TransactionDTO
     {
         $input = $data['input'] ?? '';
 

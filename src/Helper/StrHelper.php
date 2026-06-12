@@ -17,7 +17,6 @@ class StrHelper
 
         for ($i = 0; $i < $len; $i++) {
             $hexDigit = hexdec($hex[$i]);
-            // Формула: $dec = ($dec * 16) + $hexDigit
             $dec = bcadd(bcmul($dec, '16'), (string)$hexDigit);
         }
 

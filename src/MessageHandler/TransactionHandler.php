@@ -3,25 +3,37 @@
 namespace App\MessageHandler;
 
 use App\DTO\Http\Response\TransactionDTO;
-use App\Service\Alchemy\TransactionService;
 use App\Service\Coin\CoinService;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use App\Service\Coin\WalletService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class TransactionHandler
 {
+    const CHECKER_RANGE_FROM = 50000;
+
     function __construct(
         private CoinService $coinService,
-//        private TransactionService $transactionService,
+        private WalletService $walletService,
     )
     {
     }
 
-    public function __invoke(TransactionDTO $transaction)
+    public function __invoke(TransactionDTO $transaction) : void
     {
+        // получаем транзакцию из alchemy -> создаем монету -> создаем кошелек -> транзакцию
         $coin = $this->coinService->createOrFindByTransaction($transaction);
-//        $this->transactionService->geCoinInfoByTransaction($transaction); // вызов api alchemy
+
+        if (!$coin) return;
+
+        $amount = bcdiv(
+            $transaction->amountRaw,
+            bcpow('10', (string)$coin->getDecimal()),
+            $coin->getDecimal()
+        );
+
+        if ($amount >= (string) self::CHECKER_RANGE_FROM){
+            $this->walletService->addTransactions($transaction, $coin);
+        }
     }
 }

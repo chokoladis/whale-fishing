@@ -17,8 +17,6 @@ class AlchemyClientService
         #[Autowire(env: 'ALCHEMY_API_KEY')]
         protected string $alchemyApiKey,
         protected HttpClientInterface $httpClient,
-        protected CoinResource $coinResource,
-        protected CoinRepository $coinRepository,
         protected LoggerInterface $logger,
     )
     {

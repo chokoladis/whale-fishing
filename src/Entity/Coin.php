@@ -16,19 +16,22 @@ class Coin
     private ?int $id = null;
 
     #[ORM\Column]
-    private string $contractAddress ;
+    private string $contractAddress;
 
-    #[ORM\Column(length: 50, nullable: true)]
-    private ?string $network = 'native'; //'eth-mainnet'
+    #[ORM\Column(length: 50)]
+    private string $network = 'native'; //'eth-mainnet'
 
     #[ORM\Column(length: 20)]
-    private ?string $symbol = null;
+    private string $symbol;
 
     #[ORM\Column(length: 64)]
-    private ?string $name = null;
+    private string $name;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?float $price = null;
+
+    #[ORM\Column(nullable: false)]
+    private int $decimal;
 
     /**
      * @var Collection<int, CoinLink>
@@ -36,16 +39,9 @@ class Coin
     #[ORM\OneToMany(targetEntity: CoinLink::class, mappedBy: 'coin')]
     private Collection $links;
 
-    /**
-     * @var Collection<int, Wallet>
-     */
-    #[ORM\OneToMany(targetEntity: Wallet::class, mappedBy: 'coin')]
-    private Collection $wallets;
-
     public function __construct()
     {
         $this->links = new ArrayCollection();
-        $this->wallets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -119,36 +115,6 @@ class Coin
         return $this;
     }
 
-    /**
-     * @return Collection<int, Wallet>
-     */
-    public function getWallets(): Collection
-    {
-        return $this->wallets;
-    }
-
-    public function addWallet(Wallet $wallet): static
-    {
-        if (!$this->wallets->contains($wallet)) {
-            $this->wallets->add($wallet);
-            $wallet->setCoin($this);
-        }
-
-        return $this;
-    }
-
-    public function removeWallet(Wallet $wallet): static
-    {
-        if ($this->wallets->removeElement($wallet)) {
-            // set the owning side to null (unless already changed)
-            if ($wallet->getCoin() === $this) {
-                $wallet->setCoin(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getContractAddress(): ?string
     {
         return $this->contractAddress;
@@ -167,5 +133,15 @@ class Coin
     public function setNetwork(string $network): void
     {
         $this->network = $network;
+    }
+
+    public function getDecimal(): int
+    {
+        return $this->decimal;
+    }
+
+    public function setDecimal(int $decimal): void
+    {
+        $this->decimal = $decimal;
     }
 }

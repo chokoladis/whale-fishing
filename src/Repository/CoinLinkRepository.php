@@ -3,11 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\Coin;
+use App\Entity\CoinLink;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Coin>
+ * @extends ServiceEntityRepository<CoinLink>
  */
 class CoinLinkRepository extends ServiceEntityRepository
 {

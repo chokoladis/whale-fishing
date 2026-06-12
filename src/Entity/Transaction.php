@@ -10,15 +10,11 @@ use Doctrine\ORM\Mapping as ORM;
 class Transaction
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    private int $id;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
     #[ORM\JoinColumn(nullable: false)]
     private Wallet $wallet;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private User $user;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -30,9 +26,9 @@ class Transaction
     #[ORM\Column(length: 100)]
     private string $hash;
 
-    #[ORM\Column(length: 64)]
+    #[ORM\Column(name: "`from`", length: 64)]
     private string $from;
-    #[ORM\Column(length: 64)]
+    #[ORM\Column(name: "`to`",length: 64)]
     private string $to;
 
     #[ORM\Column(enumType: TransactionType::class)]
@@ -59,16 +55,6 @@ class Transaction
         $this->wallet = $wallet;
     }
 
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): void
-    {
-        $this->user = $user;
-    }
-
     public function getCoin(): Coin
     {
         return $this->coin;
@@ -87,16 +73,6 @@ class Transaction
     public function setType(TransactionType $type): void
     {
         $this->type = $type;
-    }
-
-    public function getPrice(): string
-    {
-        return $this->price;
-    }
-
-    public function setPrice(string $price): void
-    {
-        $this->price = $price;
     }
 
     public function getCreatedAt(): \DateTimeImmutable
@@ -157,5 +133,10 @@ class Transaction
     public function setAmount(string $amount): void
     {
         $this->amount = $amount;
+    }
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
     }
 }

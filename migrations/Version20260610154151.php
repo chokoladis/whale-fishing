@@ -14,7 +14,7 @@ final class Version20260610154151 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'added transaction and fix coin table';
+        return 'change table transaction, fix table coin';
     }
 
     public function up(Schema $schema): void

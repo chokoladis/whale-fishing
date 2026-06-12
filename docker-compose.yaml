@@ -9,6 +9,8 @@ services:
                 - PGID=${PGID}
         volumes:
             - .:/var/www/app
+            - ./dockerfiles/php/conf/php.ini:/usr/local/etc/php/php.ini
+            - ./dockerfiles/php/conf/php.ini:/usr/local/etc/php/cli/php.ini
 
         depends_on:
             db:

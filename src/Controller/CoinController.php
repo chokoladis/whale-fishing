@@ -6,6 +6,7 @@ use App\Request\Coin\ListRequest;
 use App\Service\Coin\CoinService;
 use App\Service\Coin\PriceService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
@@ -13,7 +14,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/v1/coin/', name: 'api_coin_')]
 final class CoinController extends AbstractController
 {
-
     public function __construct(
         private CoinService $coinService,
         private PriceService $priceService
@@ -42,7 +42,7 @@ final class CoinController extends AbstractController
     #[Route('{symbol}/price', name: 'app_coin_price', methods: ['GET'])]
     public function getPrice(
         string $symbol,
-    )
+    ) : JsonResponse
     {
         try {
             return $this->json(['data' => [

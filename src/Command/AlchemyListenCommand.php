@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 )]
 class AlchemyListenCommand extends Command
 {
-    const CHECKER_RANGE_FROM = 50000;
-
     public function __construct(
         #[Autowire(env: 'ALCHEMY_API_KEY')]
         protected string $alchemyApiKey,
@@ -63,14 +61,15 @@ class AlchemyListenCommand extends Command
                     if (!$transferInfo) return;
 
                     $transactionDTO = TransactionParser::parse($transferInfo);
-                    $this->logger->info('parsed data ', ['dto' => $transactionDTO]);
-                    if ($transactionDTO && bccomp($transactionDTO->amount, (string) self::CHECKER_RANGE_FROM) >= 0) {
+//                    $this->logger->info('parsed data ', ['dto' => $transactionDTO]);
+                    if ($transactionDTO && $transactionDTO->amountRaw) {
                         $this->bus->dispatch($transactionDTO);
                     }
                 });
             },
             function (\Exception $e) use ($output) {
                 $output->writeln("<error>Could not connect: {$e->getMessage()}</error>");
+                return null;
             }
         );
 

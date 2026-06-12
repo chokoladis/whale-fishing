@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\CoinDTO;
 use App\Entity\Coin;
 use App\Request\Coin\ListRequest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -35,10 +36,20 @@ class CoinRepository extends ServiceEntityRepository
     //    }
 
 
-    public function saveFromAlchemy(Coin $coin): void
+    public function save(CoinDTO $coinDTO): Coin
     {
+        $coin = new Coin();
+        $coin->setNetwork($coinDTO->network);
+        $coin->setContractAddress($coinDTO->contractAddress);
+        $coin->setSymbol($coinDTO->symbol);
+        $coin->setName($coinDTO->symbol);
+        $coin->setDecimal($coinDTO->decimal);
+        $coin->setPrice(0.0);
+
         $this->getEntityManager()->persist($coin);
         $this->getEntityManager()->flush();
+
+        return $coin;
     }
 
     public function getList(?ListRequest $listRequest): Paginator

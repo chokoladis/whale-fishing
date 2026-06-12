@@ -5,16 +5,32 @@ namespace App\Service\Alchemy;
 use App\Config\External\AlchemyConfig;
 use App\DTO\Http\Response\TransactionDTO;
 use App\Exception\Alchemy\IntegrationException;
-use App\Service\Alchemy\AlchemyClientService;
-use Symfony\Component\HttpClient\HttpClient;
+use App\Repository\CoinRepository;
+use App\Repository\TransactionRepository;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class TransactionService extends AlchemyClientService
 {
     const BASE_URL = AlchemyConfig::ETH_MAINNET_DOMAIN;
 
+    public function __construct(
+        #[Autowire(env: 'ALCHEMY_API_KEY')]
+        protected string $alchemyApiKey,
+        protected HttpClientInterface $httpClient,
+        protected LoggerInterface $logger,
+        protected CoinRepository $coinRepository,
+        protected TransactionRepository $transactionRepository,
+    )
+    {
+        parent::__construct($this->alchemyApiKey, $this->httpClient, $this->logger);
+    }
+
+
     /**
      * @param TransactionDTO $transactionDTO
-     * @return void
+     * @return mixed
      * @throws IntegrationException
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
@@ -22,10 +38,8 @@ class TransactionService extends AlchemyClientService
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function getAssetTransferByTransactionDTO(TransactionDTO $transactionDTO) : ?array
+    public function getAssetTransferByTransactionDTO(TransactionDTO $transactionDTO) : mixed
     {
-        $this->logger->info("Get CoinInfoByTransaction dto", [$transactionDTO]);
-
         try {
             $response = $this->httpClient->request('POST',
                 sprintf('https://%s/v2/%s',self::BASE_URL, $this->alchemyApiKey),
@@ -39,8 +53,6 @@ class TransactionService extends AlchemyClientService
                             'toBlock' => $transactionDTO->blockNumber,
                             'fromAddress' => $transactionDTO->from,
                             'contractAddress' => [$transactionDTO->contractAddress],
-                            // 'external' — это переводы нативного ETH ,
-                            // 'erc20' — это чистые переводы токенов (без DEX-мусора)
                             'category' => ['external', 'erc20'],
                             'excludeZeroValue' => true,
                             'maxCount' => '0x64', // Ограничим 100 результатами для теста,
@@ -57,13 +69,29 @@ class TransactionService extends AlchemyClientService
 
         $this->logger->debug('$response transaction data', ['data' => $data, 'type' => gettype($data)]);
 
-//              {"blockNum":"0x181e268","value":1301.279157,"erc721TokenId":null,"erc1155Metadata":[],"tokenId":null,"asset":"USDT","category":"erc20","rawContract":{"value":"0x4d8ff1b5","address":"0xdac17f958d2ee523a2206206994597c13d831ec7","decimal":"0x6"},"metadata":{"blockTimestamp":"2026-06-10T20:05:23.000Z"}}]}},"type":"array"} []
         $transfers = $data['result']['transfers'] ?? [];
 
+        $targetContract = $transactionDTO->contractAddress ? strtolower($transactionDTO->contractAddress) : null;
+        $targetHash = strtolower($transactionDTO->hash);
+
         if (!empty($transfers)) {
-            $transfer = current($transfers);
+            foreach ($transfers as $transfer) {
+                $transferHash = strtolower($transfer['hash'] ?? '');
+
+                $transferContract = isset($transfer['rawContract']['address'])
+                    ? strtolower($transfer['rawContract']['address'])
+                    : null;
+
+                if ($transferHash === $targetHash && $transferContract === $targetContract) {
+                    if (isset($transfer['rawContract']['address'])) {
+                        $transfer['rawContract']['address'] = $transferContract;
+                    }
+
+                    return $transfer;
+                }
+            }
         }
 
-        return $transfer ?? null;
+        return null;
     }
 }

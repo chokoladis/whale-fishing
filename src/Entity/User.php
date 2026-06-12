@@ -36,17 +36,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    /**
-     * @var Collection<int, Wallet>
-     */
-    #[ORM\OneToMany(targetEntity: Wallet::class, mappedBy: 'user')]
-    private Collection $wallets;
-
-    public function __construct()
-    {
-        $this->wallets = new ArrayCollection();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -128,34 +117,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     //            $this->roles = [Role::USER->value];
     //        }
     //    }
-
-    /**
-     * @return Collection<int, Wallet>
-     */
-    public function getWallets(): Collection
-    {
-        return $this->wallets;
-    }
-
-    public function addWallet(Wallet $wallet): static
-    {
-        if (!$this->wallets->contains($wallet)) {
-            $this->wallets->add($wallet);
-            $wallet->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeWallet(Wallet $wallet): static
-    {
-        if ($this->wallets->removeElement($wallet)) {
-            // set the owning side to null (unless already changed)
-            if ($wallet->getUser() === $this) {
-                $wallet->setUser(null);
-            }
-        }
-
-        return $this;
-    }
 }

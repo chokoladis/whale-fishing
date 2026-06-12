@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\WalletRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,19 +15,15 @@ class Wallet
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'wallets')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    #[ORM\Column(length: 64, unique: true)]
+    private string $address;
 
-    #[ORM\ManyToOne(inversedBy: 'wallets')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Coin $coin = null;
+    /**
+     * @var Collection<int, WalletCoin> $walletCoins
+     */
+    #[ORM\OneToMany(mappedBy: 'wallet', targetEntity: WalletCoin::class, cascade: ['persist', 'remove'])]
+    private Collection $walletCoins;
 
-    #[ORM\Column(type: 'decimal', precision: 28, scale: 8)]
-    private ?string $qty = null;
-
-    #[ORM\Column(type: 'decimal', precision: 28, scale: 8)]
-    private ?string $priceAvg = null;
 
     /**
      * @var Collection<int, Transaction>
@@ -35,102 +32,53 @@ class Wallet
     #[ORM\OneToMany(mappedBy: 'wallet', targetEntity: Transaction::class, cascade: ['persist', 'remove'])]
     private Collection $transactions;
 
-    #[ORM\Column]
-    private \DateTimeImmutable $createdAt;
-
-    #[ORM\Column]
-    private \DateTimeImmutable $updatedAt;
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUser(): ?User
+    /**
+     * @return Collection<int, Transaction>
+     */
+    public function getTransactions(): Collection
     {
-        return $this->user;
+        return $this->transactions;
     }
 
-    public function setUser(?User $user): static
+    public function addTransaction(Transaction $transaction): static
     {
-        $this->user = $user;
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions->add($transaction);
+            $transaction->setWallet($this);
+        }
 
         return $this;
     }
 
-    public function getCoin(): ?Coin
+    public function removeTransaction(Transaction $transaction): static
     {
-        return $this->coin;
-    }
-
-    public function setCoin(?Coin $coin): static
-    {
-        $this->coin = $coin;
+        if ($this->transactions->removeElement($transaction)) {
+            // set the owning side to null (unless already changed)
+            if ($transaction->getWallet() === $this) {
+                $transaction->setWallet(null);
+            }
+        }
 
         return $this;
     }
 
-    public function getQty(): ?string
+    public function getAddress(): string
     {
-        return $this->qty;
+        return $this->address;
     }
 
-    public function setQty(string $qty): static
+    public function setAddress(string $address): void
     {
-        $this->qty = $qty;
-
-        return $this;
+        $this->address = $address;
     }
 
-    public function getPriceAvg(): ?string
+    public function __construct()
     {
-        return $this->priceAvg;
-    }
-
-    public function setPriceAvg(string $priceAvg): static
-    {
-        $this->priceAvg = $priceAvg;
-
-        return $this;
-    }
-
-//    /**
-//     * @return Collection<int, Transaction>
-//     */
-//    public function getTransactions(): Collection
-//    {
-//        return $this->transactions;
-//    }
-//
-//    public function addTransaction(Transaction $transaction): static
-//    {
-//        if (!$this->transactions->contains($transaction)) {
-//            $this->transactions->add($transaction);
-//            $transaction->setWallet($this);
-//        }
-//
-//        return $this;
-//    }
-//
-//    public function removeTransaction(Transaction $transaction): static
-//    {
-//        if ($this->transactions->removeElement($transaction)) {
-//            // set the owning side to null (unless already changed)
-//            if ($transaction->getWallet() === $this) {
-//                $transaction->setWallet(null);
-//            }
-//        }
-//
-//        return $this;
-//    }
-
-    public function getTotalValue(float $currentPrice): float
-    {
-        return (float)$this->qty * $currentPrice;
-    }
-
-    public function getPnl(float $currentPrice): float
-    {
-        return ((float)$currentPrice - (float)$this->avgPrice) * (float)$this->qty;
+        $this->walletCoins = new ArrayCollection;
     }
 }
