@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\DTO;
+namespace App\DTO\Coin;
 
-readonly class CoinDTO
+readonly class CoinShortDTO
 {
     public function __construct(
         public string $network,

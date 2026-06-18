@@ -24,7 +24,7 @@ class AlchemyListenCommand extends Command
         protected string $alchemyApiKey,
         #[Autowire(service: 'monolog.logger.alchemy')]
         protected LoggerInterface $logger,
-        private MessageBusInterface $bus,
+        protected MessageBusInterface $bus,
     )
     {
         parent::__construct();

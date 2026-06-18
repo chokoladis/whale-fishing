@@ -27,7 +27,7 @@ final class Version20260610154151 extends AbstractMigration
         $this->addSql('ALTER TABLE transaction ADD hash VARCHAR(100) NOT NULL');
         $this->addSql('ALTER TABLE transaction ADD "from" VARCHAR(64) NOT NULL');
         $this->addSql('ALTER TABLE transaction ADD "to" VARCHAR(64) NOT NULL');
-        $this->addSql('ALTER TABLE transaction ADD amount NUMERIC(20, 8) NOT NULL');
+        $this->addSql('ALTER TABLE transaction ADD amount NUMERIC(36, 18) NOT NULL');
         $this->addSql('ALTER TABLE transaction DROP price');
         $this->addSql('ALTER TABLE transaction DROP qty');
         $this->addSql('ALTER TABLE transaction DROP gas');

@@ -7,11 +7,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class CoinResource
 {
-    function __construct(
-        private SerializerInterface $serializer,
-    )
-    {
-    }
 
     public function itemWithPrice(
         Coin $coin,

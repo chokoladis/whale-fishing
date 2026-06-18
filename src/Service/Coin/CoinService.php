@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Service\Coin;
 
-use App\DTO\CoinDTO;
+use App\DTO\Coin\CoinShortDTO;
+use App\DTO\Http\Request\ListRequest;
 use App\DTO\Http\Response\TransactionDTO;
 use App\Entity\Coin;
 use App\Helper\StrHelper;
 use App\Repository\CoinRepository;
-use App\Request\Coin\ListRequest;
-use App\Service\Alchemy\TransactionService;
+use App\Service\External\Alchemy\TransactionService;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -36,7 +36,7 @@ class CoinService
     /**
      * @param TransactionDTO $transactionDTO
      * @return Coin
-     * @throws \App\Exception\Alchemy\IntegrationException
+     * @throws \App\Exception\External\IntegrationException
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
@@ -55,8 +55,8 @@ class CoinService
             $this->logger->debug('transaction dto and transfer', [$transactionDTO, $transfer]);
 
             try {
-                return $this->coinRepository->save(
-                    new CoinDTO(
+                return $this->coinRepository->saveByDTO(
+                    new CoinShortDTO(
                         $transfer['category'] ?? 'native',
                         $transactionDTO->contractAddress,
                         $transfer['asset'],

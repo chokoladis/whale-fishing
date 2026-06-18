@@ -1,5 +1,5 @@
 parameters:
-
+    listing.limit: 20
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -12,3 +12,9 @@ services:
     App\Listener\ExceptionListener:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, priority: 100 }
+
+    App\MessagesHandler\TransactionHandler:
+        arguments:
+            $apiServiceProviders:
+                ALCHEMY: '@App\Service\External\Alchemy\PriceService'
+                COINGECKO: '@App\Service\External\CoinGecko\PriceService'

@@ -9,9 +9,9 @@ use App\Resource\CoinResource;
 class PriceService
 {
     public function __construct(
-        private CoinRepository $coinRepository,
-        private CoinResource $coinResource,
-        private \App\Service\Alchemy\PriceService $alchemyPriceService,
+        private CoinRepository                             $coinRepository,
+        private CoinResource                               $coinResource,
+        private \App\Service\External\Alchemy\PriceService $alchemyPriceService,
     )
     {
     }

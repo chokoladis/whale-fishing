@@ -39,9 +39,16 @@ class Coin
     #[ORM\OneToMany(targetEntity: CoinLink::class, mappedBy: 'coin')]
     private Collection $links;
 
+    #[ORM\Column(updatable: false)]
+    private \DateTimeImmutable $createdAt;
+    #[ORM\Column]
+    private \DateTimeImmutable $updatedAt;
+
     public function __construct()
     {
         $this->links = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -143,5 +150,25 @@ class Coin
     public function setDecimal(int $decimal): void
     {
         $this->decimal = $decimal;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
     }
 }

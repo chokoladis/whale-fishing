@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Coin;
+namespace App\Service\Wallet;
 
 use App\DTO\Http\Response\TransactionDTO;
 use App\Entity\Coin;
@@ -20,11 +20,11 @@ class WalletService
     const float MIN_VALUE_TOP_HOLDER = 100000;
 
     public function __construct(
-        private WalletRepository $walletRepository,
-        private WalletCoinRepository $walletCoinRepository,
-        private TransactionRepository $transactionRepository,
+        private WalletRepository                            $walletRepository,
+        private WalletCoinRepository                        $walletCoinRepository,
+        private TransactionRepository                       $transactionRepository,
 //        private CoinResource $coinResource,
-        private \App\Service\Alchemy\WalletService $alchemyService,
+        private \App\Service\External\Alchemy\WalletService $alchemyService,
     )
     {
     }

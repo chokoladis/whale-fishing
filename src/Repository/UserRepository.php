@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
+use App\DTO\Http\Request\User\RegisterRequest;
 use App\Entity\User;
-use App\Request\User\RegisterRequest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Schema\Exception\ColumnAlreadyExists;
 use Doctrine\ORM\EntityManagerInterface;

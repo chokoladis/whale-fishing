@@ -34,7 +34,7 @@ class Transaction
     #[ORM\Column(enumType: TransactionType::class)]
     private TransactionType $type;
 
-    #[ORM\Column(type: 'decimal', precision: 20, scale: 8)]
+    #[ORM\Column(type: 'decimal', precision: 36, scale: 18)]
     private string $amount;
 
     #[ORM\Column]

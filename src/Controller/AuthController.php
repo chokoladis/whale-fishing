@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
+use App\DTO\Http\Request\User\RegisterRequest;
 use App\Repository\UserRepository;
-use App\Request\User\RegisterRequest;
 use Doctrine\DBAL\Schema\Exception\ColumnAlreadyExists;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

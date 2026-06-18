@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Service\Alchemy;
+namespace App\Service\External\Alchemy;
 
 use App\Config\External\AlchemyConfig;
 use App\DTO\Http\Response\TransactionDTO;
-use App\Exception\Alchemy\IntegrationException;
+use App\Exception\External\IntegrationException;
 use App\Repository\CoinRepository;
 use App\Repository\TransactionRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class TransactionService extends AlchemyClientService
+class TransactionService extends ClientService
 {
-    const BASE_URL = AlchemyConfig::ETH_MAINNET_DOMAIN;
+    const string BASE_URL = AlchemyConfig::ETH_MAINNET_DOMAIN;
 
     public function __construct(
         #[Autowire(env: 'ALCHEMY_API_KEY')]

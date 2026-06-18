@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exception\Alchemy;
+namespace App\Exception\External;
 
 class IntegrationException extends \Exception
 {

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Alchemy;
+namespace App\Service\External\Alchemy;
 
 use App\Config\External\AlchemyConfig;
 use App\Exception\Coin\InvalidCoinSymbolException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
 
-class WalletService extends AlchemyClientService
+class WalletService extends ClientService
 {
-    protected const BASE_URL = 'https://'.AlchemyConfig::ETH_MAINNET_DOMAIN;
+    protected const string BASE_URL = 'https://'.AlchemyConfig::ETH_MAINNET_DOMAIN;
 
     const ITEMS_PER_PAGE = 10;
 

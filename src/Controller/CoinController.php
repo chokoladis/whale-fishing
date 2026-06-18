@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Request\Coin\ListRequest;
+use App\DTO\Http\Request\ListRequest;
 use App\Service\Coin\CoinService;
 use App\Service\Coin\PriceService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

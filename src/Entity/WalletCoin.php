@@ -20,10 +20,10 @@ class WalletCoin
     #[ORM\JoinColumn(nullable: false)]
     private Coin $coin;
 
-    #[ORM\Column(type: 'decimal', precision: 28, scale: 8)]
+    #[ORM\Column(type: 'decimal', precision: 36, scale: 18)]
     private string $balance = '0';
 
-    #[ORM\Column(type: 'decimal', precision: 28, scale: 8)]
+    #[ORM\Column(type: 'decimal', precision: 36, scale: 18)]
     private string $avgPrice = '0';
 
     #[ORM\Column]
