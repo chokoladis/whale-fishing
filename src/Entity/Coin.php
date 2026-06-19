@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CoinRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Coin
 {
     #[ORM\Id]
@@ -170,5 +171,11 @@ class Coin
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
+    }
+
+    #[ORM\PreUpdate]
+    public function autoUpdateUpdatedAt()
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }

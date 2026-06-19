@@ -2,18 +2,23 @@
 
 namespace App\Service\External\CoinGecko;
 
+use App\Config\External\CoinGeckoConfig;
 use App\Exception\Coin\InvalidCoinSymbolException;
+use App\Exception\External\RateLimitException;
 use App\Interface\External\GetterPriceInterface;
 use App\Repository\CoinRepository;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class PriceService extends \App\Service\External\CoinGecko\ClientService implements GetterPriceInterface
 {
 
     public function __construct(
+        #[Autowire(env: 'COINGECKO_API_KEY')]
+        protected string $apiKey,
         protected HttpClientInterface $httpClient,
         protected LoggerInterface $logger,
         protected CoinRepository $coinRepository,
@@ -24,33 +29,36 @@ class PriceService extends \App\Service\External\CoinGecko\ClientService impleme
 
     public function getPriceBySymbol(string $symbol) : float
     {
-        $symbol = strtoupper(trim($symbol));
+        $symbol = trim($symbol);
         if (!mb_strlen($symbol)) {
             throw new InvalidCoinSymbolException('Symbol cannot be empty.');
         }
 
-        $httpRequest = HttpClient::create();
-        $response = $httpRequest->request('GET',
-//            https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=0x514910771af9ca656af840dff83e8264ecf986ca&vs_currencies=usd
-//            ethereum?contract_addresses=0x514910771af9ca656af840dff83e8264ecf986ca&vs_currencies=usd
-            sprintf('/api/v3/simple/token_price/%s', self::BASE_URL, $this->alchemyApiKey, $symbol)
-        );
+        try {
+            $response = $this->httpClient->request('GET',
+                sprintf('%s/api/v3/simple/price?vs_currencies=usd&symbols=%s', CoinGeckoConfig::PRO_URL, $symbol),
+                [ 'headers' => ['x-cg-demo-api-key' => $this->apiKey]]
+            );
 
-        $responseBody = json_decode($response->getContent(), true);
+            $responseBody = json_decode($response->getContent(false), true);
+        } catch (\Throwable $error) {
+            $this->logger->error('coingecko [priceService] error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
 
-        if ($response->getStatusCode() === Response::HTTP_OK && !empty($responseBody['data'])) {
-            $data = current($responseBody['data']);
+            if ($error->getCode() === Response::HTTP_TOO_MANY_REQUESTS) {
+                throw new RateLimitException();
+            } else if ($error->getCode() === 0) {
+                // need reconnect
+                exit();
+            }
 
-            return floatval(current($data['prices'])['value']);
-//            $coin = (new Coin())
-//                ->setSymbol($data['symbol'])
-//                ->setName($data['symbol'])
-//                ->setPrice(floatval(current($data['prices'])['value']));
+            throw $error;
+        }
 
-//            todo contractAddress
-//            $this->coinRepository->save($coin);
+
+        if ($response->getStatusCode() === Response::HTTP_OK && !empty($responseBody[$symbol])) {
+            return floatval($responseBody[$symbol]['usd']);
         } else {
-            $this->logger->error('alchemy [priceService] error', ['content' => $response->getContent(), 'status' => $response->getStatusCode()]);
+            $this->logger->error('coin gecko [priceService] error', ['content' => $response->getContent(), 'status' => $response->getStatusCode()]);
 
             throw new \HttpException('Не удалось получить данные из стороннего ресурса');
         }
@@ -58,9 +66,35 @@ class PriceService extends \App\Service\External\CoinGecko\ClientService impleme
 
     public function getPriceByContractAddress(string $contractAddress) : float
     {
-//        todo
-        return 0.0;
-    }
+        $contractAddress = trim($contractAddress);
+        if (!mb_strlen($contractAddress)) {
+            throw new InvalidCoinSymbolException('$contractAddress cannot be empty.');
+        }
 
+        try {
+            $response = $this->httpClient->request('GET',
+                sprintf('%s/api/v3/simple/token_price/ethereum?vs_currencies=usd&contract_addresses=%s', self::BASE_URL, $contractAddress)
+            );
+
+            $responseBody = json_decode($response->getContent(false), true);
+
+        } catch (\Throwable $error) {
+            $this->logger->error('coingecko [priceService] error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
+
+            if ($error->getCode() === Response::HTTP_TOO_MANY_REQUESTS) {
+                throw new RateLimitException();
+            }
+
+            throw $error;
+        }
+
+        if ($response->getStatusCode() === Response::HTTP_OK && !empty($responseBody[$contractAddress])) {;
+            return floatval($responseBody[$contractAddress]['usd']);
+        } else {
+            $this->logger->error('coingecko [priceService] error', ['content' => $response->getContent(), 'status' => $response->getStatusCode()]);
+
+            throw new HttpException($response->getStatusCode(), 'Не удалось получить данные из стороннего ресурса');
+        }
+    }
 
 }

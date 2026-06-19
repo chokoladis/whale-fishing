@@ -43,7 +43,7 @@ class SettingRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    public function update(Setting $setting): void
+    public function save(Setting $setting): void
     {
         $this->getEntityManager()->persist($setting);
         $this->getEntityManager()->flush();
@@ -55,7 +55,7 @@ class SettingRepository extends ServiceEntityRepository
             ->where('s.name = :value')
             ->setParameter('value', 'external_api_service.price')
             ->getQuery()
-            ->enableResultCache(3600, 'api_service_provider.price')
+//            ->enableResultCache(3600, 'api_service_provider.price')
             ->getOneOrNullResult();
     }
 }

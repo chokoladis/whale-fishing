@@ -4,21 +4,15 @@ namespace App\Enum\External;
 
 enum ApiProvider : string
 {
-    case ALCHEMY = 'alchemy';
-    case COINGECKO = 'coingecko';
+    case ALCHEMY = 'ALCHEMY';
+    case COINGECKO = 'COINGECKO';
 
-    static function getRand(?self $exclude = null)
+    static function getNewProvider(?self $current = null) : self
     {
-        $cases = self::cases();
-        if ($exclude) {
-            foreach ($cases as $key => $case) {
-                if ($case === $exclude) {
-                    unset($cases[$key]);
-                }
-            }
+        if ($current) {
+            return $current === self::ALCHEMY ? self::COINGECKO : self::ALCHEMY;
+        } else {
+            return current(self::cases());
         }
-
-        return $cases[rand(0, count($cases)-1)];
-
     }
 }

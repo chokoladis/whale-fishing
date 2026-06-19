@@ -15,24 +15,23 @@ class SettingService
     {
     }
 
-    public function updateApiProviderForPrice(?Setting $setting = null)
+    public function updateApiProviderForPrice(?Setting $setting)
     {
+        $newValue = ApiProvider::getNewProvider();
+
         if ($setting) {
-
-            $currentApiProvider = ApiProvider::tryFrom($setting?->getValue());
-
-            if ($currentApiProvider) {
-                $newValue = ApiProvider::getRand($currentApiProvider)->name;
-            }
+            $currentApiProvider = ApiProvider::from($setting->getValue());
+            $newValue = ApiProvider::getNewProvider($currentApiProvider);
         } else {
             $setting = new Setting();
             $setting->setName('external_api_service.price');
-            $newValue = ApiProvider::getRand()->name;
         }
 
-        $setting->setValue($newValue);
+        $setting->setValue($newValue->name ?? $setting->getValue());
 
-        $this->settingRepository->update($setting);
+        $this->settingRepository->save($setting);
+
+        return $setting;
     }
 
     public function getCurrentApiPriceProvider()

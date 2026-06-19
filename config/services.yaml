@@ -13,7 +13,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, priority: 100 }
 
-    App\MessagesHandler\TransactionHandler:
+    App\MessageHandler\CoinPriceHandler:
         arguments:
             $apiServiceProviders:
                 ALCHEMY: '@App\Service\External\Alchemy\PriceService'

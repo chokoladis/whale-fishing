@@ -25,22 +25,6 @@ class CoinRepository extends ServiceEntityRepository
         parent::__construct($registry, Coin::class);
     }
 
-    //    /**
-    //     * @return Coin[] Returns an array of Coin objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult() //->getOneOrNullResult()
-    //        ;
-    //    }
-
-
     public function saveByDTO(CoinShortDTO $coinDTO): Coin
     {
         $coin = new Coin();
