@@ -16,21 +16,22 @@ class WalletRepository extends ServiceEntityRepository
         parent::__construct($registry, Wallet::class);
     }
 
-//    todo rework
-//    public function findByMinValue(string $symbol, float $value)
-//    {
-//        return $this->createQueryBuilder('w')
-//            ->addSelect('(w.qty * w.priceAvg) as HIDDEN totalValue')
-//            ->join('w.coin', 'c')
-//            ->andWhere('(w.qty * w.priceAvg) >= :val')
-//            ->andWhere('c.name = :coin')
-//            ->setParameter('coin', $symbol)
-//            ->setParameter('val', $value)
-//
-//            ->orderBy('totalValue', 'DESC')
-//            ->getQuery()
-//            ->getResult();
-//    }
+    public function findByTopHoldersBySymbol(string $symbol, float $value)
+    {
+        return $this->createQueryBuilder('w')
+            ->addSelect('w')
+            ->addSelect('(wc.balance * wc.avgPrice) as HIDDEN totalValue')
+            ->join('w.walletCoins', 'wc')
+            ->join('wc.coin', 'c')
+            ->andWhere('wc.balance >= :val')
+            ->andWhere('c.symbol = :coin')
+            ->setParameter('coin', $symbol)
+            ->setParameter('val', $value)
+
+            ->orderBy('totalValue', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 
     public function findOrCreateByAddress(string $address): ?Wallet
     {

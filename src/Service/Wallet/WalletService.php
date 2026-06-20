@@ -13,6 +13,7 @@ use App\Exception\Coin\InvalidCoinSymbolException;
 use App\Repository\TransactionRepository;
 use App\Repository\WalletCoinRepository;
 use App\Repository\WalletRepository;
+use App\Resource\WalletResource;
 
 class WalletService
 {
@@ -23,7 +24,7 @@ class WalletService
         private WalletRepository                            $walletRepository,
         private WalletCoinRepository                        $walletCoinRepository,
         private TransactionRepository                       $transactionRepository,
-//        private CoinResource $coinResource,
+        private WalletResource $walletResource,
         private \App\Service\External\Alchemy\WalletService $alchemyService,
     )
     {
@@ -36,13 +37,14 @@ class WalletService
             throw new InvalidCoinSymbolException('Symbol cannot be empty.');
         }
 
-        $wallets = $this->walletRepository->findByMinValue($symbol, self::MIN_VALUE_TOP_HOLDER);
-        dump($wallets);
+//        todo paginator
+        $wallets = $this->walletRepository->findByTopHoldersBySymbol($symbol, self::MIN_VALUE_TOP_HOLDER);
         if (empty($wallets)) {
-            $wallets = $this->alchemyService->getTopHolders($symbol);
+//            todo
+//            $wallets = $this->alchemyService->getTopHolders($symbol);
         }
 
-        return $wallets;
+        return array_map(fn (Wallet $wallet) => $this->walletResource->detail($wallet), $wallets);
     }
 
     public function addTransactions(TransactionDTO $transaction, Coin $coin)
@@ -91,5 +93,14 @@ class WalletService
         $walletCoin->setBalance($newBalance);
 
         $this->walletCoinRepository->save($walletCoin);
+    }
+
+    public function getDetail(string $address)
+    {
+        $wallet = $this->walletRepository->findOneBy([
+            'address' => $address,
+        ]);
+
+        return $this->walletResource->detail($wallet);
     }
 }

@@ -18,4 +18,16 @@ class CoinResource
             'price' => $coin->getPrice(),
         ];
     }
+
+    public function detail(Coin $coin) : array
+    {
+        return [
+            'name' => $coin->getName(),
+            'symbol' => $coin->getSymbol(),
+            'price' => $coin->getPrice(),
+            'links' => $coin->getLinks()->toArray(),
+            'contractAddress' => $coin->getContractAddress(),
+            'network' => $coin->getNetwork(),
+        ];
+    }
 }

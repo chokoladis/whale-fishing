@@ -15,7 +15,6 @@ class TransactionResource
     )
     {
         return [
-            'id' => $transaction->getId(),
             'coin' => $this->coinResource->itemWithPrice($transaction->getCoin()),
             'hash' => $transaction->getHash(),
             'from' => $transaction->getFrom(),

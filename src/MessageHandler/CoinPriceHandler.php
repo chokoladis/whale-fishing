@@ -57,7 +57,7 @@ class CoinPriceHandler
             } catch (\Throwable $e) {
                 $this->settingService->updateApiProviderForPrice($setting);
                 $this->logger->emergency('throw in coin price handler', [$e->getMessage(), $e->getTraceAsString()]);
-                die();
+                return;
             }
 
             $this->logger->info('result new price', ['price' => $price]);

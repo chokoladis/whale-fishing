@@ -1,0 +1,14 @@
+<?php
+
+namespace App\DTO\Auth\Response;
+
+readonly class RegisterDTO
+{
+    public function __construct(
+        /** @var $user - from resource */
+        public array $user,
+        public string $token,
+    )
+    {
+    }
+}

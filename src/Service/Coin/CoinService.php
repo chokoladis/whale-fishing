@@ -6,12 +6,14 @@ namespace App\Service\Coin;
 
 use App\DTO\Coin\CoinShortDTO;
 use App\DTO\Http\Request\ListRequest;
+use App\DTO\Http\Response\PageDTO;
 use App\DTO\Http\Response\TransactionDTO;
 use App\Entity\Coin;
+use App\Exception\Coin\InvalidCoinSymbolException;
 use App\Helper\StrHelper;
 use App\Repository\CoinRepository;
+use App\Resource\CoinResource;
 use App\Service\External\Alchemy\TransactionService;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -21,16 +23,32 @@ class CoinService
         #[Autowire(env: 'ALCHEMY_API_KEY')]
         private string $alchemyApiKey,
         private CoinRepository $coinRepository,
+        private CoinResource $coinResource,
         private TransactionService $transactionService,
         private LoggerInterface $logger,
+        private PriceService $priceService,
     )
     {
     }
 
-    public function getCoins(?ListRequest $request): Paginator
+    public function getCoins(?ListRequest $request): PageDTO
     {
-//        handle error
         return $this->coinRepository->getList($request);
+    }
+
+    public function getCoin(string $symbol): array
+    {
+        $symbol = trim($symbol);
+        if (!mb_strlen($symbol)) {
+            throw new InvalidCoinSymbolException('Symbol cannot be empty.');
+        }
+
+        $coin = $this->coinRepository->findOneBy(['symbol' => $symbol]);
+        if (empty($coin) || !$coin->getPrice() || $coin->getPrice() === 0.0) {
+            $coin = $this->priceService->getPriceBySymbol($symbol);
+        }
+
+        return $this->coinResource->detail($coin);
     }
 
     /**

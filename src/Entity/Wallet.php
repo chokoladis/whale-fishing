@@ -32,6 +32,11 @@ class Wallet
     #[ORM\OneToMany(mappedBy: 'wallet', targetEntity: Transaction::class, cascade: ['persist', 'remove'])]
     private Collection $transactions;
 
+    public function __construct()
+    {
+        $this->walletCoins = new ArrayCollection;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -77,8 +82,10 @@ class Wallet
         $this->address = $address;
     }
 
-    public function __construct()
+
+
+    public function getWalletCoins(): Collection
     {
-        $this->walletCoins = new ArrayCollection;
+        return $this->walletCoins;
     }
 }

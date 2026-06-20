@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\DTO\Coin\CoinShortDTO;
 use App\DTO\Http\Request\ListRequest;
+use App\DTO\Http\Response\PageDTO;
 use App\Entity\Coin;
+use App\Resource\CoinResource;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -20,6 +22,7 @@ class CoinRepository extends ServiceEntityRepository
     public function __construct(
         ManagerRegistry $registry,
         private ContainerBagInterface $params,
+        private CoinResource $coinResource
     )
     {
         parent::__construct($registry, Coin::class);
@@ -51,25 +54,35 @@ class CoinRepository extends ServiceEntityRepository
         return $coin;
     }
 
-    public function getList(?ListRequest $listRequest): Paginator
+    public function getList(?ListRequest $listRequest): PageDTO
     {
+        // todo sort by name, price in api
         $query = $this->createQueryBuilder('coin')
             ->orderBy('coin.price', 'DESC');
 
         return $this->paginate($query, $listRequest?->page, $listRequest?->perPage);
     }
 
-    public function paginate(QueryBuilder $dql, ?int $page = 1, ?int $limit = null)
+    public function paginate(QueryBuilder $dql, ?int $page = 1, ?int $perPage = null)
     {
-        $limit = $limit ?? $this->params->get('listing.limit');
+        $page = $page ?? 1;
+        $perPage = $perPage ?? $this->params->get('listing.limit');
 
         $paginator = new Paginator($dql);
 
         $paginator->getQuery()
-            ->setFirstResult($limit * ($page - 1))
-            ->setMaxResults($limit);
+            ->setFirstResult($perPage * ($page - 1))
+            ->setMaxResults($perPage);
 
-        return $paginator;
+        $coins = array_map(fn(Coin $coin) => $this->coinResource->detail($coin),
+            iterator_to_array($paginator));
+
+        return new PageDTO(
+            $coins,
+            $page,
+            $perPage,
+            $paginator->count()
+        );
     }
 
     public function findByContractAddress(string $address): ?Coin

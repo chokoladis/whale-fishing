@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\DTO\Http\Request\ListRequest;
+use App\Exception\Coin\InvalidCoinSymbolException;
 use App\Service\Coin\CoinService;
 use App\Service\Coin\PriceService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/v1/coin/', name: 'api_coin_')]
@@ -28,7 +30,8 @@ final class CoinController extends AbstractController
     ): Response
     {
         $result = $this->coinService->getCoins($listRequest);
-        if ($result->count()) {
+
+        if ($result->total) {
             return $this->json([
                 'data' => $result
             ], Response::HTTP_OK);
@@ -39,16 +42,17 @@ final class CoinController extends AbstractController
         }
     }
 
-    #[Route('{symbol}/price', name: 'app_coin_price', methods: ['GET'])]
+    // todo rate limit or http request to rabbitMQ
+    #[Route('{symbol}', name: 'app_coin_price', methods: ['GET'])]
     public function getPrice(
         string $symbol,
     ) : JsonResponse
     {
         try {
             return $this->json(['data' => [
-                'coin' => $this->priceService->getPriceBySymbol($symbol)
+                'coin' => $this->coinService->getCoin($symbol)
             ]], Response::HTTP_OK);
-        } catch (\HttpException $exception) {
+        } catch (HttpException|InvalidCoinSymbolException $exception) {
             return $this->json(['errors' => [$exception->getMessage()]], Response::HTTP_BAD_REQUEST);
         }
     }
