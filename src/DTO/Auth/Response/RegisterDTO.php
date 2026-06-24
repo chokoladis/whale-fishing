@@ -5,7 +5,7 @@ namespace App\DTO\Auth\Response;
 readonly class RegisterDTO
 {
     public function __construct(
-        /** @var $user - from resource */
+        /** @var array<string, string> $user - from resource */
         public array $user,
         public string $token,
     )

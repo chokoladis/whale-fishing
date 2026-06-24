@@ -36,7 +36,7 @@ class PriceService extends \App\Service\External\CoinGecko\ClientService impleme
 
         try {
             $response = $this->httpClient->request('GET',
-                sprintf('%s/api/v3/simple/price?vs_currencies=usd&symbols=%s', CoinGeckoConfig::PRO_URL, $symbol),
+                sprintf('%s/api/v3/simple/price?vs_currencies=usd&symbols=%s', CoinGeckoConfig::BASE_URL, $symbol),
                 [ 'headers' => ['x-cg-demo-api-key' => $this->apiKey]]
             );
 
@@ -60,7 +60,7 @@ class PriceService extends \App\Service\External\CoinGecko\ClientService impleme
         } else {
             $this->logger->error('coin gecko [priceService] error', ['content' => $response->getContent(), 'status' => $response->getStatusCode()]);
 
-            throw new \HttpException('Не удалось получить данные из стороннего ресурса');
+            throw new HttpException(Response::HTTP_NOT_FOUND, 'Не удалось получить данные из стороннего ресурса');
         }
     }
 

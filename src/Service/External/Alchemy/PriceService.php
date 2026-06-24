@@ -46,12 +46,18 @@ class PriceService extends ClientService implements GetterPriceInterface
         if ($response->getStatusCode() === Response::HTTP_OK && !empty($responseBody['data'])) {
             $data = current($responseBody['data']);
 
-            return floatval(current($data['prices'])['value']);
-        } else {
-            $this->logger->error('alchemy [priceService] error', ['content' => $response->getContent(), 'status' => $response->getStatusCode()]);
-
-            throw new HttpException($response->getStatusCode(), 'Не удалось получить данные из стороннего ресурса');
+            if (!empty($data['prices'])){
+                return floatval(current($data['prices'])['value']);
+            }
         }
+
+        $this->logger->error('alchemy [priceService] error', ['content' => $response->getContent(), 'status' => $response->getStatusCode()]);
+
+        throw new HttpException($response->getStatusCode() !== Response::HTTP_OK
+            ? $response->getStatusCode()
+            : Response::HTTP_NOT_FOUND,
+            'Не удалось получить данные из стороннего ресурса'
+        );
     }
 
     public function getPriceByContractAddress(string $contractAddress) : float

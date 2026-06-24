@@ -11,6 +11,10 @@ class WalletResource
         private WalletCoinResource $walletCoinResource,
     ){}
 
+    /**
+     * @param Wallet $wallet
+     * @return array<string, mixed>
+     */
     public function detail(
         Wallet $wallet,
     )

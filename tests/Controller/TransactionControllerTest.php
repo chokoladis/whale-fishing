@@ -4,7 +4,7 @@ namespace App\Tests\Controller;
 
 final class TransactionControllerTest extends BaseControllerTest
 {
-    public function testListSuccess() : void
+    public function testListSuccess(): void
     {
         $headers = $this->getAuthHeaders();
         $this->client->request('GET', '/api/v1/transaction/', server: $headers);
@@ -12,19 +12,24 @@ final class TransactionControllerTest extends BaseControllerTest
         self::assertResponseIsSuccessful();
     }
 
-    public function testTopHourly(): void
+    // todo?
+    public function testTopHourlySuccess(): void
     {
         $headers = $this->getAuthHeaders();
-        $this->client->request('GET', '/api/v1/transaction/topHourly', server: $headers);
+        $this->client->request('GET', '/api/v1/transaction/topHourly/', server: $headers);
 
-        self::assertResponseIsSuccessful();
+        $json = json_decode($this->client->getResponse()->getContent(), true);
+
+        self::assertEquals(['data' => []], $json);
     }
 
-    public function testTopDaily(): void
+    public function testTopDailySuccess(): void
     {
         $headers = $this->getAuthHeaders();
-        $this->client->request('GET', '/api/v1/transaction/topDaily', server: $headers);
+        $this->client->request('GET', '/api/v1/transaction/topDaily/', server: $headers);
 
-        self::assertResponseIsSuccessful();
+        $json = json_decode($this->client->getResponse()->getContent(), true);
+
+        self::assertEquals(['data' => []], $json);
     }
 }

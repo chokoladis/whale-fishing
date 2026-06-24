@@ -15,7 +15,7 @@ class SettingService
     {
     }
 
-    public function updateApiProviderForPrice(?Setting $setting)
+    public function updateApiProviderForPrice(?Setting $setting) : ?Setting
     {
         $newValue = ApiProvider::getNewProvider();
 
@@ -34,7 +34,7 @@ class SettingService
         return $setting;
     }
 
-    public function getCurrentApiPriceProvider()
+    public function getCurrentApiPriceProvider() : ?Setting
     {
         return $this->settingRepository->getCurrentApiPriceProvider();
     }

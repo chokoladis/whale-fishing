@@ -16,7 +16,7 @@ class WalletRepository extends ServiceEntityRepository
         parent::__construct($registry, Wallet::class);
     }
 
-    public function findByTopHoldersBySymbol(string $symbol, float $value)
+    public function findByTopHoldersBySymbol(string $symbol, float $value) : mixed
     {
         return $this->createQueryBuilder('w')
             ->addSelect('w')

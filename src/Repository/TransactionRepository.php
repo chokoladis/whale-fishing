@@ -56,6 +56,12 @@ class TransactionRepository extends ServiceEntityRepository
         $this->manager->flush();
     }
 
+    /**
+     * @param \DateTime $dateFrom
+     * @return array<string, mixed>
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
     public function getTopTransactionsByTime(\DateTime $dateFrom): array
     {
         // cache, set limit

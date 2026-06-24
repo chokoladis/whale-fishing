@@ -50,28 +50,6 @@ class Wallet
         return $this->transactions;
     }
 
-    public function addTransaction(Transaction $transaction): static
-    {
-        if (!$this->transactions->contains($transaction)) {
-            $this->transactions->add($transaction);
-            $transaction->setWallet($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTransaction(Transaction $transaction): static
-    {
-        if ($this->transactions->removeElement($transaction)) {
-            // set the owning side to null (unless already changed)
-            if ($transaction->getWallet() === $this) {
-                $transaction->setWallet(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getAddress(): string
     {
         return $this->address;

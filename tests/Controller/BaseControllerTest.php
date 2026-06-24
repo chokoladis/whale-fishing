@@ -2,18 +2,25 @@
 
 namespace App\Tests\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Doctrine\ORM\EntityManagerInterface;
 
 
 abstract class BaseControllerTest extends WebTestCase
 {
     const string TEST_USER_EMAIL = 'test@mail.ru';
+    const string TEST_USER_PASSWORD = 'Pdn$192_swC';
 
     protected ?KernelBrowser $client = null;
     protected ?EntityManagerInterface $em = null;
+
+    /**
+     * @param array<mixed> $claims
+     * @return array<string>
+     * @throws \Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTEncodeFailureException
+     */
     protected function getAuthHeaders(array $claims = ['email' => self::TEST_USER_EMAIL]): array
     {
         $container = static::getContainer();
@@ -35,7 +42,7 @@ abstract class BaseControllerTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->client = static::createClient();
+        $this->client = $this->createClient();
 
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
         $this->em->getConnection()->beginTransaction();

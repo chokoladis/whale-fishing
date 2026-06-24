@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/api/v1/wallets/', name: 'api.v1.wallets.')]
+#[Route('/api/v1/wallet/', name: 'api.v1.wallet.')]
 final class WalletController extends AbstractController
 {
     function __construct(

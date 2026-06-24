@@ -14,19 +14,17 @@ use App\Helper\StrHelper;
 use App\Repository\CoinRepository;
 use App\Resource\CoinResource;
 use App\Service\External\Alchemy\TransactionService;
+use Doctrine\ORM\EntityNotFoundException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class CoinService
 {
     public function __construct(
-        #[Autowire(env: 'ALCHEMY_API_KEY')]
-        private string $alchemyApiKey,
         private CoinRepository $coinRepository,
         private CoinResource $coinResource,
         private TransactionService $transactionService,
         private LoggerInterface $logger,
-        private PriceService $priceService,
     )
     {
     }
@@ -36,7 +34,12 @@ class CoinService
         return $this->coinRepository->getList($request);
     }
 
-    public function getCoin(string $symbol): array
+    /**
+     * @param string $symbol
+     * @return array<string, mixed>|null
+     * @throws InvalidCoinSymbolException
+     */
+    public function getCoin(string $symbol): ?array
     {
         $symbol = trim($symbol);
         if (!mb_strlen($symbol)) {
@@ -44,8 +47,12 @@ class CoinService
         }
 
         $coin = $this->coinRepository->findOneBy(['symbol' => $symbol]);
-        if (empty($coin) || !$coin->getPrice() || $coin->getPrice() === 0.0) {
-            $coin = $this->priceService->getPriceBySymbol($symbol);
+        if (empty($coin)) {
+            throw new EntityNotFoundException('Такая монета не была найдена');
+//            todo cron for this
+//            private PriceService $priceService,
+//            || !$coin->getPrice() || $coin->getPrice() === 0.0
+//            $coin = $this->priceService->getPriceBySymbol($symbol);
         }
 
         return $this->coinResource->detail($coin);

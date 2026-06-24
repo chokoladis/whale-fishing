@@ -23,6 +23,7 @@ final class Version20260610154151 extends AbstractMigration
         $this->addSql('ALTER TABLE coin ADD contract_address VARCHAR(255) NOT NULL');
         $this->addSql('ALTER TABLE coin ADD network VARCHAR(50) DEFAULT NULL');
         $this->addSql('DROP INDEX idx_coin_link_unique_coin_type');
+
         $this->addSql('ALTER TABLE transaction ADD block_number VARCHAR(10) NOT NULL');
         $this->addSql('ALTER TABLE transaction ADD hash VARCHAR(100) NOT NULL');
         $this->addSql('ALTER TABLE transaction ADD "from" VARCHAR(64) NOT NULL');

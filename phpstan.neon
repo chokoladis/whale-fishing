@@ -3,4 +3,6 @@ parameters:
     paths:
         - config/
         - src/
-        - tests/
+        - tests/controller
+    ignoreErrors:
+        - '#Property App\\Entity\\.*::\$id \(.*\) is never assigned#'

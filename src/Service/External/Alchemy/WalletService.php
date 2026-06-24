@@ -15,16 +15,14 @@ class WalletService extends ClientService
 
     const ITEMS_PER_PAGE = 10;
 
-    public function getTopHolders(string $coinName)
+    public function getTopHolders(string $symbol) : void
     {
-        $httpRequest = HttpClient::create();
-
-        $symbol = strtoupper(trim($coinName));
+        $symbol = trim($symbol);
         if (!mb_strlen($symbol)) {
             throw new InvalidCoinSymbolException('Symbol cannot be empty.');
         }
 
-        $response = $httpRequest->request('GET',
+        $response = $this->httpClient->request('GET',
             sprintf('%s/v2/%s', self::BASE_URL, $this->alchemyApiKey),
             [
                 'json' => [
@@ -40,10 +38,7 @@ class WalletService extends ClientService
             ]
         );
 
-        $fileLog = $_SERVER["DOCUMENT_ROOT"].'/log_debug.php';
-
-        $log = date('Y-m-d H:i:s') . ' wallet response - '.print_r( [$response->getStatusCode(), $response->getContent()], true);
-        file_put_contents($fileLog, $log . PHP_EOL, FILE_APPEND);
+        $this->logger->debug(' wallet response - ', [$response->getStatusCode(), $response->getContent()]);
 
         if ($response->getStatusCode() === Response::HTTP_OK) {
 

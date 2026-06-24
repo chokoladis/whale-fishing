@@ -25,12 +25,11 @@ class WalletService
         private WalletCoinRepository                        $walletCoinRepository,
         private TransactionRepository                       $transactionRepository,
         private WalletResource $walletResource,
-        private \App\Service\External\Alchemy\WalletService $alchemyService,
     )
     {
     }
 
-    public function getTopHolders(string $coinName)
+    public function getTopHolders(string $coinName) : mixed
     {
         $symbol = strtoupper(trim($coinName));
         if (!mb_strlen($symbol)) {
@@ -47,7 +46,7 @@ class WalletService
         return array_map(fn (Wallet $wallet) => $this->walletResource->detail($wallet), $wallets);
     }
 
-    public function addTransactions(TransactionDTO $transaction, Coin $coin)
+    public function addTransactions(TransactionDTO $transaction, Coin $coin) : void
     {
         $walletFrom = $this->walletRepository->findOrCreateByAddress($transaction->from);
 
@@ -71,7 +70,7 @@ class WalletService
         $this->transactionRepository->save($walletTo, $transaction, $coin, TransactionType::IN);
     }
 
-    public function updateWalletCoin(Wallet $wallet, Coin $coin, string $amount, TransactionType $type)
+    public function updateWalletCoin(Wallet $wallet, Coin $coin, string $amount, TransactionType $type) : void
     {
         $walletCoin = $this->walletCoinRepository->findOneBy([
             'wallet' => $wallet,
@@ -95,7 +94,7 @@ class WalletService
         $this->walletCoinRepository->save($walletCoin);
     }
 
-    public function getDetail(string $address)
+    public function getDetail(string $address) : mixed
     {
         $wallet = $this->walletRepository->findOneBy([
             'address' => $address,

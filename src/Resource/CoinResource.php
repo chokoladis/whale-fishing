@@ -8,6 +8,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 class CoinResource
 {
 
+    /**
+     * @param Coin $coin
+     * @return array<string, string|float|null>
+     */
     public function itemWithPrice(
         Coin $coin,
     ) : array
@@ -19,6 +23,10 @@ class CoinResource
         ];
     }
 
+    /**
+     * @param Coin $coin
+     * @return array<string, mixed>
+     */
     public function detail(Coin $coin) : array
     {
         return [

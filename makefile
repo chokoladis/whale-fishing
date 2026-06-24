@@ -13,15 +13,22 @@ reload:
 
 #db
 db-restore:
-	gunzip -c dumps/what_if.sql.gz | docker exec -i what-if_mysql mysql -u$(DB_USERNAME) -p$(DB_PASSWORD) $(DB_DATABASE);
+	gunzip -c dumps/wf.sql.gz | docker exec -i wf_db psql -U$(DB_USERNAME) -d$(DB_DATABASE);
 db-export:
-	docker exec what-if_mysql mysqldump -u$(DB_USERNAME) -p$(DB_PASSWORD) $(DB_DATABASE) | gzip > dumps/what_if_$(shell date +%F).sql.gz
-
-#composer
-install-composer:
-	docker exec -w /var/www/what_if what-if_php composer install --no-interaction --prefer-dist --optimize-autoloader
-update-composer:
-	docker exec -w /var/www/what_if what-if_php composer update --no-interaction
+	docker exec wf_db pg_dump -U$(DB_USERNAME) $(DB_DATABASE) | gzip > dumps/wf_$(shell date +%F).sql.gz
 
 app_bash:
 	docker-compose exec -u www-data php bash
+
+#testing
+test-prepare-cleardata:
+	docker exec -w /var/www/app wf_php php bin/console --env=test doctrine:database:create
+	docker exec -w /var/www/app wf_php php bin/console --env=test doctrine:migrations:migrate
+
+test-prepare-realdata:
+	docker exec -w /var/www/app wf_php php bin/console --env=test doctrine:database:create
+	docker exec wf_db pg_dump -U${DB_USERNAME} ${DB_DATABASE} > dumps/dump.sql
+	docker exec -i wf_db psql -U${DB_USERNAME} ${DB_DATABASE}_test < dumps/dump.sql
+
+test:
+	docker exec -w /var/www/app wf_php php bin/phpunit

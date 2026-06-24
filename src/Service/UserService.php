@@ -18,7 +18,7 @@ class UserService
     {
     }
 
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request) : RegisterDTO
     {
         $user = $this->userRepository->add($request);
 

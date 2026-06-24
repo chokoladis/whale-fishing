@@ -7,15 +7,28 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/api/v1/transaction/', name: 'api_transaction_')]
+#[Route('/api/v1/transaction/', name: 'api.v1.transaction.')]
 final class TransactionController extends AbstractController
 {
     public function __construct(
         private \App\Service\Wallet\TransactionService $transactionService,
     )
     {
+    }
+
+    #[Route('', name: 'list', methods: ['GET'])]
+    public function list(
+        #[MapQueryString] ?ListRequest $listRequest,
+    ) : JsonResponse
+    {
+        try {
+            return $this->json(['data' => $this->transactionService->getList($listRequest)], Response::HTTP_OK);
+        } catch (HttpException $exception) {
+            return $this->json(['errors' => [$exception->getMessage()]], Response::HTTP_BAD_REQUEST);
+        }
     }
 
     #[Route('topHourly/', name: 'topHourly', methods: ['GET'])]
@@ -48,15 +61,5 @@ final class TransactionController extends AbstractController
         }
     }
 
-    #[Route('', name: 'list', methods: ['GET'])]
-    public function list(
-        #[MapQueryString] ?ListRequest $listRequest,
-    ) : JsonResponse
-    {
-        try {
-            return $this->json(['data' => $this->transactionService->getList($listRequest)], Response::HTTP_OK);
-        } catch (\HttpException $exception) {
-            return $this->json(['errors' => [$exception->getMessage()]], Response::HTTP_BAD_REQUEST);
-        }
-    }
+
 }

@@ -87,7 +87,6 @@ services:
             context: .
             dockerfile: dockerfiles/php/Dockerfile
         command: php bin/console messenger:consume async -vv
-        restart: on-failure
         volumes:
             - .:/var/www/app
         depends_on:

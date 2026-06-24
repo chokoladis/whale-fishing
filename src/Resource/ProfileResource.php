@@ -8,6 +8,10 @@ use App\Entity\User;
 class ProfileResource
 {
 
+    /**
+     * @param User $user
+     * @return array<string, string|array<string,string>>
+     */
     public function profile(
         User $user,
     ) : array

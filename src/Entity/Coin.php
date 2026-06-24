@@ -174,7 +174,7 @@ class Coin
     }
 
     #[ORM\PreUpdate]
-    public function autoUpdateUpdatedAt()
+    public function autoUpdateUpdatedAt() : void
     {
         $this->updatedAt = new \DateTimeImmutable();
     }

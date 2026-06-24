@@ -10,9 +10,9 @@ final class AuthControllerTest extends BaseControllerTest
     {
         $this->client->request('POST', '/api/v1/auth/register', [], [], ['CONTENT_TYPE' => 'application/json'],
             json_encode([
-                'email' => self::TEST_USER_EMAIL,
-                'password' => 'Pdn$192_swC',
-                'password_confirm' => 'Pdn$192_swC',
+                'email' => 'emailtest' . rand(1000, 9999) . '@gmail.com',
+                'password' => self::TEST_USER_PASSWORD,
+                'password_confirm' => self::TEST_USER_PASSWORD,
             ]));
 
         self::assertResponseIsSuccessful();
@@ -24,8 +24,15 @@ final class AuthControllerTest extends BaseControllerTest
         $this->client->request('POST', '/api/v1/auth/register', [], [], ['CONTENT_TYPE' => 'application/json'],
             json_encode([
                 'email' => self::TEST_USER_EMAIL,
-                'password' => 'Pdn$192_swC',
-                'password_confirm' => 'Pdn$192_swC',
+                'password' => self::TEST_USER_PASSWORD,
+                'password_confirm' => self::TEST_USER_PASSWORD,
+            ]));
+
+        $this->client->request('POST', '/api/v1/auth/register', [], [], ['CONTENT_TYPE' => 'application/json'],
+            json_encode([
+                'email' => self::TEST_USER_EMAIL,
+                'password' => self::TEST_USER_PASSWORD,
+                'password_confirm' => self::TEST_USER_PASSWORD,
             ]));
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
@@ -36,14 +43,14 @@ final class AuthControllerTest extends BaseControllerTest
 //        $this->client->request('POST', '/api/v1/auth/register', [], [], ['CONTENT_TYPE' => 'application/json'],
 //            json_encode([
 //                'email' => self::TEST_USER_EMAIL,
-//                'password' => 'Pdn$192_swC',
-//                'password_confirm' => 'Pdn$192_swC',
+//                'password' => self::TEST_USER_PASSWORD,
+//                'password_confirm' => self::TEST_USER_PASSWORD,
 //            ]));
 
         $this->client->request('POST', '/api/v1/auth/login', [], [], ['CONTENT_TYPE' => 'application/json'],
             json_encode([
                 'email' => self::TEST_USER_EMAIL,
-                'password' => 'Pdn$192_swC',
+                'password' => self::TEST_USER_PASSWORD,
             ]));
 
         self::assertResponseIsSuccessful();

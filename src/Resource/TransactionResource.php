@@ -10,9 +10,13 @@ class TransactionResource
         private CoinResource $coinResource,
     ){}
 
+    /**
+     * @param Transaction $transaction
+     * @return array<string, mixed>
+     */
     public function getShortData(
         Transaction $transaction,
-    )
+    ) : array
     {
         return [
             'coin' => $this->coinResource->itemWithPrice($transaction->getCoin()),

@@ -18,9 +18,9 @@ services:
             $apiServiceProviders:
                 ALCHEMY: '@App\Service\External\Alchemy\PriceService'
                 COINGECKO: '@App\Service\External\CoinGecko\PriceService'
-
-    App\Service\Coin\PriceService:
-        arguments:
-            $apiServiceProviders:
-                ALCHEMY: '@App\Service\External\Alchemy\PriceService'
-                COINGECKO: '@App\Service\External\CoinGecko\PriceService'
+#
+#    App\Service\Coin\PriceService:
+#        arguments:
+#            $apiServiceProviders:
+#                ALCHEMY: '@App\Service\External\Alchemy\PriceService'
+#                COINGECKO: '@App\Service\External\CoinGecko\PriceService'

@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 class CoinPriceHandler
 {
-    /** @var array{string, GetterPriceInterface} $apiServiceProviders */
+    /** @param array{string, GetterPriceInterface} $apiServiceProviders */
     function __construct(
         private CoinRepository  $coinRepository,
         #[Autowire(service: 'monolog.logger.priceUpdater')]

@@ -3,7 +3,7 @@
 namespace App\Service\Wallet;
 
 use App\DTO\Http\Request\ListRequest;
-use App\DTO\Http\Response\TransactionDTO;
+use App\DTO\Http\Response\PageDTO;
 use App\Entity\Transaction;
 use App\Exception\External\IntegrationException;
 use App\Repository\CoinRepository;
@@ -22,9 +22,7 @@ class TransactionService
     {
     }
 
-
     /**
-     * @param TransactionDTO $transactionDTO
      * @return mixed
      * @throws IntegrationException
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
@@ -33,7 +31,7 @@ class TransactionService
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function getTopHourly()
+    public function getTopHourly() : mixed
     {
         $datetime = new \DateTime();
         $datetime->modify('-1 hour');
@@ -51,7 +49,7 @@ class TransactionService
             $this->transactionRepository->getTopTransactionsByTime($datetime));
     }
 
-    public function getList(?ListRequest $listRequest)
+    public function getList(?ListRequest $listRequest) : PageDTO
     {
         return $this->transactionRepository->getList($listRequest);
     }
