@@ -13,6 +13,8 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, priority: 100 }
 
+    App\OpenApi\OpenApiSpec: ~
+
     App\MessageHandler\CoinPriceHandler:
         arguments:
             $apiServiceProviders:

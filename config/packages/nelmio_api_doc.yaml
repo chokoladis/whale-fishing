@@ -1,0 +1,105 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: WhaleFishing API
+            description: |
+                REST API платформы **WhaleFishing** — мониторинг Smart Money и кошельков китов.
+
+                ## Аутентификация
+
+                Большинство эндпоинтов требуют JWT-токен в заголовке:
+
+                ```
+                Authorization: Bearer {token}
+                ```
+
+                Токен можно получить через:
+                - `POST /api/v1/auth/register` — регистрация
+                - `POST /api/v1/auth/login` — вход по email и password
+
+                ## Публичные эндпоинты (без токена)
+
+                - `/api/v1/auth/*`
+                - `/api/v1/coin/*`
+                - `/api/v1/transaction/topHourly/`
+                - `/api/v1/transaction/topDaily/`
+
+                ## Формат ошибок
+
+                - **422** — ошибки валидации: `{ "errors": { "field": "message" } }`
+                - **400/404/429/500** — `{ "errors": ["message"] }` или `{ "errors": { "field": "message" } }`
+
+                ## Пагинация
+
+                Списки возвращают объект `data` с полями `items`, `page`, `perPage`, `total`.
+                По умолчанию `perPage = 20`, максимум `30`.
+            version: 1.0.0
+        servers:
+            - url: '%env(DEFAULT_URI)%'
+              description: Текущее окружение
+            - url: http://localhost:8000
+              description: Local (Docker nginx)
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+                    description: JWT-токен (Lexik JWT Authentication Bundle)
+        security:
+            - Bearer: []
+        paths:
+            /api/v1/auth/login:
+                post:
+                    operationId: authLogin
+                    tags: [Auth]
+                    summary: Вход в систему
+                    description: |
+                        Аутентификация по email и password.
+                        Обрабатывается Symfony Security (`json_login`), не контроллером.
+                    security: []
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    required: [email, password]
+                                    properties:
+                                        email:
+                                            type: string
+                                            format: email
+                                            example: user@example.com
+                                        password:
+                                            type: string
+                                            format: password
+                                            example: 'Pdn$192_swC'
+                    responses:
+                        '200':
+                            description: Успешный вход
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+                                                description: JWT access token
+                                                example: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...
+                        '401':
+                            description: Неверный email или password
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            code:
+                                                type: integer
+                                                example: 401
+                                            message:
+                                                type: string
+                                                example: Invalid credentials.
+    areas:
+        default:
+            path_patterns:
+                - ^/api(?!/doc)

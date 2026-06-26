@@ -2,7 +2,6 @@
 
 namespace App\DTO\Http\Request\Auth;
 
-use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class PasswordRestoreSendCode

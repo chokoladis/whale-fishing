@@ -10,7 +10,7 @@ security:
 
     firewalls:
         dev:
-            pattern: ^/(_profiler|_wdt|assets|build)/
+            pattern: ^/(_profiler|_wdt|assets|build|api/doc)
             security: false
         login:
             pattern: ^/api/v1/auth/login

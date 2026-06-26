@@ -7,7 +7,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 readonly class RegisterRequest
 {
     public function __construct(
-        #[Assert\Optional]
         public ?string $name,
         #[Assert\NotBlank]
         #[Assert\Email]
