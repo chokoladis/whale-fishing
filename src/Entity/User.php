@@ -21,6 +21,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $name = null;
+
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
@@ -110,11 +113,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $data;
     }
 
-    //    #[ORM\PrePersist]
-    //    public function beforeAddSetDefalutRoles()
-    //    {
-    //        if (empty($this->roles)) {
-    //            $this->roles = [Role::USER->value];
-    //        }
-    //    }
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): void
+    {
+        $this->name = $name;
+    }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use App\DTO\Auth\Response\RegisterDTO;
-use App\DTO\Http\Request\User\RegisterRequest;
+use App\DTO\Http\Request\Auth\RegisterRequest;
+use App\DTO\Http\Response\Auth\RegisterDTO;
 use App\Repository\UserRepository;
 use App\Resource\ProfileResource;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;

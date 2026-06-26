@@ -60,7 +60,6 @@ services:
         MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
         MERCURE_EXTRA_DIRECTIVES: |
           cors_origins http://127.0.0.1:8000
-      # Comment the following line to disable the development mode
       command: /usr/bin/caddy run --config /etc/caddy/dev.Caddyfile
       volumes:
         - mercure_data:/data

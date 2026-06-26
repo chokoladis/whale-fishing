@@ -2,8 +2,7 @@
 
 namespace App\Service\External\Alchemy;
 
-use App\Exception\Coin\InvalidCoinSymbolException;
-use App\Exception\External\RateLimitException;
+use App\Exception\RateLimitException;
 use App\Interface\External\GetterPriceInterface;
 use App\Repository\CoinRepository;
 use App\Tool\SettingService;

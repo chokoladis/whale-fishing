@@ -17,6 +17,7 @@ class ProfileResource
     ) : array
     {
         return [
+            'name' => $user->getName(),
             'email' => $user->getEmail(),
             'roles' => $user->getRoles(),
         ];

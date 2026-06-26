@@ -2,7 +2,7 @@
 
 namespace App\Interface\External;
 
-use App\Exception\External\RateLimitException;
+use App\Exception\RateLimitException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 interface GetterPriceInterface

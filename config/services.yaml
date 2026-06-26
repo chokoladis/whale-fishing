@@ -1,7 +1,7 @@
 parameters:
     listing.limit: 20
 services:
-    # default configuration for services in *this* file
+
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
@@ -18,9 +18,8 @@ services:
             $apiServiceProviders:
                 ALCHEMY: '@App\Service\External\Alchemy\PriceService'
                 COINGECKO: '@App\Service\External\CoinGecko\PriceService'
-#
-#    App\Service\Coin\PriceService:
-#        arguments:
-#            $apiServiceProviders:
-#                ALCHEMY: '@App\Service\External\Alchemy\PriceService'
-#                COINGECKO: '@App\Service\External\CoinGecko\PriceService'
+
+    App\Tool\Notification\EmailSenderToken: ~
+
+    App\Interface\SendTokenInterface:
+        class: App\Tool\Notification\EmailSenderToken

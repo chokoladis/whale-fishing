@@ -4,7 +4,7 @@ namespace App\Service\External\CoinGecko;
 
 use App\Config\External\CoinGeckoConfig;
 use App\Exception\Coin\InvalidCoinSymbolException;
-use App\Exception\External\RateLimitException;
+use App\Exception\RateLimitException;
 use App\Interface\External\GetterPriceInterface;
 use App\Repository\CoinRepository;
 use Psr\Log\LoggerInterface;

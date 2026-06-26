@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exception\External;
+namespace App\Exception;
 
 class RateLimitException extends \Exception
 {

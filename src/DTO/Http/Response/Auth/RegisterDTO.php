@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\Auth\Response;
+namespace App\DTO\Http\Response\Auth;
 
 readonly class RegisterDTO
 {
