@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\Http\Request\Auth\PasswordRestoreConfirm;
-use App\DTO\Http\Request\Auth\PasswordRestoreSendCode;
+use App\DTO\Http\Request\Auth\PasswordRestoreSendToken;
 use App\DTO\Http\Request\Auth\RegisterRequest;
 use App\Exception\RateLimitException;
 use App\OpenApi\Schema\FieldErrorResponse;
@@ -18,6 +18,7 @@ use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -74,7 +75,7 @@ final class AuthController extends AbstractController
         }
     }
 
-    #[Route('password/send_code/', name: 'password.sendCode', methods: ['POST'])]
+    #[Route('password/send/', name: 'password.sendCode', methods: ['POST'])]
     #[OA\Post(
         operationId: 'authPasswordSendCode',
         summary: 'Отправка кода восстановления пароля',
@@ -83,7 +84,7 @@ final class AuthController extends AbstractController
     )]
     #[OA\RequestBody(
         required: true,
-        content: new OA\JsonContent(ref: new Model(type: PasswordRestoreSendCode::class)),
+        content: new OA\JsonContent(ref: new Model(type: PasswordRestoreSendToken::class)),
     )]
     #[OA\Response(response: 204, description: 'Код отправлен (тело ответа пустое)')]
     #[OA\Response(
@@ -96,18 +97,26 @@ final class AuthController extends AbstractController
         description: 'Ошибка валидации',
         content: new OA\JsonContent(ref: new Model(type: ValidationErrorResponse::class)),
     )]
-    public function passwordSendCode(
-        #[MapRequestPayload] PasswordRestoreSendCode $request,
+    public function passwordSendToken(
+        #[MapRequestPayload] PasswordRestoreSendToken $request,
     ): Response
     {
         try {
             $this->passwordService->sendToken($request);
 
-            return $this->json()->setStatusCode(Response::HTTP_NO_CONTENT);
+            return $this->json([])->setStatusCode(Response::HTTP_NO_CONTENT);
         } catch (RateLimitException $e) {
             return $this->json([
                 'errors' => [$e->getMessage()]
             ], Response::HTTP_TOO_MANY_REQUESTS);
+        } catch (TransportException $e) {
+            return $this->json([
+                'errors' => [$e->getMessage()]
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (NotFoundResourceException $e) {
+            return $this->json([
+                'errors' => [$e->getMessage()]
+            ], Response::HTTP_NOT_FOUND);
         }
     }
 
@@ -139,7 +148,7 @@ final class AuthController extends AbstractController
     {
         try {
             $this->passwordService->restore($request);
-            return $this->json()->setStatusCode(Response::HTTP_NO_CONTENT);
+            return $this->json([])->setStatusCode(Response::HTTP_NO_CONTENT);
         } catch (ValidatorException|NotFoundResourceException $e) {
             return $this->json([
                 'errors' => [

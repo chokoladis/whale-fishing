@@ -20,7 +20,6 @@ abstract class BaseSenderToken implements SendTokenInterface
     {
     }
 
-
     public function setUser(User $user) : self
     {
         $this->user = $user;

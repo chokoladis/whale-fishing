@@ -2,7 +2,9 @@ include .env
 
 build:
 	docker-compose up --build -d
-up:
+up-base:
+	docker-compose up -d php nginx db pgadmin
+up-full:
 	docker-compose up -d
 down:
 	docker-compose stop

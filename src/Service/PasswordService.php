@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\DTO\Http\Request\Auth\PasswordRestoreConfirm;
-use App\DTO\Http\Request\Auth\PasswordRestoreSendCode;
+use App\DTO\Http\Request\Auth\PasswordRestoreSendToken;
 use App\Entity\PasswordRestore;
 use App\Entity\User;
 use App\Exception\RateLimitException;
@@ -23,7 +23,7 @@ class PasswordService
         private UserPasswordHasherInterface $passwordHasher,
     ){}
 
-    public function sendToken(PasswordRestoreSendCode $request)
+    public function sendToken(PasswordRestoreSendToken $request)
     {
         $user = $this->userRepository->findOneBy([
             'email' => $request->email
@@ -42,13 +42,25 @@ class PasswordService
     private function checkQtyRequests(User $user)
     {
         // todo cleaner by cron
-        // разрешено 2 запроса за 10минут
-        // 3 запрос через полчаса после последнего
-        // 4 через сутки
+        $collection = $this->passwordRestoreRepository->getRowsByUserIdForDay($user->getId());
+        $count = count($collection);
 
-        $qtyRequestByDay = $this->passwordRestoreRepository->findCountByUserId($user->getId());
-        if ($qtyRequestByDay > 2) {
+        if (!$count)
+            return;
+
+        $now         = new \DateTimeImmutable();
+        $lastRequest = current($collection);
+
+        if ($count > 3) {
             throw new RateLimitException('Код уже был отправлен, попробуйте позже');
+        } else {
+            //minutes
+            $diff = ($now->getTimestamp() - $lastRequest->getCreatedAt()->getTimestamp()) / 60;
+            if ($count == 3 && $diff < 30) {
+                throw new RateLimitException('Код уже был отправлен, попробуйте позже');
+            } elseif ($count == 2 && $diff < 10) {
+                throw new RateLimitException('Код уже был отправлен, попробуйте позже');
+            }
         }
     }
 
@@ -68,7 +80,7 @@ class PasswordService
 
         $row = $this->passwordRestoreRepository->getActiveByToken($request->token,$user->getId());
         if (!$row)
-            throw new NotFoundResourceException('Не верный токен восстановления');
+            throw new NotFoundResourceException('Указан истекший или некорректный токен');
 
         $row->setExpiredAt(new \DateTimeImmutable());
 

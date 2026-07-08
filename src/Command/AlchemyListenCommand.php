@@ -22,9 +22,9 @@ class AlchemyListenCommand extends Command
     public function __construct(
         #[Autowire(env: 'ALCHEMY_API_KEY')]
         protected string $alchemyApiKey,
-        #[Autowire(service: 'monolog.logger.alchemy')]
-        protected LoggerInterface $logger,
         protected MessageBusInterface $bus,
+        #[Autowire(service: 'monolog.logger.commands')]
+        protected LoggerInterface $logger,
     )
     {
         parent::__construct();

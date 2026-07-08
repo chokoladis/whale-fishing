@@ -1,18 +1,24 @@
 monolog:
     channels:
-        - alchemy
         - priceUpdater
+        - senderToken
+        - commands
     handlers:
-        alchemy:
-            type: stream
-            path: '%kernel.logs_dir%/alchemy.log'
-            level: debug
-            channels: [ alchemy ]
         priceUpdater:
             type: stream
             path: '%kernel.logs_dir%/priceUpdater.log'
             level: debug
             channels: [ priceUpdater ]
+        senderToken:
+            type: stream
+            path: '%kernel.logs_dir%/senderToken.log'
+            level: debug
+            channels: [ senderToken ]
+        commands:
+            type: stream
+            path: '%kernel.logs_dir%/commands.log'
+            level: debug
+            channels: [ commands ]
 
 when@dev: &monolog_dev
     monolog:

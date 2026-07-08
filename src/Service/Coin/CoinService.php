@@ -48,7 +48,7 @@ class CoinService
 
         $coin = $this->coinRepository->findOneBy(['symbol' => $symbol]);
         if (empty($coin)) {
-            throw new EntityNotFoundException('Такая монета не была найдена');
+            throw new EntityNotFoundException('Данной монеты нет в базе');
 //            todo cron for this
 //            private PriceService $priceService,
 //            || !$coin->getPrice() || $coin->getPrice() === 0.0
