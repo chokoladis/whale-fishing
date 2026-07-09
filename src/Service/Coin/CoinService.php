@@ -16,7 +16,6 @@ use App\Resource\CoinResource;
 use App\Service\External\Alchemy\TransactionService;
 use Doctrine\ORM\EntityNotFoundException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class CoinService
 {

@@ -14,7 +14,7 @@ class CoinLinkRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Coin::class);
+        parent::__construct($registry, CoinLink::class);
     }
 
 //    /**

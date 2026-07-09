@@ -7,6 +7,7 @@ use App\DTO\Http\Response\Auth\RegisterDTO;
 use App\Repository\UserRepository;
 use App\Resource\ProfileResource;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\HttpKernel\Attribute\RateLimit;
 
 class UserService
 {
@@ -18,6 +19,7 @@ class UserService
     {
     }
 
+    #[RateLimit('login_register')]
     public function register(RegisterRequest $request) : RegisterDTO
     {
         $user = $this->userRepository->add($request);

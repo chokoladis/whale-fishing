@@ -3,7 +3,7 @@ include .env
 build:
 	docker-compose up --build -d
 up-base:
-	docker-compose up -d php nginx db pgadmin
+	docker-compose up -d php nginx db
 up-full:
 	docker-compose up -d
 down:
@@ -11,7 +11,7 @@ down:
 
 reload:
 	make down
-	make up
+	make up-base
 
 #db
 db-restore:

@@ -76,7 +76,7 @@ class PasswordRestoreRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function save(PasswordRestore $passwordRestore)
+    public function save(PasswordRestore $passwordRestore) : void
     {
         $this->getEntityManager()->persist($passwordRestore);
         $this->getEntityManager()->flush();
@@ -107,6 +107,10 @@ class PasswordRestoreRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    /**
+     * @param array<int, int> $ids
+     * @return mixed
+     */
     public function deleteByIds(array $ids) : mixed
     {
         return $this->createQueryBuilder('p')

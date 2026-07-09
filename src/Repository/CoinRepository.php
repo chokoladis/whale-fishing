@@ -63,7 +63,7 @@ class CoinRepository extends ServiceEntityRepository
         return $this->paginate($query, $listRequest?->page, $listRequest?->perPage);
     }
 
-    public function paginate(QueryBuilder $dql, ?int $page = 1, ?int $perPage = null)
+    public function paginate(QueryBuilder $dql, ?int $page = 1, ?int $perPage = null) : PageDTO
     {
         $page = $page ?? 1;
         $perPage = $perPage ?? $this->params->get('listing.limit');

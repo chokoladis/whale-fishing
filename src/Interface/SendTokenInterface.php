@@ -8,5 +8,5 @@ interface SendTokenInterface
 {
     public function setUser(User $user) : self;
 
-    public function sendToken();
+    public function sendToken() : void;
 }

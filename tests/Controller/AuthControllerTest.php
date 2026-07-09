@@ -118,10 +118,7 @@ final class AuthControllerTest extends BaseControllerTest
                 'password_confirm' => self::TEST_USER_PASSWORD,
             ]));
 
-        $json = json_decode($this->client->getResponse()->getContent(), 1);
-
-        self::assertEquals(['errors' => ['token']], $json);
+        self::assertEquals(['errors' => ['token']], json_decode($this->client->getResponse()->getContent(), true));
     }
-
 
 }

@@ -95,7 +95,13 @@ class TransactionRepository extends ServiceEntityRepository
         );
     }
 
-    protected function paginate(QueryBuilder $query, int $page, int $perPage)
+    /**
+     * @param QueryBuilder $query
+     * @param int $page
+     * @param int $perPage
+     * @return Paginator<Transaction>
+     */
+    protected function paginate(QueryBuilder $query, int $page, int $perPage) : Paginator
     {
         $paginator = new Paginator($query);
 

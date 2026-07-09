@@ -10,6 +10,7 @@ use App\Exception\RateLimitException;
 use App\Interface\SendTokenInterface;
 use App\Repository\PasswordRestoreRepository;
 use App\Repository\UserRepository;
+use Symfony\Component\HttpKernel\Attribute\RateLimit;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -23,7 +24,7 @@ class PasswordService
         private UserPasswordHasherInterface $passwordHasher,
     ){}
 
-    public function sendToken(PasswordRestoreSendToken $request)
+    public function sendToken(PasswordRestoreSendToken $request) : void
     {
         $user = $this->userRepository->findOneBy([
             'email' => $request->email
@@ -39,7 +40,7 @@ class PasswordService
             ->sendToken();
     }
 
-    private function checkQtyRequests(User $user)
+    private function checkQtyRequests(User $user) : void
     {
         // todo cleaner by cron
         $collection = $this->passwordRestoreRepository->getRowsByUserIdForDay($user->getId());
@@ -64,7 +65,7 @@ class PasswordService
         }
     }
 
-    public function restore(PasswordRestoreConfirm $request)
+    public function restore(PasswordRestoreConfirm $request) : void
     {
         //todo rate limit на уровне мидлы или просто фреймворка/сервера
 
