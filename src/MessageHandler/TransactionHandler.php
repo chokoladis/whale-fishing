@@ -2,10 +2,12 @@
 
 namespace App\MessageHandler;
 
-use App\DTO\Http\Response\TransactionDTO;
-use App\Messages\UpdateCoinPrice;
+use App\Messages\TransactionMessage;
+use App\Messages\UpdateCoinPriceMessage;
 use App\Service\Coin\CoinService;
 use App\Service\Wallet\WalletService;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -18,26 +20,38 @@ class TransactionHandler
         private CoinService $coinService,
         private WalletService $walletService,
         protected MessageBusInterface $bus,
+        #[Autowire(service: 'monolog.logger.commands')]
+        private LoggerInterface $logger
     )
     {
     }
 
-    public function __invoke(TransactionDTO $transaction) : void
+    public function __invoke(TransactionMessage $transaction) : void
     {
+        $data = $transaction->dto;
+
         // получаем транзакцию из alchemy -> создаем монету -> создаем кошелек -> транзакцию
-        $coin = $this->coinService->createOrFindByTransaction($transaction);
-        if (!$coin) return;
+        $coinContract = $this->coinService->createOrFindByTransaction($data);
 
-        $this->bus->dispatch(new UpdateCoinPrice($transaction->contractAddress));
+        if (!$coinContract) return;
 
-        $amount = bcdiv(
-            $transaction->amountRaw,
-            bcpow('10', (string)$coin->getDecimal()),
-            $coin->getDecimal()
+        $this->bus->dispatch(
+            new UpdateCoinPriceMessage(
+                $coinContract->getCoin()->getSymbol(),
+                $data->contractAddress
+            )
         );
 
+        $this->logger->debug('after dispatch update price');
+        $amount = bcdiv(
+            $data->amountRaw,
+            bcpow('10', (string)$coinContract->getDecimal()),
+            $coinContract->getDecimal()
+        );
+
+//        todo check
         if ($amount >= self::CHECKER_RANGE_FROM){
-            $this->walletService->addTransactions($transaction, $coin);
+            $this->walletService->addTransactions($data, $coinContract->getCoin());
         }
     }
 }

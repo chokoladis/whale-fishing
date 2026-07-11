@@ -15,11 +15,11 @@ services:
 
     App\OpenApi\OpenApiSpec: ~
 
-    App\MessageHandler\CoinPriceHandler:
-        arguments:
-            $apiServiceProviders:
-                ALCHEMY: '@App\Service\External\Alchemy\PriceService'
-                COINGECKO: '@App\Service\External\CoinGecko\PriceService'
+#    App\MessageHandler\CoinPriceHandler:
+#        arguments:
+#            $apiServiceProviders:
+#                ALCHEMY: '@App\Service\External\Alchemy\PriceService'
+#                COINGECKO: '@App\Service\External\CoinGecko\PriceService'
 
     App\Tool\Notification\EmailSenderToken: ~
 

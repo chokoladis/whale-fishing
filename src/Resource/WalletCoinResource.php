@@ -3,6 +3,7 @@
 namespace App\Resource;
 
 use App\Entity\WalletCoin;
+use App\Resource\Coin\CoinResource;
 
 class WalletCoinResource
 {
@@ -22,7 +23,7 @@ class WalletCoinResource
             'avgPrice' => rtrim(rtrim($walletCoin->getAvgPrice(),'0'),'.'), //todo
         ];
 
-        $price = $walletCoin->getCoin()->getPrice();
+        $price = $walletCoin->getCoin()->getAvgPrice();
 
         if ($price && $price != 0.0) {
             $data['total'] = $walletCoin->getTotalValue($price);

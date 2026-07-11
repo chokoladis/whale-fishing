@@ -16,12 +16,6 @@ class Coin
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private string $contractAddress;
-
-    #[ORM\Column(length: 50)]
-    private string $network = 'native'; //'eth-mainnet'
-
     #[ORM\Column(length: 20)]
     private string $symbol;
 
@@ -29,10 +23,7 @@ class Coin
     private string $name;
 
     #[ORM\Column(nullable: true)]
-    private ?float $price = null;
-
-    #[ORM\Column(nullable: false)]
-    private int $decimal;
+    private ?float $avgPrice = null;
 
     /**
      * @var Collection<int, CoinLink>
@@ -44,6 +35,16 @@ class Coin
     private \DateTimeImmutable $createdAt;
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
+
+    #[ORM\OneToOne(mappedBy: 'Coin', cascade: ['persist', 'remove'])]
+    private ?CoinDetail $coinDetail = null;
+
+    /**
+     * @var Collection<CoinContract> $coinContract
+     */
+    #[ORM\OneToMany(mappedBy: 'Coin', targetEntity: CoinContract::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private Collection $coinContract;
 
     public function __construct()
     {
@@ -81,16 +82,42 @@ class Coin
         return $this;
     }
 
-    public function getPrice(): ?float
+    public function getAvgPrice(): ?float
     {
-        return $this->price;
+        return $this->avgPrice;
     }
 
-    public function setPrice(float $price): static
+    public function setAvgPrice(float $avgPrice): static
     {
-        $this->price = $price;
+        $this->avgPrice = $avgPrice;
 
         return $this;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    #[ORM\PreUpdate]
+    public function autoUpdateUpdatedAt() : void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     /**
@@ -123,59 +150,25 @@ class Coin
         return $this;
     }
 
-    public function getContractAddress(): ?string
+    public function getCoinDetail(): ?CoinDetail
     {
-        return $this->contractAddress;
+        return $this->coinDetail;
     }
 
-    public function setContractAddress(?string $contractAddress): void
+    public function setCoinDetail(CoinDetail $coinDetail): static
     {
-        $this->contractAddress = $contractAddress;
+        // set the owning side of the relation if necessary
+        if ($coinDetail->getCoin() !== $this) {
+            $coinDetail->setCoin($this);
+        }
+
+        $this->coinDetail = $coinDetail;
+
+        return $this;
     }
 
-    public function getNetwork(): string
+    public function getCoinContract(): Collection
     {
-        return $this->network;
-    }
-
-    public function setNetwork(string $network): void
-    {
-        $this->network = $network;
-    }
-
-    public function getDecimal(): int
-    {
-        return $this->decimal;
-    }
-
-    public function setDecimal(int $decimal): void
-    {
-        $this->decimal = $decimal;
-    }
-
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getUpdatedAt(): \DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    #[ORM\PreUpdate]
-    public function autoUpdateUpdatedAt() : void
-    {
-        $this->updatedAt = new \DateTimeImmutable();
+        return $this->coinContract;
     }
 }

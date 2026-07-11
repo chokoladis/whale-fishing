@@ -3,10 +3,12 @@
 namespace App\MessageHandler;
 
 use App\Entity\Coin;
+use App\Enum\Coin\NativeCoins;
 use App\Exception\RateLimitException;
 use App\Interface\External\GetterPriceInterface;
-use App\Messages\UpdateCoinPrice;
+use App\Messages\UpdateCoinPriceMessage;
 use App\Repository\CoinRepository;
+use App\Service\External\ModuleIO\PriceService;
 use App\Tool\SettingService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -14,25 +16,43 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-class CoinPriceHandler
+class UpdateCoinPriceHandler
 {
     /** @param array{string, GetterPriceInterface} $apiServiceProviders */
     function __construct(
         private CoinRepository  $coinRepository,
         #[Autowire(service: 'monolog.logger.priceUpdater')]
         protected LoggerInterface $logger,
-        private array $apiServiceProviders,
+//        private array $apiServiceProviders,
         private SettingService $settingService,
+        private PriceService $priceService,
     )
     {
     }
 
-    public function __invoke(UpdateCoinPrice $message) : void
+    public function __invoke(UpdateCoinPriceMessage $message) : void
     {
-        /** @var Coin $coin */
+        // index составной?
+        /** @var ?Coin $coin */
         $coin = $this->coinRepository->findOneBy([
+            'symbol' => $message->symbol,
             'contractAddress' => $message->contractAddress,
         ]);
+
+        if (!$coin) {
+            $coin = new Coin();
+            $coin->setName($message->symbol);
+            $coin->setSymbol($message->symbol);
+//            $coin->setNetwork($message->contractAddress);
+//            $coin->setContractAddress($message->contractAddress);
+        }
+
+        if ($nativeCoin = NativeCoins::tryFrom($message->symbol)) {
+
+        } else {
+
+        }
+
 
         if ($coin->getPrice() === 0.0 || time() - $coin->getUpdatedAt()->getTimestamp() > 3600) {
 
@@ -61,15 +81,15 @@ class CoinPriceHandler
             }
 
             $this->logger->info('result new price', ['price' => $price]);
+        }
 
-            try {
-                $this->coinRepository->updatePrice(
-                    $coin,
-                    $price
-                );
-            } catch (\Throwable $exception) {
-                $this->logger->error($exception->getMessage(), ['exception' => [$exception->getFile(), $exception->getLine()]]);
-            }
+        try {
+            $this->coinRepository->updatePrice(
+                $coin,
+                $price
+            );
+        } catch (\Throwable $exception) {
+            $this->logger->error($exception->getMessage(), ['exception' => [$exception->getFile(), $exception->getLine()]]);
         }
     }
 }

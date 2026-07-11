@@ -9,11 +9,9 @@
 - - JSON-RPC - Для получения детальной транзакции
 * DEX Screener / GeckoTerminal API: Актуальные цены токенов-щиткоинов, которых нет на Coingecko. // todo
 2. Компонент "Watcher" (Backend Engine):
-* Messenger + Redis: (создание TransactionWatcherHandler).
-* HttpClient: rate limiting бесплатных API (через очереди и задержки).
+* Messenger + RabbitMQ: (создание TransactionHandler).
 3. Логика "Profit & Loss" (P&L) Calculator:
 * посчитать: за сколько купил, за сколько продал, какая нереализованная прибыль.
-* Challenge: Учет газа (комиссий) в стоимости позиции.
 Система Алертов (The Value):
 * Telegram Notifier: Когда "кит" закупает новый токен на сумму > X, пользователю летит сообщение с кнопкой-ссылкой на контракт.
 * Strategy Pattern: Разные типы алертов (на покупку, на продажу, на перевод на биржу — "Dump warning").
@@ -26,3 +24,4 @@
 ---
 ## Что готово
 - v0.0.1 - транзакции, кошельки, монеты (вывод по api, актуализация транзакций по wss)
+- v0.1.0 - добавлена документация (http://localhost:8000/api/doc/)

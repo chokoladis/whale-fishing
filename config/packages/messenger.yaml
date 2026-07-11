@@ -12,4 +12,4 @@ framework:
 
         routing:
             App\DTO\Http\Response\TransactionDTO: async
-            App\Messages\UpdateCoinPrice: async
+#            App\Messages\UpdateCoinPrice: async

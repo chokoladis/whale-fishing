@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Resource;
+namespace App\Resource\Coin;
 
 use App\Entity\Coin;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class CoinResource
 {
@@ -19,7 +18,7 @@ class CoinResource
         return [
             'name' => $coin->getName(),
             'symbol' => $coin->getSymbol(),
-            'price' => $coin->getPrice(),
+            'price' => $coin->getAvgPrice(),
         ];
     }
 
@@ -32,10 +31,9 @@ class CoinResource
         return [
             'name' => $coin->getName(),
             'symbol' => $coin->getSymbol(),
-            'price' => $coin->getPrice(),
+            'avgPrice' => $coin->getAvgPrice(),
             'links' => $coin->getLinks()->toArray(),
-            'contractAddress' => $coin->getContractAddress(),
-            'network' => $coin->getNetwork(),
+            'contracts' => $coin->getCoinContract()->toArray(),
         ];
     }
 }

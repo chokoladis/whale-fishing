@@ -8,7 +8,7 @@ use App\Helper\StrHelper;
 class TransactionParser
 {
 
-    public static function parse(mixed $data) : ?TransactionDTO
+    public static function parse(mixed $data, string $network) : ?TransactionDTO
     {
         $input = $data['input'] ?? '';
 
@@ -22,8 +22,9 @@ class TransactionParser
                 $data['hash'],
                 $data['from'],
                 '0x' . substr($toParam, 24),
-                $data['to'],
-                StrHelper::bchexdec(substr($cleanInput, 64, 64))
+                $data['to'] ?? 'native',
+                StrHelper::bchexdec(substr($cleanInput, 64, 64)),
+                $network
             );
         }
 

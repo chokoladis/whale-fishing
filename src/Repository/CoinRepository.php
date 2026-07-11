@@ -6,7 +6,7 @@ use App\DTO\Coin\CoinShortDTO;
 use App\DTO\Http\Request\ListRequest;
 use App\DTO\Http\Response\PageDTO;
 use App\Entity\Coin;
-use App\Resource\CoinResource;
+use App\Resource\Coin\CoinResource;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -31,12 +31,8 @@ class CoinRepository extends ServiceEntityRepository
     public function saveByDTO(CoinShortDTO $coinDTO): Coin
     {
         $coin = new Coin();
-        $coin->setNetwork($coinDTO->network);
-        $coin->setContractAddress($coinDTO->contractAddress);
         $coin->setSymbol($coinDTO->symbol);
         $coin->setName($coinDTO->symbol);
-        $coin->setDecimal($coinDTO->decimal);
-        $coin->setPrice(0.0);
 
         $this->getEntityManager()->persist($coin);
         $this->getEntityManager()->flush();
@@ -83,12 +79,5 @@ class CoinRepository extends ServiceEntityRepository
             $perPage,
             $paginator->count()
         );
-    }
-
-    public function findByContractAddress(string $address): ?Coin
-    {
-        return $this->findOneBy([
-            'contractAddress' => strtolower($address)
-        ]);
     }
 }
