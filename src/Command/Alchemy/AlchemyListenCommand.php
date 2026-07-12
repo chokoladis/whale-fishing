@@ -42,14 +42,14 @@ class AlchemyListenCommand extends Command
         $this->addArgument(
             'mainnet',
             InputArgument::REQUIRED,
-            'Network name (e.g. eth, matic, opt, sol)'
+            'Network name (e.g. ethereum, polygon, solana)'
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($network = Network::tryFrom(
-            strtoupper($input->getArgument('mainnet'))
+            strtolower($input->getArgument('mainnet'))
         )) {
             $this->network = $network->value;
 
@@ -128,7 +128,7 @@ class AlchemyListenCommand extends Command
             Network::OPTIMISM => AlchemyConfig::OPTIMISM_MAINNET_DOMAIN,
             Network::ARBITRUM => AlchemyConfig::ARBITRUM_MAINNET_DOMAIN,
             Network::BASE => AlchemyConfig::BASE_MAINNET_DOMAIN,
-            Network::SOLANA => AlchemyConfig::SOLANA_MAINNET_DOMAIN,
+//            Network::SOLANA => AlchemyConfig::SOLANA_MAINNET_DOMAIN,
         };
     }
 }

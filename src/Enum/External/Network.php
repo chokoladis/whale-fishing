@@ -4,10 +4,10 @@ namespace App\Enum\External;
 
 enum Network : string
 {
-    case ETHEREUM = 'ETH';
-    case POLYGON = 'MATIC';
-    case OPTIMISM = 'OPT';
-    case ARBITRUM = 'ARB';
-    case BASE = 'BASE';
-    case SOLANA = 'SOL';
+    case ETHEREUM = 'ethereum';
+    case POLYGON = 'polygon';
+    case OPTIMISM = 'optimism';
+    case ARBITRUM = 'arbitrum';
+    case BASE = 'base';
+//    case SOLANA = 'solana';
 }

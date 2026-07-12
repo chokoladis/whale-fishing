@@ -32,7 +32,8 @@ class CoinContract
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
 
-    #[ORM\ManyToOne(inversedBy: 'coinContract', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Coin::class, inversedBy: 'coinContract', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')] //fieldName: 'coin_parent_id'
     private ?Coin $coin = null;
 
     public function __construct()
@@ -125,9 +126,4 @@ class CoinContract
     {
         $this->updatedAt = new \DateTimeImmutable();
     }
-
-
-    #[ORM\ManyToOne(targetEntity: Coin::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private Coin $coinParent;
 }

@@ -55,19 +55,19 @@ class TransactionService extends ClientService
                             'contractAddress' => [$transactionDTO->contractAddress],
                             'category' => ['external', 'erc20'],
                             'excludeZeroValue' => true,
-                            'maxCount' => '0x64', // Ограничим 100 результатами для теста,
+                            'maxCount' => '0x1',
                         ]
                     ]
                 ]
                 ]);
         } catch (\Throwable $e) {
             $this->logger->error('error handle in service', [$e->getMessage(), $e->getFile(), $e->getLine(), $this->alchemyApiKey]);
-            dd();
+            return null;
         }
 
         $data = $response->toArray();
 
-        $this->logger->debug('$response transaction data', ['data' => $data, 'type' => gettype($data)]);
+        $this->logger->alert('res asset transfer', ['res' => $data]);
 
         $transfers = $data['result']['transfers'] ?? [];
 

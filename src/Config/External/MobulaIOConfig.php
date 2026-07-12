@@ -2,7 +2,7 @@
 
 namespace App\Config\External;
 
-readonly final class ModuleIOConfig
+readonly final class MobulaIOConfig
 {
     const BASE_URL = 'https://api.mobula.io';
 }

@@ -11,10 +11,5 @@ interface GetterPriceInterface
      * @throws HttpException
      * @throws RateLimitException
      */
-    public function getPriceBySymbol(string $symbol) : float;
-    /**
-     * @throws HttpException
-     * @throws RateLimitException
-     */
-    public function getPriceByContractAddress(string $contractAddress) : float;
+    public function getPriceByNetworkAndAddress(string $network, string $contractAddress) : float;
 }

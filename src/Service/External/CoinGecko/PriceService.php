@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class PriceService extends \App\Service\External\CoinGecko\ClientService implements GetterPriceInterface
+class PriceService extends ClientService implements GetterPriceInterface
 {
 
     public function __construct(
@@ -27,48 +27,16 @@ class PriceService extends \App\Service\External\CoinGecko\ClientService impleme
         parent::__construct($this->httpClient, $this->logger);
     }
 
-    public function getPriceBySymbol(string $symbol) : float
+    public function getPriceByNetworkAndAddress(string $network, string $contractAddress) : float
     {
-        $symbol = trim($symbol);
-        if (!mb_strlen($symbol)) {
-            throw new InvalidCoinSymbolException('Symbol cannot be empty.');
-        }
+        // todo вынести в базовый класс?
+//        https://api.coingecko.com/api/v3/simple/token_price/{network}?contract_addresses={contract_address}&vs_currencies=usd
+//        Если это нативная монета (contract_address === 'native'), то дергаешь их обычный эндпоинт .../simple/price?ids={network_id}
 
-        try {
-            $response = $this->httpClient->request('GET',
-                sprintf('%s/api/v3/simple/price?vs_currencies=usd&symbols=%s', CoinGeckoConfig::BASE_URL, $symbol),
-                [ 'headers' => ['x-cg-demo-api-key' => $this->apiKey]]
-            );
-
-            $responseBody = json_decode($response->getContent(false), true);
-        } catch (\Throwable $error) {
-            $this->logger->error('coingecko [priceService] error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
-
-            if ($error->getCode() === Response::HTTP_TOO_MANY_REQUESTS) {
-                throw new RateLimitException();
-            } else if ($error->getCode() === 0) {
-                // need reconnect
-                exit();
-            }
-
-            throw $error;
-        }
-
-
-        if ($response->getStatusCode() === Response::HTTP_OK && !empty($responseBody[$symbol])) {
-            return floatval($responseBody[$symbol]['usd']);
-        } else {
-            $this->logger->error('coin gecko [priceService] error', ['content' => $response->getContent(), 'status' => $response->getStatusCode()]);
-
-            throw new HttpException(Response::HTTP_NOT_FOUND, 'Не удалось получить данные из стороннего ресурса');
-        }
-    }
-
-    public function getPriceByContractAddress(string $contractAddress) : float
-    {
+        $network = trim($network);
         $contractAddress = trim($contractAddress);
-        if (!mb_strlen($contractAddress)) {
-            throw new InvalidCoinSymbolException('$contractAddress cannot be empty.');
+        if (!mb_strlen($contractAddress) || !mb_strlen($network)) {
+            throw new InvalidCoinSymbolException('$contractAddress or $network cannot be empty.');
         }
 
         try {

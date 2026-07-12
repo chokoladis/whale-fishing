@@ -33,8 +33,6 @@ class CoinContractRepository extends ServiceEntityRepository
 
     public function saveByDTO(CoinShortDTO $coinDTO): CoinContract
     {
-        $this->getEntityManager()->getConnection()->beginTransaction();
-
         try {
             $coin = new Coin();
             $coin->setSymbol($coinDTO->symbol);
@@ -52,10 +50,8 @@ class CoinContractRepository extends ServiceEntityRepository
             $this->getEntityManager()->persist($coinContract);
             $this->getEntityManager()->flush();
 
-            $this->getEntityManager()->getConnection()->commit();
         } catch (\Throwable $exception) {
-            $this->logger->critical('ошибка в репозитории', [$exception->getMessage()]);
-            $this->getEntityManager()->getConnection()->rollBack();
+            $this->logger->critical('ошибка в coinContract репозитории', [$exception->getMessage(), $coinDTO]);
             throw $exception;
         }
 
