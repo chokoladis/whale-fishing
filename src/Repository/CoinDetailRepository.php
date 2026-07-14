@@ -16,28 +16,9 @@ class CoinDetailRepository extends ServiceEntityRepository
         parent::__construct($registry, CoinDetail::class);
     }
 
-    //    /**
-    //     * @return CoinDetail[] Returns an array of CoinDetail objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?CoinDetail
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function save(CoinDetail $coinDetail)
+    {
+        $this->getEntityManager()->persist($coinDetail);
+        $this->getEntityManager()->flush();
+    }
 }

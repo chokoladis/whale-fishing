@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\OpenApi\Schema\ProfileResponse;
-use OpenApi\Attributes as OA;
 use Nelmio\ApiDocBundle\Attribute\Model;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

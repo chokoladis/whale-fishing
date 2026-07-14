@@ -58,14 +58,14 @@ class CoinContractRepository extends ServiceEntityRepository
         return $coinContract;
     }
 
-    public function updatePrice(Coin $coin, float $price): Coin
+    public function updatePrice(CoinContract $coinContract, float $price): CoinContract
     {
-        $coin->setAvgPrice($price);
+        $coinContract->setLocalPrice($price);
 
-        $this->getEntityManager()->persist($coin);
+        $this->getEntityManager()->persist($coinContract);
         $this->getEntityManager()->flush();
 
-        return $coin;
+        return $coinContract;
     }
 
     public function getList(?ListRequest $listRequest): PageDTO

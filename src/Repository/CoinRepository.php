@@ -40,9 +40,9 @@ class CoinRepository extends ServiceEntityRepository
         return $coin;
     }
 
-    public function updatePrice(Coin $coin, float $price): Coin
+    public function updatePrice(Coin $coin, string $price): Coin
     {
-        $coin->setPrice($price);
+        $coin->setAvgPrice($price);
 
         $this->getEntityManager()->persist($coin);
         $this->getEntityManager()->flush();

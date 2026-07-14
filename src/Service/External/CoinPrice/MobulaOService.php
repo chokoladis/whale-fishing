@@ -3,6 +3,7 @@
 namespace App\Service\External\CoinPrice;
 
 use App\Config\External\MobulaIOConfig;
+use App\DTO\Http\Response\Coin\CoinStatisticsResponse;
 use App\Exception\RateLimitException;
 use App\Repository\CoinRepository;
 use Psr\Log\LoggerInterface;
@@ -12,7 +13,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MobulaOService extends BaseService
 {
-    protected const BASE_URL = MobulaIOConfig::BASE_URL;
 
     public function __construct(
         #[Autowire(env: 'MOBULAIO_API_KEY')]
@@ -56,7 +56,7 @@ class MobulaOService extends BaseService
 //        dd();
 //    }
 
-    public function getPriceByNetworkAndAddress(string $network, string $contractAddress) : float
+    public function getCoinDetail(string $network, string $contractAddress) : \App\DTO\Http\Response\Coin\CoinDetailResponse
     {
         //        "/api/1/market/data?shouldFetchPriceChange=24h&blockchain=ethereum&asset=cult"
         $this->validateNetworkAndContract($network, $contractAddress);
@@ -64,10 +64,14 @@ class MobulaOService extends BaseService
         try {
             $response = $this->httpClient->request(
                 'GET',
-                sprintf('%s//api/1/market/data?shouldFetchPriceChange=24h&blockchain=%s&asset=%s', self::BASE_URL, $network, $contractAddress),
+                sprintf('%s/api/1/market/data?blockchain=%s&asset=%s', MobulaIOConfig::BASE_URL, $network, $contractAddress),
                 ['headers' => ['Authorization' => $this->apiKey,]]
             );
-            $responseBody = json_decode($response->getContent(false), true);
+            // todo переделать в dto?
+            $responseBody = json_decode($response->getContent(), true);
+            if (empty($responseBody['data']))
+                throw new \Exception('Пустой ответ');
+
         } catch (\Throwable $error) {
             $this->logger->error('mobulaIO [priceService] error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
 
@@ -81,9 +85,28 @@ class MobulaOService extends BaseService
             throw $error;
         }
 
-//        todo next
-        $this->logger->debug('moduleIO [priceService] response', ['content' => $responseBody]);
-        dd();
+//        $this->logger->debug('moduleIO [priceService] response', ['content' => $responseBody]);
+        //        todo save from all address? save logo
+        //    {"data":
+        //      { "logo":"https://metadata.mobula.io/assets/logos/evm_1_0xdac17f958d2ee523a2206206994597c13d831ec7.webp",
+        //        ! contracts больше 15
+        //          "contracts":[
+        //              {"address":"0x55d398326f99059ff775485246999027b3197955","blockchainId":"56","blockchain":"BNB Smart Chain (BEP20)","decimals":18},
+        //          ],
+        $data = $responseBody['data'];
 
+        return new \App\DTO\Http\Response\Coin\CoinDetailResponse(
+            $data['name'],
+            $data['symbol'],
+            $data['decimals'],
+            $data['price'],
+            new CoinStatisticsResponse(
+                $data['market_cap'],
+                $data['volume'],
+                $data['liquidity'],
+                $data['total_supply'],
+                $data['circulating_supply'],
+            )
+        );
     }
 }

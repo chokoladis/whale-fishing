@@ -2,6 +2,7 @@
 
 namespace App\MessageHandler;
 
+use App\Helper\StrHelper;
 use App\Messages\TransactionMessage;
 use App\Messages\UpdateCoinPriceMessage;
 use App\Service\Coin\CoinService;
@@ -14,7 +15,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 #[AsMessageHandler]
 class TransactionHandler
 {
-    const int CHECKER_RANGE_FROM = 50000;
+    const string CHECKER_RANGE_FROM = '50000';
 
     function __construct(
         private CoinService $coinService,
@@ -31,27 +32,27 @@ class TransactionHandler
         $data = $transaction->dto;
 
         // получаем транзакцию из alchemy -> создаем монету -> создаем кошелек -> транзакцию
+        // update price in coin and cont contract
         $coinContract = $this->coinService->createOrFindByTransaction($data);
-
         if (!$coinContract) return;
 
         $this->bus->dispatch(
             new UpdateCoinPriceMessage(
-                $coinContract->getCoin()->getSymbol(),
-                $data->contractAddress
+                $data->network,
+                $data->contractAddress,
             )
         );
 
-        $this->logger->debug('after dispatch update price');
         $amount = bcdiv(
             $data->amountRaw,
             bcpow('10', (string)$coinContract->getDecimal()),
             $coinContract->getDecimal()
         );
+        $amount = StrHelper::trimZeros($amount);
 
-//        todo check
-        if ($amount >= self::CHECKER_RANGE_FROM){
-            $this->walletService->addTransactions($data, $coinContract->getCoin());
-        }
+        if (bccomp($amount, self::CHECKER_RANGE_FROM) < 0)
+            return;
+
+        $this->walletService->addTransactions($data, $coinContract);
     }
 }

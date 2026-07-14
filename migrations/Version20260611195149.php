@@ -28,7 +28,6 @@ final class Version20260611195149 extends AbstractMigration
         $this->addSql('ALTER TABLE wallet_coin ADD CONSTRAINT FK_38FB6258712520F3 FOREIGN KEY (wallet_id) REFERENCES wallet (id) ON DELETE CASCADE NOT DEFERRABLE');
         $this->addSql('ALTER TABLE wallet_coin ADD CONSTRAINT FK_38FB625884BBDA7 FOREIGN KEY (coin_id) REFERENCES coin (id) NOT DEFERRABLE');
 
-        $this->addSql('ALTER TABLE coin ADD decimal INT NOT NULL');
         $this->addSql('ALTER TABLE transaction DROP CONSTRAINT fk_723705d1a76ed395');
         $this->addSql('DROP INDEX idx_723705d1a76ed395');
         $this->addSql('ALTER TABLE transaction DROP user_id');
@@ -50,7 +49,6 @@ final class Version20260611195149 extends AbstractMigration
         $this->addSql('ALTER TABLE wallet_coin DROP CONSTRAINT FK_38FB6258712520F3');
         $this->addSql('ALTER TABLE wallet_coin DROP CONSTRAINT FK_38FB625884BBDA7');
         $this->addSql('DROP TABLE wallet_coin');
-        $this->addSql('ALTER TABLE coin DROP decimal');
         $this->addSql('ALTER TABLE transaction ADD user_id INT NOT NULL');
         $this->addSql('ALTER TABLE transaction ADD CONSTRAINT fk_723705d1a76ed395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('CREATE INDEX idx_723705d1a76ed395 ON transaction (user_id)');

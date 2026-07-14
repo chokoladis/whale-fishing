@@ -6,10 +6,12 @@ namespace App\Service\Wallet;
 
 use App\DTO\Http\Response\TransactionDTO;
 use App\Entity\Coin;
+use App\Entity\CoinContract;
 use App\Entity\Wallet;
 use App\Entity\WalletCoin;
 use App\Enum\Coin\TransactionType;
 use App\Exception\Coin\InvalidCoinSymbolException;
+use App\Helper\StrHelper;
 use App\Repository\TransactionRepository;
 use App\Repository\WalletCoinRepository;
 use App\Repository\WalletRepository;
@@ -46,28 +48,28 @@ class WalletService
         return array_map(fn (Wallet $wallet) => $this->walletResource->detail($wallet), $wallets);
     }
 
-    public function addTransactions(TransactionDTO $transaction, Coin $coin) : void
+    public function addTransactions(TransactionDTO $transaction, CoinContract $coinContract) : void
     {
         $walletFrom = $this->walletRepository->findOrCreateByAddress($transaction->from);
 
         $this->updateWalletCoin(
             $walletFrom,
-            $coin,
+            $coinContract->getCoin(),
             $transaction->amountRaw,
             TransactionType::OUT
         );
-        $this->transactionRepository->save($walletFrom, $transaction, $coin, TransactionType::OUT);
 
+        $this->transactionRepository->save($walletFrom, $transaction, $coinContract, TransactionType::OUT);
         //
 
         $walletTo = $this->walletRepository->findOrCreateByAddress($transaction->to);
         $this->updateWalletCoin(
             $walletTo,
-            $coin,
+            $coinContract->getCoin(),
             $transaction->amountRaw,
             TransactionType::IN
         );
-        $this->transactionRepository->save($walletTo, $transaction, $coin, TransactionType::IN);
+        $this->transactionRepository->save($walletTo, $transaction, $coinContract, TransactionType::IN);
     }
 
     public function updateWalletCoin(Wallet $wallet, Coin $coin, string $amount, TransactionType $type) : void
@@ -89,7 +91,7 @@ class WalletService
             ? bcadd($currentBalance, $amount)
             : bcsub($currentBalance, $amount);
 
-        $walletCoin->setBalance($newBalance);
+        $walletCoin->setBalance(StrHelper::trimZeros($newBalance));
 
         $this->walletCoinRepository->save($walletCoin);
     }

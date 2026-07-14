@@ -2,7 +2,6 @@
 
 namespace App\DTO\Http\Request;
 
-use Symfony\Component\Validator\Constraints\IsNull;
 use Symfony\Component\Validator\Constraints\Range;
 
 readonly class ListRequest

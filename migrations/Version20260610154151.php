@@ -14,16 +14,12 @@ final class Version20260610154151 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'change table transaction, fix table coin';
+        return 'change table transaction';
     }
 
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE coin ADD contract_address VARCHAR(255) NOT NULL');
-        $this->addSql('ALTER TABLE coin ADD network VARCHAR(50) DEFAULT NULL');
-        $this->addSql('DROP INDEX idx_coin_link_unique_coin_type');
-
         $this->addSql('ALTER TABLE transaction ADD block_number VARCHAR(10) NOT NULL');
         $this->addSql('ALTER TABLE transaction ADD hash VARCHAR(100) NOT NULL');
         $this->addSql('ALTER TABLE transaction ADD "from" VARCHAR(64) NOT NULL');
@@ -42,7 +38,6 @@ final class Version20260610154151 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE coin DROP contract_address');
         $this->addSql('ALTER TABLE coin DROP network');
-        $this->addSql('CREATE UNIQUE INDEX idx_coin_link_unique_coin_type ON coin_link (coin_id, type)');
         $this->addSql('ALTER TABLE transaction ADD price NUMERIC(28, 8) NOT NULL');
         $this->addSql('ALTER TABLE transaction ADD qty NUMERIC(28, 8) NOT NULL');
         $this->addSql('ALTER TABLE transaction ADD gas NUMERIC(28, 8) NOT NULL');

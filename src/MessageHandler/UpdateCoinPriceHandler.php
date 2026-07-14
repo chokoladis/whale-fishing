@@ -3,93 +3,101 @@
 namespace App\MessageHandler;
 
 use App\Entity\Coin;
-use App\Enum\Coin\NativeCoins;
-use App\Exception\RateLimitException;
-use App\Interface\External\GetterPriceInterface;
+use App\Entity\CoinContract;
+use App\Entity\CoinDetail;
 use App\Messages\UpdateCoinPriceMessage;
+use App\Repository\CoinContractRepository;
+use App\Repository\CoinDetailRepository;
 use App\Repository\CoinRepository;
-use App\Service\External\ModuleIO\PriceService;
+use App\Service\External\CoinPrice\MobulaOService;
 use App\Tool\SettingService;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class UpdateCoinPriceHandler
 {
-    /** @param array{string, GetterPriceInterface} $apiServiceProviders */
+    private ?Coin $coin = null;
+    private ?CoinContract $coinContract = null;
+
     function __construct(
-        private CoinRepository  $coinRepository,
-        #[Autowire(service: 'monolog.logger.priceUpdater')]
+        private CoinContractRepository $coinContractRepository,
+        private CoinRepository $coinRepository,
+        private CoinDetailRepository $coinDetailRepository,
         protected LoggerInterface $logger,
-//        private array $apiServiceProviders,
-        private SettingService $settingService,
-        private PriceService $priceService,
+        private MobulaOService $mobulaPriceService,
     )
     {
     }
 
     public function __invoke(UpdateCoinPriceMessage $message) : void
     {
-        // index составной?
-        /** @var ?Coin $coin */
-        $coin = $this->coinRepository->findOneBy([
-            'symbol' => $message->symbol,
+        /** @var ?CoinContract $coinContract */
+        $coinContract = $this->coinContractRepository->findOneBy([
+            'network' => $message->network,
             'contractAddress' => $message->contractAddress,
         ]);
 
-        if (!$coin) {
-            $coin = new Coin();
-            $coin->setName($message->symbol);
-            $coin->setSymbol($message->symbol);
+        if (!$coinContract) {
+            $this->logger->debug('Почему то не создался coin');
+            return;
+//            $coin = new Coin();
+//            $coin->setName($message->symbol);
+//            $coin->setSymbol($message->symbol);
 //            $coin->setNetwork($message->contractAddress);
 //            $coin->setContractAddress($message->contractAddress);
         }
 
-        if ($nativeCoin = NativeCoins::tryFrom($message->symbol)) {
+        $this->coinContract = $coinContract;
+        $this->coin = $coinContract->getCoin();
 
-        } else {
+//        $this->logger->debug('invoke update coin price', ['coin price' => $this->coin->getAvgPrice(), 'coinContract' => $this->coinContract]);
 
-        }
+//        todo?
+//        if ($nativeCoin = NativeCoins::tryFrom($message->symbol)) {
+//        }
 
+        if (empty($this->coin->getAvgPrice()) || empty($this->coinContract->getLocalPrice())
+            || time() - $this->coin->getUpdatedAt()->getTimestamp() > 3600) {
 
-        if ($coin->getPrice() === 0.0 || time() - $coin->getUpdatedAt()->getTimestamp() > 3600) {
-
-            $provider = current($this->apiServiceProviders);
-
-            $setting = $this->settingService->getCurrentApiPriceProvider();
-            if ($setting?->getValue()) {
-                $provider = $this->apiServiceProviders[$setting->getValue()];
-                $this->logger->debug('new provider', ['provider' => $provider]);
-            }
-
-            // todo check
             $this->logger->info('try get price');
             try {
-                $price = $provider->getPriceByContractAddress($message->contractAddress);
-                $this->logger->info('getting price', ['price' => $price]);
-            } catch (HttpException | RateLimitException $e) {
-                $newSetting = $this->settingService->updateApiProviderForPrice($setting);
-                $provider = $this->apiServiceProviders[$newSetting->getValue()];
-                $price = $provider->getPriceByContractAddress($message->contractAddress);
-                $this->logger->info('getting price by second provider', ['price' => $price]);
+                $coinDetailResponse = $this->mobulaPriceService->getCoinDetail(
+                    $message->network,
+                    $message->contractAddress
+                );
+
+                $this->logger->info('getting price', ['response' => $coinDetailResponse]);
+
+                $this->fullUpdateCoin($coinDetailResponse);
             } catch (\Throwable $e) {
-                $this->settingService->updateApiProviderForPrice($setting);
                 $this->logger->emergency('throw in coin price handler', [$e->getMessage(), $e->getTraceAsString()]);
                 return;
             }
-
-            $this->logger->info('result new price', ['price' => $price]);
         }
+    }
 
-        try {
-            $this->coinRepository->updatePrice(
-                $coin,
-                $price
-            );
-        } catch (\Throwable $exception) {
-            $this->logger->error($exception->getMessage(), ['exception' => [$exception->getFile(), $exception->getLine()]]);
+    private function fullUpdateCoin(\App\DTO\Http\Response\Coin\CoinDetailResponse $coinDetailResponse): void
+    {
+        $this->logger->info('full update coin', ['response' => $coinDetailResponse]);
+        //        todo in one transaction
+        $this->coinContractRepository->updatePrice($this->coinContract,  $coinDetailResponse->price);
+
+        if ($this->coin->getName() !== $coinDetailResponse->name) {
+            $this->coin->setName($coinDetailResponse->name);
         }
+        $this->coinRepository->updatePrice($this->coin, $coinDetailResponse->price);
+
+        $stats = $coinDetailResponse->statistics;
+
+        $coinDetail = new CoinDetail();
+        $coinDetail->setCoin($this->coin);
+        $coinDetail->setMarketCap($stats->marketCap);
+        $coinDetail->setVolume($stats->volume);
+        $coinDetail->setLiquidity($stats->liquidity);
+        $coinDetail->setTotalSupply($stats->totalSupply);
+        $coinDetail->setCirculationSupply($stats->circulationSupply);
+
+        $this->coinDetailRepository->save($coinDetail);
     }
 }

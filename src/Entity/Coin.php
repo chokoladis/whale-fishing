@@ -22,8 +22,8 @@ class Coin
     #[ORM\Column(length: 64)]
     private string $name;
 
-    #[ORM\Column(nullable: true)]
-    private ?float $avgPrice = null;
+    #[ORM\Column(nullable: true, length: 60)]
+    private ?string $avgPrice = null;
 
     /**
      * @var Collection<int, CoinLink>
@@ -36,13 +36,13 @@ class Coin
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
 
-    #[ORM\OneToOne(mappedBy: 'Coin', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'coin', cascade: ['persist', 'remove'])]
     private ?CoinDetail $coinDetail = null;
 
     /**
      * @var Collection<CoinContract> $coinContract
      */
-    #[ORM\OneToMany(mappedBy: 'Coin', targetEntity: CoinContract::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(mappedBy: 'coin', targetEntity: CoinContract::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Collection $coinContract;
 
@@ -82,12 +82,12 @@ class Coin
         return $this;
     }
 
-    public function getAvgPrice(): ?float
+    public function getAvgPrice(): ?string
     {
         return $this->avgPrice;
     }
 
-    public function setAvgPrice(float $avgPrice): static
+    public function setAvgPrice(string $avgPrice): static
     {
         $this->avgPrice = $avgPrice;
 

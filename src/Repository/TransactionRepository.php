@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\DTO\Http\Request\ListRequest;
 use App\DTO\Http\Response\PageDTO;
 use App\DTO\Http\Response\TransactionDTO;
-use App\Entity\Coin;
+use App\Entity\CoinContract;
 use App\Entity\Transaction;
 use App\Entity\Wallet;
 use App\Enum\Coin\TransactionType;
@@ -33,12 +33,12 @@ class TransactionRepository extends ServiceEntityRepository
         parent::__construct($registry, Transaction::class);
     }
 
-    public function save(Wallet $wallet, TransactionDTO $transaction, Coin $coin, TransactionType $type): void
+    public function save(Wallet $wallet, TransactionDTO $transaction, CoinContract $coinContract, TransactionType $type): void
     {
         $amount = bcdiv(
             $transaction->amountRaw,
-            bcpow('10', (string)$coin->getDecimal()),
-            $coin->getDecimal()
+            bcpow('10', (string)$coinContract->getDecimal()),
+            $coinContract->getDecimal()
         );
 
         $newTransaction = new Transaction();
@@ -50,7 +50,7 @@ class TransactionRepository extends ServiceEntityRepository
         $newTransaction->setAmount($amount);
 
         $newTransaction->setWallet($wallet);
-        $newTransaction->setCoin($coin);
+        $newTransaction->setCoin($coinContract->getCoin());
 
         $this->manager->persist($newTransaction);
         $this->manager->flush();

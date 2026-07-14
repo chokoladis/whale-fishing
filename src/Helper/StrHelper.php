@@ -22,4 +22,19 @@ class StrHelper
 
         return $dec;
     }
+
+    static function trimZeros(string $str): string
+    {
+        if (!str_contains($str, '.')) {
+            return $str;
+        }
+
+        $str = rtrim($str, '0');
+
+        if (str_ends_with($str, '.')) {
+            $str = substr($str, 0, strlen($str) - 1);
+        }
+
+        return $str;
+    }
 }

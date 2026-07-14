@@ -11,5 +11,5 @@ framework:
             failed: 'doctrine://default?queue_name=failed'
 
         routing:
-            App\DTO\Http\Response\TransactionDTO: async
-#            App\Messages\UpdateCoinPrice: async
+            App\Messages\TransactionMessage: async
+            App\Messages\UpdateCoinPriceMessage: async

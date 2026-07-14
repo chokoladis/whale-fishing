@@ -6,7 +6,6 @@ namespace App\Service\External\Alchemy;
 
 use App\Config\External\AlchemyConfig;
 use App\Exception\Coin\InvalidCoinSymbolException;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
 
 class WalletService extends ClientService

@@ -75,7 +75,6 @@ class CoinService
      */
     public function createOrFindByTransaction(TransactionDTO $transactionDTO)
     {
-        $this->logger->debug('createOrFindByTransaction');
         // todo mb find by network too ?
         if ($coin = $this->coinContractRepository->findByAddressAndNetwork(
             $transactionDTO->contractAddress,

@@ -10,7 +10,6 @@ use App\Exception\RateLimitException;
 use App\Interface\SendTokenInterface;
 use App\Repository\PasswordRestoreRepository;
 use App\Repository\UserRepository;
-use Symfony\Component\HttpKernel\Attribute\RateLimit;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Validator\Exception\ValidatorException;

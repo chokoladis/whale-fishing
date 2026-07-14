@@ -21,20 +21,19 @@ class CoinContract
     private string $network = 'native';
 
     #[ORM\Column(nullable: true)]
-    private ?float $localPrice = null;
+    private ?string $localPrice = null;
 
     #[ORM\Column]
     private int $decimal;
-
 
     #[ORM\Column(updatable: false)]
     private \DateTimeImmutable $createdAt;
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
 
-    #[ORM\ManyToOne(targetEntity: Coin::class, inversedBy: 'coinContract', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')] //fieldName: 'coin_parent_id'
-    private ?Coin $coin = null;
+    #[ORM\ManyToOne(targetEntity: Coin::class, inversedBy: 'coinContract', cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private Coin $coin;
 
     public function __construct()
     {
@@ -47,7 +46,7 @@ class CoinContract
         return $this->id;
     }
 
-    public function getCoin(): ?Coin
+    public function getCoin(): Coin
     {
         return $this->coin;
     }
@@ -59,12 +58,12 @@ class CoinContract
         return $this;
     }
 
-    public function getLocalPrice(): ?float
+    public function getLocalPrice(): ?string
     {
         return $this->localPrice;
     }
 
-    public function setLocalPrice(float $price): static
+    public function setLocalPrice(string $price): static
     {
         $this->localPrice = $price;
 

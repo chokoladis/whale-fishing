@@ -67,8 +67,6 @@ class TransactionService extends ClientService
 
         $data = $response->toArray();
 
-        $this->logger->alert('res asset transfer', ['res' => $data]);
-
         $transfers = $data['result']['transfers'] ?? [];
 
         $targetContract = $transactionDTO->contractAddress ? strtolower($transactionDTO->contractAddress) : null;

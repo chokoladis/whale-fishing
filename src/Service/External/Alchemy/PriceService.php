@@ -28,39 +28,9 @@ class PriceService extends ClientService implements GetterPriceInterface
         parent::__construct($this->alchemyApiKey, $this->httpClient, $this->logger);
     }
 
-    public function getPriceBySymbol(string $symbol) : float
+    public function getPriceByNetworkAndAddress(string $network, string $contractAddress) : float
     {
-        $symbol = trim($symbol);
-        if (!mb_strlen($symbol)) {
-            throw new BadRequestException('Symbol cannot be empty.');
-        }
 
-        $httpRequest = HttpClient::create();
-        $response = $httpRequest->request('GET',
-            sprintf('%s/prices/v1/%s/tokens/by-symbol?symbols=%s', self::BASE_URL, $this->alchemyApiKey, $symbol)
-        );
-
-        $responseBody = json_decode($response->getContent(), true);
-
-        if ($response->getStatusCode() === Response::HTTP_OK && !empty($responseBody['data'])) {
-            $data = current($responseBody['data']);
-
-            if (!empty($data['prices'])){
-                return floatval(current($data['prices'])['value']);
-            }
-        }
-
-        $this->logger->error('alchemy [priceService] error', ['content' => $response->getContent(), 'status' => $response->getStatusCode()]);
-
-        throw new HttpException($response->getStatusCode() !== Response::HTTP_OK
-            ? $response->getStatusCode()
-            : Response::HTTP_NOT_FOUND,
-            'Не удалось получить данные из стороннего ресурса'
-        );
-    }
-
-    public function getPriceByContractAddress(string $contractAddress) : float
-    {
         $contractAddress = trim($contractAddress);
         if (!mb_strlen($contractAddress)) {
             // create new exception

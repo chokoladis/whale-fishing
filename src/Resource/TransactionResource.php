@@ -3,6 +3,7 @@
 namespace App\Resource;
 
 use App\Entity\Transaction;
+use App\Resource\Coin\CoinResource;
 
 class TransactionResource
 {

@@ -80,11 +80,10 @@ class AlchemyListenCommand extends Command
                             /** @var Message $msg */
                             $data = json_decode($msg->getPayload(), true);
                         } else {
-//                            $this->logger->debug('type msg', [gettype($msg)]);
                             return;
                         }
 
-                        $this->logger->info('msg result', ['msg data' => $data]);
+//                        $this->logger->info('msg result', ['msg data' => $data]);
 
                         if (isset($data['result']) && !isset($data['params'])) {
                             $output->writeln("<info>Subscribed: {$data['result']}</info>");
@@ -95,8 +94,6 @@ class AlchemyListenCommand extends Command
                         if (!$transferInfo) return;
 
                         $transactionDTO = TransactionParser::parse($transferInfo, $this->network);
-
-                        $this->logger->info('parsed data ', ['dto' => $transactionDTO]);
 
                         if ($transactionDTO && $transactionDTO->amountRaw) {
                             $this->bus->dispatch(

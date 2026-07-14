@@ -3,11 +3,11 @@
 namespace App\Service\External\CoinPrice;
 
 use App\Exception\Coin\InvalidCoinSymbolException;
-use App\Interface\External\GetterPriceInterface;
+use App\Interface\External\GetCoinDetailInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-abstract class BaseService implements GetterPriceInterface
+abstract class BaseService implements GetCoinDetailInterface
 {
     public function __construct(
         protected HttpClientInterface $httpClient,

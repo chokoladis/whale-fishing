@@ -22,25 +22,30 @@ class CoinDetail
     private ?array $investors = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 24, scale: 10)]
-    private ?string $marketCap = null;
+    private ?int $marketCap = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 24, scale: 10)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 26, scale: 10)]
     private ?string $liquidity = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 22, scale: 10)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 24, scale: 10)]
     private ?string $volume = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 14, scale: 0)]
-    private ?string $totalSupply = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 16, scale: 0)]
+    private ?int $totalSupply = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 24, scale: 10)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 26, scale: 10)]
     private ?string $circulationSupply = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 14, scale: 0)]
-    private ?string $maxSupply = null;
+//    #[ORM\Column(type: Types::DECIMAL, precision: 14, scale: 0)]
+//    private ?string $maxSupply = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $listedAt = null;
+
+    public function __construct()
+    {
+        $this->listedAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -59,24 +64,24 @@ class CoinDetail
         return $this;
     }
 
-    public function getinvestors(): ?array
+    public function getInvestors(): ?array
     {
         return $this->investors;
     }
 
-    public function setinvestors(?array $investors): static
+    public function setInvestors(?array $investors): static
     {
         $this->investors = $investors;
 
         return $this;
     }
 
-    public function getMarketCap(): ?string
+    public function getMarketCap(): ?int
     {
         return $this->marketCap;
     }
 
-    public function setMarketCap(string $marketCap): static
+    public function setMarketCap(int $marketCap): static
     {
         $this->marketCap = $marketCap;
 
@@ -95,24 +100,24 @@ class CoinDetail
         return $this;
     }
 
-    public function getvolume(): ?string
+    public function getVolume(): ?string
     {
         return $this->volume;
     }
 
-    public function setvolume(string $volume): static
+    public function setVolume(string $volume): static
     {
         $this->volume = $volume;
 
         return $this;
     }
 
-    public function getTotalSupply(): ?string
+    public function getTotalSupply(): ?int
     {
         return $this->totalSupply;
     }
 
-    public function setTotalSupply(string $totalSupply): static
+    public function setTotalSupply(int $totalSupply): static
     {
         $this->totalSupply = $totalSupply;
 
@@ -131,17 +136,17 @@ class CoinDetail
         return $this;
     }
 
-    public function getMaxSupply(): ?string
-    {
-        return $this->maxSupply;
-    }
-
-    public function setMaxSupply(string $maxSupply): static
-    {
-        $this->maxSupply = $maxSupply;
-
-        return $this;
-    }
+//    public function getMaxSupply(): ?string
+//    {
+//        return $this->maxSupply;
+//    }
+//
+//    public function setMaxSupply(string $maxSupply): static
+//    {
+//        $this->maxSupply = $maxSupply;
+//
+//        return $this;
+//    }
 
     public function getListedAt(): ?\DateTimeImmutable
     {
