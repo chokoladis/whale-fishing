@@ -8,9 +8,11 @@ RUN apk add --no-cache argon2-dev rabbitmq-c-dev
 
 RUN docker-php-ext-install pdo pdo_pgsql sodium
 
-RUN pecl install redis amqp && docker-php-ext-enable redis amqp
+RUN pecl install redis amqp xdebug && docker-php-ext-enable redis amqp xdebug
 
 RUN docker-php-ext-install -j$(nproc) bcmath
+
+COPY ./dockerfiles/php/conf/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
 ARG PUID=1000
 ARG PGID=1000
