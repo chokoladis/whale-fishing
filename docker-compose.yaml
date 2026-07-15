@@ -14,6 +14,8 @@ services:
         depends_on:
             db:
                 condition: service_started
+        environment:
+            - PHP_IDE_CONFIG=serverName=Docker
 #            rabbitmq:
 #                condition: service_healthy
 
