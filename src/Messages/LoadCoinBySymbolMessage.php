@@ -2,7 +2,7 @@
 
 namespace App\Messages;
 
-readonly class GetCoinBySymbolMessage
+readonly class LoadCoinBySymbolMessage
 {
     public function __construct(
         public string $symbol,

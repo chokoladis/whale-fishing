@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\DTO\Coin\CoinShortDTO;
@@ -37,13 +39,13 @@ class CoinContractRepository extends ServiceEntityRepository
             $coin = new Coin();
             $coin->setSymbol($coinDTO->symbol);
             $coin->setName($coinDTO->symbol);
-            $coin->setAvgPrice(0.0);
+            $coin->setAvgPrice('0');
 
             $coinContract = new CoinContract();
             $coinContract->setNetwork($coinDTO->network);
             $coinContract->setContractAddress($coinDTO->contractAddress);
             $coinContract->setDecimal($coinDTO->decimal);
-            $coinContract->setLocalPrice(0.0);
+            $coinContract->setLocalPrice('0');
             $coinContract->setCoin($coin);
 
             $this->getEntityManager()->persist($coin);
@@ -58,12 +60,11 @@ class CoinContractRepository extends ServiceEntityRepository
         return $coinContract;
     }
 
-    public function updatePrice(CoinContract $coinContract, float $price): CoinContract
+    public function updatePrice(CoinContract $coinContract, string $price): CoinContract
     {
         $coinContract->setLocalPrice($price);
 
-        $this->getEntityManager()->persist($coinContract);
-        $this->getEntityManager()->flush();
+        $this->save($coinContract);
 
         return $coinContract;
     }
@@ -105,5 +106,11 @@ class CoinContractRepository extends ServiceEntityRepository
             'contractAddress' => strtolower($address),
             'network' => $network
         ]);
+    }
+
+    public function save(CoinContract $coinContract)
+    {
+        $this->getEntityManager()->persist($coinContract);
+        $this->getEntityManager()->flush();
     }
 }

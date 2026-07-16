@@ -21,8 +21,8 @@ class CoinDetail
     #[ORM\Column(nullable: true)]
     private ?array $investors = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 24, scale: 10)]
-    private ?int $marketCap = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 18, scale: 4)]
+    private ?float $marketCap = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 26, scale: 10)]
     private ?string $liquidity = null;
@@ -36,16 +36,8 @@ class CoinDetail
     #[ORM\Column(type: Types::DECIMAL, precision: 26, scale: 10)]
     private ?string $circulationSupply = null;
 
-//    #[ORM\Column(type: Types::DECIMAL, precision: 14, scale: 0)]
-//    private ?string $maxSupply = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $listedAt = null;
-
-    public function __construct()
-    {
-        $this->listedAt = new \DateTimeImmutable();
-    }
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    private ?int $maxSupply = null;
 
     public function getId(): ?int
     {
@@ -76,12 +68,12 @@ class CoinDetail
         return $this;
     }
 
-    public function getMarketCap(): ?int
+    public function getMarketCap(): ?float
     {
         return $this->marketCap;
     }
 
-    public function setMarketCap(int $marketCap): static
+    public function setMarketCap(float $marketCap): static
     {
         $this->marketCap = $marketCap;
 
@@ -136,26 +128,14 @@ class CoinDetail
         return $this;
     }
 
-//    public function getMaxSupply(): ?string
-//    {
-//        return $this->maxSupply;
-//    }
-//
-//    public function setMaxSupply(string $maxSupply): static
-//    {
-//        $this->maxSupply = $maxSupply;
-//
-//        return $this;
-//    }
-
-    public function getListedAt(): ?\DateTimeImmutable
+    public function getMaxSupply(): ?int
     {
-        return $this->listedAt;
+        return $this->maxSupply;
     }
 
-    public function setListedAt(\DateTimeImmutable $listedAt): static
+    public function setMaxSupply(int $maxSupply): static
     {
-        $this->listedAt = $listedAt;
+        $this->maxSupply = $maxSupply;
 
         return $this;
     }

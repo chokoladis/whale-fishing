@@ -9,6 +9,8 @@ use App\Messages\UpdateCoinPriceMessage;
 use App\Repository\CoinContractRepository;
 use App\Repository\CoinDetailRepository;
 use App\Repository\CoinRepository;
+use App\Service\Coin\CoinPriceService;
+use App\Service\Coin\CoinService;
 use App\Service\External\CoinPrice\MobulaOService;
 use App\Tool\SettingService;
 use Psr\Log\LoggerInterface;
@@ -22,10 +24,9 @@ class UpdateCoinPriceHandler
 
     function __construct(
         private CoinContractRepository $coinContractRepository,
-        private CoinRepository $coinRepository,
-        private CoinDetailRepository $coinDetailRepository,
         protected LoggerInterface $logger,
         private MobulaOService $mobulaPriceService,
+        private CoinService $coinService,
     )
     {
     }
@@ -69,35 +70,11 @@ class UpdateCoinPriceHandler
 
                 $this->logger->info('getting price', ['response' => $coinDetailResponse]);
 
-                $this->fullUpdateCoin($coinDetailResponse);
+                $this->coinService->fullUpdateCoin($coinContract, $coinDetailResponse);
             } catch (\Throwable $e) {
                 $this->logger->emergency('throw in coin price handler', [$e->getMessage(), $e->getTraceAsString()]);
                 return;
             }
         }
-    }
-
-    private function fullUpdateCoin(\App\DTO\Http\Response\Coin\CoinDetailResponse $coinDetailResponse): void
-    {
-        $this->logger->info('full update coin', ['response' => $coinDetailResponse]);
-        //        todo in one transaction
-        $this->coinContractRepository->updatePrice($this->coinContract,  $coinDetailResponse->price);
-
-        if ($this->coin->getName() !== $coinDetailResponse->name) {
-            $this->coin->setName($coinDetailResponse->name);
-        }
-        $this->coinRepository->updatePrice($this->coin, $coinDetailResponse->price);
-
-        $stats = $coinDetailResponse->statistics;
-
-        $coinDetail = new CoinDetail();
-        $coinDetail->setCoin($this->coin);
-        $coinDetail->setMarketCap($stats->marketCap);
-        $coinDetail->setVolume($stats->volume);
-        $coinDetail->setLiquidity($stats->liquidity);
-        $coinDetail->setTotalSupply($stats->totalSupply);
-        $coinDetail->setCirculationSupply($stats->circulationSupply);
-
-        $this->coinDetailRepository->save($coinDetail);
     }
 }

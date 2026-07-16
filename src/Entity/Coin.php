@@ -49,6 +49,7 @@ class Coin
     public function __construct()
     {
         $this->links = new ArrayCollection();
+        $this->coinContract = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }

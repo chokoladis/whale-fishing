@@ -9,10 +9,12 @@ use App\DTO\Http\Request\ListRequest;
 use App\DTO\Http\Response\PageDTO;
 use App\DTO\Http\Response\TransactionDTO;
 use App\Entity\CoinContract;
+use App\Entity\CoinDetail;
 use App\Exception\Coin\InvalidCoinSymbolException;
 use App\Helper\StrHelper;
-use App\Messages\GetCoinBySymbolMessage;
+use App\Messages\LoadCoinBySymbolMessage;
 use App\Repository\CoinContractRepository;
+use App\Repository\CoinDetailRepository;
 use App\Repository\CoinRepository;
 use App\Resource\Coin\CoinResource;
 use App\Service\External\Alchemy\TransactionService;
@@ -25,6 +27,7 @@ class CoinService
     public function __construct(
         private CoinRepository $coinRepository,
         private CoinContractRepository $coinContractRepository,
+        private CoinDetailRepository $coinDetailRepository,
         private CoinResource $coinResource,
         private TransactionService $transactionService,
         private LoggerInterface $logger,
@@ -46,18 +49,18 @@ class CoinService
     public function getCoin(string $symbol): ?array
     {
         $symbol = trim($symbol);
-        if (!mb_strlen($symbol)) {
+        if (empty($symbol)) {
             throw new InvalidCoinSymbolException('Symbol cannot be empty.');
         }
 
         $coin = $this->coinRepository->findOneBy(['symbol' => $symbol]);
         if (empty($coin)) {
-            $this->messageBus->dispatch(new GetCoinBySymbolMessage($symbol));
+            $this->messageBus->dispatch(new LoadCoinBySymbolMessage($symbol));
             throw new EntityNotFoundException('Данной монеты нет в базе');
         }
 
-        if (!$coin->getPrice()) {
-            $this->messageBus->dispatch(new GetCoinBySymbolMessage($symbol));
+        if (empty($coin->getAvgPrice())) {
+            $this->messageBus->dispatch(new LoadCoinBySymbolMessage($symbol));
         }
 
         return $this->coinResource->detail($coin);
@@ -97,5 +100,33 @@ class CoinService
         $this->logger->debug('не получилось достать coin из транзакции' , [$transactionDTO]);
 
         return null;
+    }
+
+    public function fullUpdateCoin(CoinContract $coinContract , \App\DTO\Http\Response\Coin\CoinDetailResponse $coinDetailResponse): void
+    {
+        $this->logger->info('full update coin', ['response' => $coinDetailResponse]);
+        //        todo in one transaction
+        $this->coinContractRepository->updatePrice($coinContract,  $coinDetailResponse->price);
+
+        $coin = $coinContract->getCoin();
+        if ($coin->getName() !== $coinDetailResponse->name) {
+            $coin->setName($coinDetailResponse->name);
+        }
+        $this->coinRepository->updatePrice($coin, $coinDetailResponse->price);
+
+        $stats = $coinDetailResponse->statistics;
+
+        $coinDetail = new CoinDetail();
+        $coinDetail->setCoin($coin);
+        $coinDetail->setMarketCap($stats->marketCap);
+        $coinDetail->setVolume($stats->volume);
+        $coinDetail->setLiquidity($stats->liquidity);
+        $coinDetail->setTotalSupply($stats->totalSupply);
+        $coinDetail->setCirculationSupply($stats->circulationSupply);
+
+        if ($stats->maxSupply)
+            $coinDetail->setMaxSupply($stats->maxSupply);
+
+        $this->coinDetailRepository->save($coinDetail);
     }
 }

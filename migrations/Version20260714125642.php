@@ -27,6 +27,9 @@ final class Version20260714125642 extends AbstractMigration
         $this->addSql('ALTER TABLE coin_detail ALTER volume TYPE NUMERIC(24, 10)');
         $this->addSql('ALTER TABLE coin_detail ALTER total_supply TYPE NUMERIC(16, 0)');
         $this->addSql('ALTER TABLE coin_detail ALTER circulation_supply TYPE NUMERIC(26, 10)');
+        $this->addSql('ALTER TABLE coin_detail ADD max_supply BIGINT DEFAULT NULL');
+        $this->addSql('ALTER TABLE coin_detail DROP listed_at');
+        $this->addSql('ALTER TABLE coin_detail ALTER market_cap TYPE NUMERIC(24, 4)');
     }
 
     public function down(Schema $schema): void
@@ -39,5 +42,8 @@ final class Version20260714125642 extends AbstractMigration
         $this->addSql('ALTER TABLE coin_detail ALTER volume TYPE NUMERIC(22, 10)');
         $this->addSql('ALTER TABLE coin_detail ALTER total_supply TYPE NUMERIC(14, 0)');
         $this->addSql('ALTER TABLE coin_detail ALTER circulation_supply TYPE NUMERIC(24, 10)');
+        $this->addSql('ALTER TABLE coin_detail ADD listed_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL');
+        $this->addSql('ALTER TABLE coin_detail DROP max_supply');
+        $this->addSql('ALTER TABLE coin_detail ALTER market_cap TYPE NUMERIC(24, 10)');
     }
 }

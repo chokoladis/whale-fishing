@@ -44,17 +44,22 @@ class CoinRepository extends ServiceEntityRepository
     {
         $coin->setAvgPrice($price);
 
-        $this->getEntityManager()->persist($coin);
-        $this->getEntityManager()->flush();
+        $this->save($coin);
 
         return $coin;
+    }
+
+    public function save(Coin $coin)
+    {
+        $this->getEntityManager()->persist($coin);
+        $this->getEntityManager()->flush();
     }
 
     public function getList(?ListRequest $listRequest): PageDTO
     {
         // todo sort by name, price in api
         $query = $this->createQueryBuilder('coin')
-            ->orderBy('coin.price', 'DESC');
+            ->orderBy('coin.avgPrice', 'DESC');
 
         return $this->paginate($query, $listRequest?->page, $listRequest?->perPage);
     }
