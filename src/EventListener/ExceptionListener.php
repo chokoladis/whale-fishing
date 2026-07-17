@@ -1,16 +1,26 @@
 <?php
 
-namespace App\Listener;
+namespace App\EventListener;
 
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExceptionListener
+#[AsEventListener(event: 'kernel.exception', priority: 100)]
+final class ExceptionListener
 {
+    public function __construct(
+        private TranslatorInterface $translator,
+    )
+    {
+    }
+
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
@@ -30,7 +40,7 @@ class ExceptionListener
         } else if ($exception instanceof TooManyRequestsHttpException) {
             $event->setResponse(new JsonResponse([
                 'errors'  => [
-                    $exception->getMessage() ? $exception->getMessage() : 'Rate limit exceeded.'
+                    $exception->getMessage() ? $exception->getMessage() : $this->translator->trans('error.many_request'),
                 ],
             ],$exception->getStatusCode()));
 

@@ -1,8 +1,8 @@
 framework:
     rate_limiter:
-        login_register:
+        register:
             policy: 'sliding_window'
-            limit: 5
+            limit: 4
             interval: '10 minutes'
         password_restore:
             policy: 'sliding_window'
@@ -14,6 +14,6 @@ framework:
             interval: '1 minute'
         api:
             policy: 'token_bucket'
-            limit: 2
+            limit: 20
             rate: { interval: '1 minute' }
 

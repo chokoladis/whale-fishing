@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
 use Symfony\Component\Mailer\Exception\TransportException;
-use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -37,6 +36,7 @@ final class AuthController extends AbstractController
     }
 
     #[Route('register/', name: 'register', methods: ['POST'])]
+    #[RateLimit('register')]
     #[OA\Post(
         operationId: 'authRegister',
         summary: 'Регистрация пользователя',
@@ -64,16 +64,8 @@ final class AuthController extends AbstractController
     )]
     public function register(
         #[MapRequestPayload] RegisterRequest $request,
-        RateLimiterFactoryInterface $rateLimiter
     ): Response
     {
-        $limiter = $rateLimiter->create('login_register');
-        if (!$limiter->consume(1)->isAccepted()) {
-            return $this->json([
-                'errors' => ['Превышен лимит запросов']
-            ], Response::HTTP_TOO_MANY_REQUESTS);
-        }
-
         try {
             return $this->json($this->userService->register($request));
         } catch (ColumnAlreadyExists $e) {
@@ -110,16 +102,8 @@ final class AuthController extends AbstractController
     )]
     public function passwordSendToken(
         #[MapRequestPayload] PasswordRestoreSendToken $request,
-        RateLimiterFactoryInterface $rateLimiter
     ): Response
     {
-        $limiter = $rateLimiter->create('password_restore');
-        if (!$limiter->consume(1)->isAccepted()) {
-            return $this->json([
-                'errors' => ['Превышен лимит запросов']
-            ], Response::HTTP_TOO_MANY_REQUESTS);
-        }
-
         try {
             $this->passwordService->sendToken($request);
 
@@ -164,15 +148,8 @@ final class AuthController extends AbstractController
     )]
     public function passwordRestore(
         #[MapRequestPayload] PasswordRestoreConfirm $request,
-        RateLimiterFactoryInterface $rateLimiter
     ): Response
     {
-        $limiter = $rateLimiter->create('password_restore');
-        if (!$limiter->consume(1)->isAccepted()) {
-            return $this->json([
-                'errors' => ['Превышен лимит запросов']
-            ], Response::HTTP_TOO_MANY_REQUESTS);
-        }
         try {
             $this->passwordService->restore($request);
             return $this->json([])->setStatusCode(Response::HTTP_NO_CONTENT);

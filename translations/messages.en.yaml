@@ -1,0 +1,2 @@
+error:
+    many_requests: Request limit exceeded. Try later.

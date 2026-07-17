@@ -9,10 +9,6 @@ services:
     App\:
         resource: '../src/'
 
-    App\Listener\ExceptionListener:
-        tags:
-            - { name: kernel.event_listener, event: kernel.exception, priority: 100 }
-
     App\OpenApi\OpenApiSpec: ~
 
 #    App\MessageHandler\CoinPriceHandler:
@@ -25,3 +21,7 @@ services:
 
     App\Interface\SendTokenInterface:
         class: App\Tool\Notification\EmailSenderToken
+
+    App\EventListener\ApiRateLimitListener:
+        arguments:
+            $apiListener: '@limiter.api'
