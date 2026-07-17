@@ -86,7 +86,7 @@ services:
         build:
             context: .
             dockerfile: dockerfiles/php/Dockerfile
-        command: php bin/console messenger:consume async -vv
+        command: php bin/console messenger:consume async
         volumes:
             - .:/var/www/app
         depends_on:
@@ -100,7 +100,7 @@ services:
         build:
             context: .
             dockerfile: dockerfiles/php/Dockerfile
-        command: php bin/console scheduler:consume
+        command: php bin/console messenger:consume scheduler_default
         volumes:
             - .:/var/www/app
         depends_on:

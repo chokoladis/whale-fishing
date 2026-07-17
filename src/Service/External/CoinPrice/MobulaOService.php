@@ -30,37 +30,6 @@ class MobulaOService extends BaseService
         parent::__construct($this->httpClient, $this->logger);
     }
 
-
-//    public function somecode(string $symbol)
-//    {
-//        $symbol = trim($symbol);
-//        if (!mb_strlen($symbol)) {
-//            throw new InvalidCoinSymbolException('Symbol cannot be empty.');
-//        }
-//
-//        try {
-//            $response = $this->httpClient->request('GET', sprintf('%s/api/1/metadata?symbol=%s', self::BASE_URL, $symbol),
-//                [
-//                    'headers' => ['Authorization' => $this->apiKey,]
-//                ]);
-//            $responseBody = json_decode($response->getContent(false), true);
-//        } catch (\Throwable $error) {
-//            $this->logger->error('moduleIO [priceService] error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
-//
-//            if ($error->getCode() === Response::HTTP_TOO_MANY_REQUESTS) {
-//                throw new RateLimitException();
-//            } else if ($error->getCode() === 0) {
-//                // need reconnect
-//                exit();
-//            }
-//
-//            throw $error;
-//        }
-//
-//        $this->logger->debug('moduleIO [priceService] response', ['content' => $responseBody]);
-//        dd();
-//    }
-
     public function getCoinDetail(string $network, string $contractAddress) : \App\DTO\Http\Response\Coin\CoinDetailResponse
     {
         //        "/api/1/market/data?shouldFetchPriceChange=24h&blockchain=ethereum&asset=cult"
@@ -90,7 +59,6 @@ class MobulaOService extends BaseService
             throw $error;
         }
 
-        //        $this->logger->debug('moduleIO [priceService] response', ['content' => $responseBody]);
         //        todo save from all address? save logo
         //    {"data":
         //      { "logo":"https://metadata.mobula.io/assets/logos/evm_1_0xdac17f958d2ee523a2206206994597c13d831ec7.webp",
@@ -107,10 +75,10 @@ class MobulaOService extends BaseService
             StrHelper::trimZeros(bcadd(strval($data['price']), '0', $data['decimals'])),
             new CoinStatisticsResponse(
                 $data['market_cap'],
-                $data['volume'],
-                $data['liquidity'],
+                strval($data['volume']),
+                strval($data['liquidity']),
                 $data['total_supply'],
-                $data['circulating_supply'],
+                strval($data['circulating_supply']),
             )
         );
     }
@@ -160,6 +128,7 @@ class MobulaOService extends BaseService
                 );
             }
         }
+//        $this->logger->debug('mobule response data by symbol', [$data]);
 
         return new \App\DTO\Http\Response\Coin\CoinDetailResponse(
             $data['name'],
@@ -171,7 +140,7 @@ class MobulaOService extends BaseService
                 strval($data['volume']),
                 strval($data['liquidity']),
                 $data['total_supply'],
-                strval($data['circulating_supply']), //296998891.222
+                strval($data['circulating_supply']),
                 $data['max_supply']
             ),
             $contracts

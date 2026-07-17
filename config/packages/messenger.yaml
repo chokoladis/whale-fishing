@@ -10,8 +10,3 @@ framework:
                     multiplier: 2
                     max_delay: 5000
             failed: 'doctrine://default?queue_name=failed'
-
-        routing:
-            App\Messages\TransactionMessage: async
-            App\Messages\UpdateCoinPriceMessage: async
-            App\Messages\LoadCoinBySymbolMessage: async
