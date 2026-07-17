@@ -79,7 +79,7 @@ services:
           test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
           interval: 5s
           timeout: 5s
-          retries: 5
+          retries: 2
 
     messenger_worker:
         container_name: wf_messenger

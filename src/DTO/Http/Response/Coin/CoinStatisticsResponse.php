@@ -10,7 +10,7 @@ readonly class CoinStatisticsResponse
         public float $marketCap,
         public string $volume,
         public string $liquidity,
-        public int $totalSupply,
+        public float $totalSupply,
         public string $circulationSupply,
         public ?int $maxSupply = null,
         //todo

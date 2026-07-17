@@ -30,8 +30,8 @@ class CoinDetail
     #[ORM\Column(type: Types::DECIMAL, precision: 24, scale: 10)]
     private ?string $volume = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 16, scale: 0)]
-    private ?int $totalSupply = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 16, scale: 4)]
+    private ?float $totalSupply = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 26, scale: 10)]
     private ?string $circulationSupply = null;
@@ -104,12 +104,12 @@ class CoinDetail
         return $this;
     }
 
-    public function getTotalSupply(): ?int
+    public function getTotalSupply(): ?float
     {
         return $this->totalSupply;
     }
 
-    public function setTotalSupply(int $totalSupply): static
+    public function setTotalSupply(float $totalSupply): static
     {
         $this->totalSupply = $totalSupply;
 

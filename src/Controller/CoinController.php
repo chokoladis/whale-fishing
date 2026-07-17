@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Attribute\RateLimit;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -120,6 +121,7 @@ final class CoinController extends AbstractController
         description: 'Монета не найдена',
         content: new OA\JsonContent(ref: new Model(type: ErrorResponse::class)),
     )]
+    #[RateLimit('coin_get', 'ip')]
     public function get(
         string $symbol,
     ) : JsonResponse

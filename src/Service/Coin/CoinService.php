@@ -48,7 +48,7 @@ class CoinService
      */
     public function getCoin(string $symbol): ?array
     {
-        $symbol = trim($symbol);
+        $symbol = strtoupper(trim($symbol));
         if (empty($symbol)) {
             throw new InvalidCoinSymbolException('Symbol cannot be empty.');
         }
