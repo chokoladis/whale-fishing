@@ -2,6 +2,7 @@
 
 namespace App\Command\User;
 
+use App\Messages\CleanPasswordRestoreMessage;
 use App\Repository\PasswordRestoreRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -9,13 +10,14 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
-#[AsCronTask('@weekly', method: 'clear')]
 #[AsCommand(
     name: 'app:password-restore.clear',
     description: 'Clean up old rows in password restore'
 )]
+#[AsMessageHandler()]
 class PasswordRestoreCommand extends Command
 {
     public function __construct(
@@ -44,5 +46,10 @@ class PasswordRestoreCommand extends Command
         } catch (\Throwable $exception) {
             $this->logger->error($exception->getMessage());
         }
+    }
+
+    public function __invoke(CleanPasswordRestoreMessage $message)
+    {
+        $this->clear();
     }
 }

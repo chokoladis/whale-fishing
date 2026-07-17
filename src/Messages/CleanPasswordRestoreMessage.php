@@ -5,11 +5,9 @@ namespace App\Messages;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 
 #[AsMessage('async')]
-readonly class UpdateCoinPriceMessage
+readonly class CleanPasswordRestoreMessage
 {
     public function __construct(
-        public string $network,
-        public string $contractAddress,
     )
     {
     }
