@@ -116,8 +116,13 @@ class CoinService
 
         $stats = $coinDetailResponse->statistics;
 
-        $coinDetail = new CoinDetail();
-        $coinDetail->setCoin($coin);
+        if (!$coin->getCoinDetail()) {
+            $coinDetail = new CoinDetail();
+            $coinDetail->setCoin($coin);
+        } else {
+            $coinDetail = $coin->getCoinDetail();
+        }
+
         $coinDetail->setMarketCap($stats->marketCap);
         $coinDetail->setVolume($stats->volume);
         $coinDetail->setLiquidity($stats->liquidity);

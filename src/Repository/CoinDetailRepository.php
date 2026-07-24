@@ -18,7 +18,9 @@ class CoinDetailRepository extends ServiceEntityRepository
 
     public function save(CoinDetail $coinDetail)
     {
-        $this->getEntityManager()->persist($coinDetail);
+        if (!$coinDetail->getId())
+            $this->getEntityManager()->persist($coinDetail);
+
         $this->getEntityManager()->flush();
     }
 }

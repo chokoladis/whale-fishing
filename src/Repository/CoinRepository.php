@@ -43,6 +43,7 @@ class CoinRepository extends ServiceEntityRepository
     public function updatePrice(Coin $coin, string $price): Coin
     {
         $coin->setAvgPrice($price);
+        $coin->setUpdatedAt(new \DateTimeImmutable());
 
         $this->save($coin);
 
@@ -51,7 +52,9 @@ class CoinRepository extends ServiceEntityRepository
 
     public function save(Coin $coin)
     {
-        $this->getEntityManager()->persist($coin);
+        if (!$coin->getId())
+            $this->getEntityManager()->persist($coin);
+
         $this->getEntityManager()->flush();
     }
 

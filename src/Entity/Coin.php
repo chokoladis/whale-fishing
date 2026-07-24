@@ -115,12 +115,6 @@ class Coin
         $this->updatedAt = $updatedAt;
     }
 
-    #[ORM\PreUpdate]
-    public function autoUpdateUpdatedAt() : void
-    {
-        $this->updatedAt = new \DateTimeImmutable();
-    }
-
     /**
      * @return Collection<int, CoinLink>
      */

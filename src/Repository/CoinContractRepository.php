@@ -110,7 +110,9 @@ class CoinContractRepository extends ServiceEntityRepository
 
     public function save(CoinContract $coinContract)
     {
-        $this->getEntityManager()->persist($coinContract);
+        if (!$coinContract->getId())
+            $this->getEntityManager()->persist($coinContract);
+
         $this->getEntityManager()->flush();
     }
 }
