@@ -10,7 +10,7 @@ readonly class CoinShortDTO
         public string $symbol,
         public string $contractAddress,
         public string $network,
-        public int $decimal,
+        public int    $decimal,
     )
     {
     }

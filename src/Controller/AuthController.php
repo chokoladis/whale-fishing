@@ -16,6 +16,7 @@ use Doctrine\DBAL\Schema\Exception\ColumnAlreadyExists;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
@@ -29,7 +30,7 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 final class AuthController extends AbstractController
 {
     function __construct(
-        private UserService $userService,
+        private UserService     $userService,
         private PasswordService $passwordService,
     )
     {
@@ -63,11 +64,12 @@ final class AuthController extends AbstractController
         content: new OA\JsonContent(ref: new Model(type: ValidationErrorResponse::class)),
     )]
     public function register(
-        #[MapRequestPayload] RegisterRequest $request,
+        #[MapRequestPayload] RegisterRequest $registerRequest,
+        Request                              $request
     ): Response
     {
         try {
-            return $this->json($this->userService->register($request));
+            return $this->json($this->userService->register($registerRequest, $request));
         } catch (ColumnAlreadyExists $e) {
             return $this->json([
                 'errors' => [

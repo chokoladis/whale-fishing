@@ -26,10 +26,10 @@ class LoadCoinCommand extends Command
 {
     public function __construct(
         // for test
-        private MobulaOService $priceService,
-        private CoinRepository $coinRepository,
+        private MobulaOService      $priceService,
+        private CoinRepository      $coinRepository,
         private CoinContractService $coinContractService,
-        private CoinDetailService $coinDetailService,
+        private CoinDetailService   $coinDetailService,
     )
     {
         parent::__construct();

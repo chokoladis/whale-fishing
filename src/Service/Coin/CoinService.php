@@ -25,13 +25,13 @@ use Symfony\Component\Messenger\MessageBusInterface;
 class CoinService
 {
     public function __construct(
-        private CoinRepository $coinRepository,
+        private CoinRepository         $coinRepository,
         private CoinContractRepository $coinContractRepository,
-        private CoinDetailRepository $coinDetailRepository,
-        private CoinResource $coinResource,
-        private TransactionService $transactionService,
-        private LoggerInterface $logger,
-        private MessageBusInterface $messageBus
+        private CoinDetailRepository   $coinDetailRepository,
+        private CoinResource           $coinResource,
+        private TransactionService     $transactionService,
+        private LoggerInterface        $logger,
+        private MessageBusInterface    $messageBus
     )
     {
     }
@@ -82,11 +82,11 @@ class CoinService
         if ($coin = $this->coinContractRepository->findByAddressAndNetwork(
             $transactionDTO->contractAddress,
             $transactionDTO->network
-        )){
+        )) {
             return $coin;// todo ?
         }
 
-        if ($transfer = $this->transactionService->getAssetTransferByTransactionDTO($transactionDTO)){
+        if ($transfer = $this->transactionService->getAssetTransferByTransactionDTO($transactionDTO)) {
             return $this->coinContractRepository->saveByDTO(
                 new CoinShortDTO(
                     $transfer['asset'],
@@ -97,16 +97,16 @@ class CoinService
             );
         }
 
-        $this->logger->debug('не получилось достать coin из транзакции' , [$transactionDTO]);
+        $this->logger->debug('не получилось достать coin из транзакции', [$transactionDTO]);
 
         return null;
     }
 
-    public function fullUpdateCoin(CoinContract $coinContract , \App\DTO\Http\Response\Coin\CoinDetailResponse $coinDetailResponse): void
+    public function fullUpdateCoin(CoinContract $coinContract, \App\DTO\Http\Response\Coin\CoinDetailResponse $coinDetailResponse): void
     {
         $this->logger->info('full update coin', ['response' => $coinDetailResponse]);
         //        todo in one transaction
-        $this->coinContractRepository->updatePrice($coinContract,  $coinDetailResponse->price);
+        $this->coinContractRepository->updatePrice($coinContract, $coinDetailResponse->price);
 
         $coin = $coinContract->getCoin();
         if ($coin->getName() !== $coinDetailResponse->name) {

@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\RefreshTokenRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints\Uuid;
 
 #[ORM\Entity(repositoryClass: RefreshTokenRepository::class)]
 #[ORM\Table(name: 'refresh_tokens')]
@@ -15,7 +14,7 @@ class RefreshToken
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 36, type: 'CHAR')]
+    #[ORM\Column(length: 64)]
     private ?string $tokenHash = null;
 
     #[ORM\ManyToOne]
@@ -28,14 +27,14 @@ class RefreshToken
     #[ORM\Column(length: 39)]
     private ?string $ipAddress = null;
 
-    #[ORM\Column]
+    #[ORM\Column()]
     private bool $isRevoked = false;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $expiredAt = null;
+    private \DateTimeImmutable $expiredAt;
 
     public function getId(): ?int
     {

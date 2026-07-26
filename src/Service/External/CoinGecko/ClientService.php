@@ -12,7 +12,7 @@ class ClientService
 
     public function __construct(
         protected HttpClientInterface $httpClient,
-        protected LoggerInterface $logger,
+        protected LoggerInterface     $logger,
     )
     {
     }

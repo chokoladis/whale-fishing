@@ -15,7 +15,7 @@ class CoinDetailService
 {
     public function __construct(
         private CoinDetailRepository $coinDetailRepository,
-        private LoggerInterface $logger,
+        private LoggerInterface      $logger,
     )
     {
     }

@@ -18,17 +18,17 @@ class PriceService extends ClientService implements GetterPriceInterface
 {
     public function __construct(
         #[Autowire(env: 'ALCHEMY_API_KEY')]
-        protected string $alchemyApiKey,
+        protected string              $alchemyApiKey,
         protected HttpClientInterface $httpClient,
-        protected LoggerInterface $logger,
-        protected CoinRepository $coinRepository,
-        protected SettingService $settingService,
+        protected LoggerInterface     $logger,
+        protected CoinRepository      $coinRepository,
+        protected SettingService      $settingService,
     )
     {
         parent::__construct($this->alchemyApiKey, $this->httpClient, $this->logger);
     }
 
-    public function getPriceByNetworkAndAddress(string $network, string $contractAddress) : float
+    public function getPriceByNetworkAndAddress(string $network, string $contractAddress): float
     {
 
         $contractAddress = trim($contractAddress);
@@ -41,7 +41,7 @@ class PriceService extends ClientService implements GetterPriceInterface
         try {
             $response = $httpRequest->request('POST',
                 sprintf('%s/prices/v1/%s/tokens/by-address', self::BASE_URL, $this->alchemyApiKey),
-                [ 'json' => ['addresses' => [['network' => 'eth-mainnet', 'address' => $contractAddress]]]]
+                ['json' => ['addresses' => [['network' => 'eth-mainnet', 'address' => $contractAddress]]]]
             );
 
             $responseBody = json_decode($response->getContent(false), true);

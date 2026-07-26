@@ -4,37 +4,34 @@ namespace App\Service\Auth;
 
 use App\DTO\Http\Request\Token\RefreshRequest;
 use App\Entity\RefreshToken;
+use App\Entity\User;
 use App\Exception\Auth\RefreshTokenInvalid;
 use App\Helper\SecureHelper;
-use App\Helper\UserHelper;
 use App\Repository\RefreshTokenRepository;
-use App\Tool\Security\JWTToken;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Uid\Uuid;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Uid\Uuid;
 
 class TokenService
 {
     public function __construct(
         #[Autowire(env: 'APP_SECRET')]
-        private string $secret,
-//        #[Autowire(param: 'jwt.refresh_token.lifetime')]
-//        private int $refreshTokenLifetime,
-        private ContainerBagInterface $params,
-        private RefreshTokenRepository $refreshTokenRepository,
-        private LoggerInterface $logger,
+        private string                   $secret,
+        private ContainerBagInterface    $params,
+        private RefreshTokenRepository   $refreshTokenRepository,
+        private JWTTokenManagerInterface $JWTTokenManager,
+        private LoggerInterface          $logger,
     )
     {
     }
 
-//    todo
-    public function refresh(RefreshRequest $request)
+    public function getNewAccessToken(RefreshRequest $request)
     {
-        $tokenHash = hash('argon2id', $request->refresh_token . $this->secret);
+        $tokenHash = hash('sha256', $request->refresh_token . $this->secret);
 
         $refreshToken = $this->refreshTokenRepository->findOneBy([
             'tokenHash' => $tokenHash
@@ -43,20 +40,18 @@ class TokenService
         if (!$refreshToken)
             throw new RefreshTokenInvalid('Данный refresh token не был найден');
 
-        if ($refreshToken->revoked)
+        if ($refreshToken->isRevoked())
             throw new RefreshTokenInvalid('Ваш refresh token уже не действителен');
 
-        $dataToken = $this->JWTTokenManager->parse($request->refresh_token);
+        if ($refreshToken->getExpiredAt()->getTimestamp() - time() <= 0) {
+            $refreshToken->setIsRevoked(true);
+            $this->refreshTokenRepository->save($refreshToken);
+            throw new RefreshTokenInvalid('Ваш refresh token уже не действителен');
+        }
 
-        $newRefreshToken = new RefreshToken();
-        $newRefreshToken->setTokenHash($tokenHash);
-
-        $this->refreshTokenRepository->save();
-
-        // user_id для сброса токенов при смене пароля
         // device_fingerprint, ip_address(смотреть подсеть) - для безопастности и 2фа
 
-//        $this->JWTTokenManager->create($user);
+        return $this->JWTTokenManager->create($refreshToken->getUser());
     }
 
     //todo limit
@@ -66,7 +61,7 @@ class TokenService
 
         $token = Uuid::v7();
 
-        $tokenHash = password_hash($token->hash(), PASSWORD_ARGON2ID);
+        $tokenHash = hash('sha256', $token->hash() . $this->secret);
 
         $newRefreshToken = new RefreshToken;
         $newRefreshToken->setTokenHash($tokenHash);
@@ -74,7 +69,6 @@ class TokenService
         $newRefreshToken->setUser($user);
         $newRefreshToken->setDeviceFingerprint(SecureHelper::getDeviceFingerprint($request));
         $newRefreshToken->setExpiredAt((new \DateTimeImmutable())->modify('+' . $lifetime . ' seconds'));
-
 
         $this->refreshTokenRepository->save($newRefreshToken);
 
@@ -94,8 +88,17 @@ class TokenService
 //        }
 
 //    todo
-    public function revoke()
+    public function revokeAll(User $user)
     {
+        /** @var RefreshToken[] $refreshTokens */
+        $refreshTokens = $this->refreshTokenRepository->findBy([
+            'user' => $user
+        ]);
 
+        if (!empty($refreshTokens)) {
+            foreach ($refreshTokens as $refreshToken) {
+                $refreshToken->setIsRevoked(true);
+            }
+        }
     }
 }

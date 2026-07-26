@@ -21,16 +21,16 @@ class MobulaOService extends BaseService
 
     public function __construct(
         #[Autowire(env: 'MOBULAIO_API_KEY')]
-        protected string $apiKey,
+        protected string              $apiKey,
         protected HttpClientInterface $httpClient,
-        protected LoggerInterface $logger,
-        protected CoinRepository $coinRepository,
+        protected LoggerInterface     $logger,
+        protected CoinRepository      $coinRepository,
     )
     {
         parent::__construct($this->httpClient, $this->logger);
     }
 
-    public function getCoinDetail(string $network, string $contractAddress) : \App\DTO\Http\Response\Coin\CoinDetailResponse
+    public function getCoinDetail(string $network, string $contractAddress): \App\DTO\Http\Response\Coin\CoinDetailResponse
     {
         //        "/api/1/market/data?shouldFetchPriceChange=24h&blockchain=ethereum&asset=cult"
         $this->validateNetworkAndContract($network, $contractAddress);
@@ -83,7 +83,7 @@ class MobulaOService extends BaseService
         );
     }
 
-    public function getCoinDetailBySymbol(string $symbol) : \App\DTO\Http\Response\Coin\CoinDetailResponse
+    public function getCoinDetailBySymbol(string $symbol): \App\DTO\Http\Response\Coin\CoinDetailResponse
     {
         try {
             $response = $this->httpClient->request(
@@ -120,7 +120,7 @@ class MobulaOService extends BaseService
         $contracts = [];
 
         foreach ($data['blockchains'] as $idx => $blockchain) {
-            if ($network = Network::tryFrom(strtolower($blockchain))){
+            if ($network = Network::tryFrom(strtolower($blockchain))) {
                 $contracts[] = new CoinContractResponse(
                     $data['contracts'][$idx],
                     $network->value,

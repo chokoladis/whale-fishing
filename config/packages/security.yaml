@@ -20,8 +20,10 @@ security:
                 username_path: email
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
-#                success_handler: App\EventListener\Auth\LoginListener
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+                failure_handler: App\EventListener\Auth\AuthFailedListener
+            login_throttling:
+                max_attempts: 3
+                interval: '10 minutes'
         api_auth:
             pattern: ^/api/v1/auth
             security:

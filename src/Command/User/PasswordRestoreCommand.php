@@ -11,7 +11,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
 #[AsCommand(
     name: 'app:password-restore.clear',
@@ -23,19 +22,20 @@ class PasswordRestoreCommand extends Command
     public function __construct(
         protected PasswordRestoreRepository $passwordRestoreRepository,
         #[Autowire(service: 'monolog.logger.commands')]
-        protected LoggerInterface $logger,
-    ){
+        protected LoggerInterface           $logger,
+    )
+    {
         parent::__construct();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : int
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->clear();
 
         return Command::SUCCESS;
     }
 
-    public function clear() : void
+    public function clear(): void
     {
         $arIds = $this->passwordRestoreRepository->getOldRows();
         $this->logger->debug('count id for delete', [$arIds]);
