@@ -20,9 +20,9 @@ class CoinRepository extends ServiceEntityRepository
 {
 
     public function __construct(
-        ManagerRegistry $registry,
+        ManagerRegistry               $registry,
         private ContainerBagInterface $params,
-        private CoinResource $coinResource
+        private CoinResource          $coinResource
     )
     {
         parent::__construct($registry, Coin::class);
@@ -43,6 +43,7 @@ class CoinRepository extends ServiceEntityRepository
     public function updatePrice(Coin $coin, string $price): Coin
     {
         $coin->setAvgPrice($price);
+        $coin->setUpdatedAt(new \DateTimeImmutable());
 
         $this->save($coin);
 
@@ -51,7 +52,9 @@ class CoinRepository extends ServiceEntityRepository
 
     public function save(Coin $coin)
     {
-        $this->getEntityManager()->persist($coin);
+        if (!$coin->getId())
+            $this->getEntityManager()->persist($coin);
+
         $this->getEntityManager()->flush();
     }
 
@@ -64,7 +67,7 @@ class CoinRepository extends ServiceEntityRepository
         return $this->paginate($query, $listRequest?->page, $listRequest?->perPage);
     }
 
-    public function paginate(QueryBuilder $dql, ?int $page = 1, ?int $perPage = null) : PageDTO
+    public function paginate(QueryBuilder $dql, ?int $page = 1, ?int $perPage = null): PageDTO
     {
         $page = $page ?? 1;
         $perPage = $perPage ?? $this->params->get('listing.limit');

@@ -86,7 +86,7 @@ services:
         build:
             context: .
             dockerfile: dockerfiles/php/Dockerfile
-        command: php bin/console messenger:consume async
+        command: php bin/console messenger:consume async --fetch-size=1
         volumes:
             - .:/var/www/app
         depends_on:

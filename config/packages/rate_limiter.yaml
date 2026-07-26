@@ -8,6 +8,10 @@ framework:
             policy: 'sliding_window'
             limit: 4
             interval: '30 minutes'
+        token_refresher:
+            policy: 'sliding_window'
+            limit: 2
+            interval: '10 minutes'
         coin_get:
             policy: 'sliding_window'
             limit: 5

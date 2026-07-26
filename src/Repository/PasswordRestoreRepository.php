@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\PasswordRestore;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,25 +22,23 @@ class PasswordRestoreRepository extends ServiceEntityRepository
      * @return array<int, PasswordRestore>
      * @throws \DateMalformedStringException
      */
-    public function getRowsByUserIdForDay(int $userId) : array
+    public function getRowsByUserIdForDay(User $user): array
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.userId = :id')
+            ->andWhere('p.user = :user')
             ->andWhere('p.expiredAt > :now')
-            ->setParameter('id', $userId)
+            ->setParameter('user', $user)
             ->setParameter('now', new \DateTime('now')->modify('-1day'))
             ->getQuery()
             ->getResult();
     }
 
-    public function getActiveByToken(string $token, int $userId) : ?PasswordRestore
+    public function getActiveByToken(string $token): ?PasswordRestore
     {
         return $this->createQueryBuilder('p')
             ->andWhere('p.token = :token')
-            ->andWhere('p.userId = :userId')
             ->andWhere('p.expiredAt > :now')
             ->setParameter('token', $token)
-            ->setParameter('userId', $userId)
             ->setParameter('now', new \DateTime('now'))
             ->getQuery()
             ->getOneOrNullResult();
@@ -50,7 +49,7 @@ class PasswordRestoreRepository extends ServiceEntityRepository
      * @return PasswordRestore|null
      * @description only for test
      */
-    public function getNotActiveTokenByEmail(string $email) : ?PasswordRestore
+    public function getNotActiveTokenByEmail(string $email): ?PasswordRestore
     {
         return $this->createQueryBuilder('p')
             ->join('p.user', 'u')
@@ -63,7 +62,7 @@ class PasswordRestoreRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function getLastByUserEmail(string $email) : ?PasswordRestore
+    public function getLastByUserEmail(string $email): ?PasswordRestore
     {
         return $this->createQueryBuilder('p')
             ->join('p.user', 'u')
@@ -76,7 +75,7 @@ class PasswordRestoreRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function save(PasswordRestore $passwordRestore) : void
+    public function save(PasswordRestore $passwordRestore): void
     {
         $this->getEntityManager()->persist($passwordRestore);
         $this->getEntityManager()->flush();
@@ -87,7 +86,7 @@ class PasswordRestoreRepository extends ServiceEntityRepository
      * @throws \DateMalformedStringException
      * @description for cron task
      */
-    public function getOldRows() : array
+    public function getOldRows(): array
     {
         return $this->createQueryBuilder('p')
             ->addSelect('p.id')
@@ -97,7 +96,7 @@ class PasswordRestoreRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function deleteById(int $id) : mixed
+    public function deleteById(int $id): mixed
     {
         return $this->createQueryBuilder('p')
             ->delete()
@@ -111,7 +110,7 @@ class PasswordRestoreRepository extends ServiceEntityRepository
      * @param array<int, int> $ids
      * @return mixed
      */
-    public function deleteByIds(array $ids) : mixed
+    public function deleteByIds(array $ids): mixed
     {
         return $this->createQueryBuilder('p')
             ->delete()

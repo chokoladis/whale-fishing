@@ -20,9 +20,16 @@ security:
                 username_path: email
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+                failure_handler: App\EventListener\Auth\AuthFailedListener
+            login_throttling:
+                max_attempts: 3
+                interval: '10 minutes'
         api_auth:
             pattern: ^/api/v1/auth
+            security:
+                false
+        api_token:
+            pattern: ^/api/v1/token
             security:
                 false
         api_coin:
@@ -42,10 +49,13 @@ security:
             pattern:   ^/api
             stateless: true
             jwt: ~
+#            entry_point: jwt
+#            refresh_jwt:
+#                check_path: /api/v1/token/refresh
 
 
     access_control:
-        - { path: ^/api/v1/auth/, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/(auth|token), roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/coin/, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/transaction/topDaily/, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/transaction/topHourly/, roles: PUBLIC_ACCESS }

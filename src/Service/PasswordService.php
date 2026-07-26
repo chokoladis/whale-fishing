@@ -4,12 +4,15 @@ namespace App\Service;
 
 use App\DTO\Http\Request\Auth\PasswordRestoreConfirm;
 use App\DTO\Http\Request\Auth\PasswordRestoreSendToken;
-use App\Entity\PasswordRestore;
 use App\Entity\User;
 use App\Exception\RateLimitException;
 use App\Interface\SendTokenInterface;
 use App\Repository\PasswordRestoreRepository;
 use App\Repository\UserRepository;
+use App\Service\Auth\TokenService;
+use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -17,13 +20,20 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 class PasswordService
 {
     public function __construct(
-        private SendTokenInterface $senderToken,
-        private UserRepository $userRepository,
-        private PasswordRestoreRepository $passwordRestoreRepository,
+        private SendTokenInterface          $senderToken,
+        private UserRepository              $userRepository,
+        private PasswordRestoreRepository   $passwordRestoreRepository,
         private UserPasswordHasherInterface $passwordHasher,
-    ){}
+        private TokenService                $tokenService,
+        private EntityManagerInterface      $entityManager,
+        #[Autowire(env: 'APP_SECRET')]
+        private string                      $secret,
+        private LoggerInterface             $servicesLogger
+    )
+    {
+    }
 
-    public function sendToken(PasswordRestoreSendToken $request) : void
+    public function sendToken(PasswordRestoreSendToken $request): void
     {
         $user = $this->userRepository->findOneBy([
             'email' => $request->email
@@ -39,16 +49,16 @@ class PasswordService
             ->sendToken();
     }
 
-    private function checkQtyRequests(User $user) : void
+    private function checkQtyRequests(User $user): void
     {
         // todo cleaner by cron
-        $collection = $this->passwordRestoreRepository->getRowsByUserIdForDay($user->getId());
+        $collection = $this->passwordRestoreRepository->getRowsByUserIdForDay($user);
         $count = count($collection);
 
         if (!$count)
             return;
 
-        $now         = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable();
         $lastRequest = current($collection);
 
         if ($count > 3) {
@@ -64,31 +74,40 @@ class PasswordService
         }
     }
 
-    public function restore(PasswordRestoreConfirm $request) : void
+    public function restore(PasswordRestoreConfirm $request): void
     {
         //todo rate limit на уровне мидлы или просто фреймворка/сервера
 
         if (!$request->token)
             throw new ValidatorException('Не указан токен');
 
-        $user = $this->userRepository->findOneBy([
-            'email' => $request->email
-        ]);
+        $tokenHash = hash('sha256', $request->token . $this->secret);
 
-        if (!$user)
-            throw new NotFoundResourceException("Пользователь с таким email не был найден");
-
-        $row = $this->passwordRestoreRepository->getActiveByToken($request->token,$user->getId());
+        $row = $this->passwordRestoreRepository->getActiveByToken($tokenHash);
         if (!$row)
             throw new NotFoundResourceException('Указан истекший или некорректный токен');
 
-        $row->setExpiredAt(new \DateTimeImmutable());
+        $user = $row->getUser();
 
-        $this->passwordRestoreRepository->save($row);
+        try {
+            $conn = $this->entityManager->getConnection();
+            $conn->beginTransaction();
 
-        $this->userRepository->upgradePassword(
-            $user,
-            $this->passwordHasher->hashPassword($user, $request->password)
-        );
+            $user->setPassword($this->passwordHasher->hashPassword($user, $request->password));
+            $user->setUpdatedAt(new \DateTimeImmutable());
+            $this->entityManager->persist($user);
+
+            $row->setExpiredAt(new \DateTimeImmutable());
+            $this->entityManager->persist($row);
+
+            $this->tokenService->revokeAll($user);
+
+            $this->entityManager->flush();
+
+            $conn->commit();
+        } catch (\Throwable $exception) {
+            $this->servicesLogger->error($exception->getMessage());
+            $conn->rollBack();
+        }
     }
 }

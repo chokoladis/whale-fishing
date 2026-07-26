@@ -9,6 +9,7 @@ enum Network : string
     case OPTIMISM = 'optimism';
     case ARBITRUM = 'arbitrum';
     case BASE = 'base';
+    //todo mantle ?
     //    case SOLANA = 'solana';
     //
     //Optimistic","Avalanche C-Chain","BNB Smart Chain (BEP20)","Mantle - отдаются в mobula/api/1/metadata?symbol=%s

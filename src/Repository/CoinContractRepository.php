@@ -24,10 +24,10 @@ class CoinContractRepository extends ServiceEntityRepository
 {
 
     public function __construct(
-        ManagerRegistry $registry,
+        ManagerRegistry               $registry,
         private ContainerBagInterface $params,
-        private CoinResource $coinResource,
-        private LoggerInterface $logger
+        private CoinResource          $coinResource,
+        private LoggerInterface       $logger
     )
     {
         parent::__construct($registry, CoinContract::class);
@@ -78,7 +78,7 @@ class CoinContractRepository extends ServiceEntityRepository
         return $this->paginate($query, $listRequest?->page, $listRequest?->perPage);
     }
 
-    public function paginate(QueryBuilder $dql, ?int $page = 1, ?int $perPage = null) : PageDTO
+    public function paginate(QueryBuilder $dql, ?int $page = 1, ?int $perPage = null): PageDTO
     {
         $page = $page ?? 1;
         $perPage = $perPage ?? $this->params->get('listing.limit');
@@ -110,7 +110,9 @@ class CoinContractRepository extends ServiceEntityRepository
 
     public function save(CoinContract $coinContract)
     {
-        $this->getEntityManager()->persist($coinContract);
+        if (!$coinContract->getId())
+            $this->getEntityManager()->persist($coinContract);
+
         $this->getEntityManager()->flush();
     }
 }

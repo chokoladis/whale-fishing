@@ -7,7 +7,7 @@ class CoinContractResponse
     public function __construct(
         public string $address,
         public string $network, //todo in enum?
-        public int $decimals,
+        public int    $decimals,
     )
     {
     }

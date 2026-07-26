@@ -14,31 +14,35 @@ class EmailSenderToken extends BaseSenderToken
 {
     public function __construct(
         private readonly MailerInterface $mailer,
+        #[Autowire(env: 'APP_SECRET')]
+        protected string                 $secret,
         #[Autowire(env: 'MAILER_RESEND_EMAIL_FROM')]
-        private readonly string $emailFrom,
+        private readonly string          $emailFrom,
         #[Autowire(service: 'monolog.logger.senderToken')]
-        protected LoggerInterface $logger,
-        EntityManagerInterface $Manager,
+        protected LoggerInterface        $logger,
+        EntityManagerInterface           $Manager,
     )
     {
-        parent::__construct($Manager);
+        parent::__construct($Manager, $secret);
     }
 
-    public function sendToken() : void
+    public function sendToken(): void
     {
+        $this->generateToken();
+
+        $email = (new Email())
+            ->from($this->emailFrom)
+            ->to($this->user->getEmail())
+            ->subject($this->getSubject())
+            ->html($this->getHtmlMessage());
+
         $conn = $this->entityManager->getConnection();
         $conn->setAutoCommit(false);
         $conn->beginTransaction();
 
-        $this->generateToken()->save();
+        $this->save();
 
         try {
-            $email = (new Email())
-                ->from($this->emailFrom)
-                ->to($this->user->getEmail())
-                ->subject($this->getSubject())
-                ->html($this->getHtmlMessage());
-
             $this->mailer->send($email);
 
             $conn->commit();

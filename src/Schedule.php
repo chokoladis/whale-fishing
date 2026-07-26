@@ -14,7 +14,8 @@ final class Schedule implements ScheduleProviderInterface
 {
     public function __construct(
         private CacheInterface $cache,
-    ) {
+    )
+    {
     }
 
     public function getSchedule(): SymfonySchedule
@@ -23,6 +24,6 @@ final class Schedule implements ScheduleProviderInterface
             ->add(RecurringMessage::every('1 day', new CleanPasswordRestoreMessage()))
             ->stateful($this->cache)
             ->processOnlyLastMissedRun(true) // ensure only last missed task is run
-        ;
+            ;
     }
 }

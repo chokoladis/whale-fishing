@@ -14,7 +14,7 @@ class CoinContractService
 {
     public function __construct(
         private CoinContractRepository $coinContractRepository,
-        private LoggerInterface $logger,
+        private LoggerInterface        $logger,
     )
     {
     }
@@ -34,7 +34,7 @@ class CoinContractService
 
                 $this->coinContractRepository->save($newContract);
             }
-        }  else if ($coin->getCoinContract()->count() != count($coinDetailResponse->coinContracts)){
+        } else if ($coin->getCoinContract()->count() != count($coinDetailResponse->coinContracts)) {
             foreach ($coinDetailResponse->coinContracts as $coinContract) {
 
                 $newContract = $this->coinContractRepository->findByAddressAndNetwork(

@@ -13,9 +13,9 @@ class ClientService
 
     public function __construct(
         #[Autowire(env: 'ALCHEMY_API_KEY')]
-        protected string $alchemyApiKey,
+        protected string              $alchemyApiKey,
         protected HttpClientInterface $httpClient,
-        protected LoggerInterface $logger,
+        protected LoggerInterface     $logger,
     )
     {
     }

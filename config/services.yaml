@@ -1,5 +1,9 @@
 parameters:
-    listing.limit: 20
+    listing:
+        limit: 20
+    jwt:
+        refresh_token:
+            lifetime: 604800
 services:
 
     _defaults:
@@ -25,3 +29,6 @@ services:
     App\EventListener\ApiRateLimitListener:
         arguments:
             $apiListener: '@limiter.api'
+    App\EventListener\Auth\RefreshTokenListener:
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccess }

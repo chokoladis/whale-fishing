@@ -2,7 +2,6 @@
 
 namespace App\EventListener;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,16 +32,16 @@ final class ExceptionListener
             }
 
             $event->setResponse(new JsonResponse([
-                'errors'  => $errors,
+                'errors' => $errors,
             ], Response::HTTP_UNPROCESSABLE_ENTITY));
 
             return;
         } else if ($exception instanceof TooManyRequestsHttpException) {
             $event->setResponse(new JsonResponse([
-                'errors'  => [
-                    $exception->getMessage() ? $exception->getMessage() : $this->translator->trans('error.many_request'),
+                'errors' => [
+                    $exception->getMessage() ? $exception->getMessage() : $this->translator->trans('error.many_requests'),
                 ],
-            ],$exception->getStatusCode()));
+            ], $exception->getStatusCode()));
 
             return;
         }
@@ -52,7 +51,7 @@ final class ExceptionListener
             : Response::HTTP_INTERNAL_SERVER_ERROR;
 
         $response = new JsonResponse([
-            'errors'   => [ $exception->getMessage() ],
+            'errors' => [$exception->getMessage()],
         ], $statusCode);
 
         $event->setResponse($response);

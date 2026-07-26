@@ -6,8 +6,9 @@ readonly class RegisterDTO
 {
     public function __construct(
         /** @var array<string, string> $user - from resource */
-        public array $user,
-        public string $token,
+        public array  $user,
+        public string $access_token,
+        public string $refresh_token,
     )
     {
     }
