@@ -14,10 +14,10 @@ use Psr\Log\LoggerInterface;
 class TransactionService
 {
     public function __construct(
-        protected LoggerInterface $logger,
-        protected CoinRepository $coinRepository,
+        protected LoggerInterface       $logger,
+        protected CoinRepository        $coinRepository,
         protected TransactionRepository $transactionRepository,
-        protected TransactionResource $transactionResource,
+        protected TransactionResource   $transactionResource,
     )
     {
     }
@@ -31,7 +31,7 @@ class TransactionService
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function getTopHourly() : mixed
+    public function getTopHourly(): mixed
     {
         $datetime = new \DateTime();
         $datetime->modify('-1 hour');
@@ -40,7 +40,7 @@ class TransactionService
             $this->transactionRepository->getTopTransactionsByTime($datetime));
     }
 
-    public function getTopDaily() : mixed
+    public function getTopDaily(): mixed
     {
         $datetime = new \DateTime();
         $datetime->modify('-24 hours');
@@ -49,7 +49,7 @@ class TransactionService
             $this->transactionRepository->getTopTransactionsByTime($datetime));
     }
 
-    public function getList(?ListRequest $listRequest) : PageDTO
+    public function getList(?ListRequest $listRequest): PageDTO
     {
         return $this->transactionRepository->getList($listRequest);
     }

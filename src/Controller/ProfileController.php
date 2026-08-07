@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\OpenApi\Schema\ProfileResponse;
+use App\Resource\ProfileResource;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,6 +14,12 @@ use Symfony\Component\Routing\Attribute\Route;
 #[OA\Tag(name: 'Profile')]
 final class ProfileController extends AbstractController
 {
+    public function __construct(
+        private ProfileResource $profileResource,
+    )
+    {
+    }
+
     #[Route('', name: 'index', methods: ['GET'])]
     #[OA\Get(
         operationId: 'profileGet',
@@ -28,7 +35,7 @@ final class ProfileController extends AbstractController
     public function profile(): Response
     {
         return $this->json([
-            'user' => $this->getUser(),
+            'user' => $this->profileResource->fullData($this->getUser()),
         ]);
     }
 }

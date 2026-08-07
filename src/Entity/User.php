@@ -146,7 +146,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->passwordRestores = new ArrayCollection(); // обязательно инициализировать в конструкторе
         $this->createdAt = new \DateTimeImmutable();
-        $this->udpatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getPasswordRestores(): Collection

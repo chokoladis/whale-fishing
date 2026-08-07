@@ -14,13 +14,13 @@ class CoinContractService
 {
     public function __construct(
         private CoinContractRepository $coinContractRepository,
-        private LoggerInterface        $logger,
+//        private LoggerInterface        $logger,
     )
     {
     }
 
 
-    public function updateByCoinDetailResponse(Coin $coin, CoinDetailResponse $coinDetailResponse)
+    public function updateByCoinDetailResponse(Coin $coin, CoinDetailResponse $coinDetailResponse) : void
     {
         if ($coin->getCoinContract()->isEmpty()) {
             foreach ($coinDetailResponse->coinContracts as $coinContract) {
@@ -48,8 +48,8 @@ class CoinContractService
                     $newContract->setCoin($coin);
                     $newContract->setLocalPrice($coin->getAvgPrice());
                     $newContract->setNetwork($coinContract->network);
-                    $newContract->setContractAddress($coinContract->contractAddress);
-                    $newContract->setDecimal($coinContract->decimal);
+                    $newContract->setContractAddress($coinContract->address);
+                    $newContract->setDecimal($coinContract->decimals);
                 }
 
                 $this->coinContractRepository->save($newContract);

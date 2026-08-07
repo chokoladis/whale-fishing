@@ -68,7 +68,7 @@ class CoinService
 
     /**
      * @param TransactionDTO $transactionDTO
-     * @return CoinContract
+     * @return ?CoinContract
      * @throws \App\Exception\External\IntegrationException
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
