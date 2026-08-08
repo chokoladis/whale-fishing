@@ -2,7 +2,6 @@
 
 namespace App\Service\External\CoinGecko;
 
-use App\Config\External\CoinGeckoConfig;
 use App\Exception\Coin\InvalidCoinSymbolException;
 use App\Exception\RateLimitException;
 use App\Interface\External\GetterPriceInterface;
@@ -18,16 +17,16 @@ class PriceService extends ClientService implements GetterPriceInterface
 
     public function __construct(
         #[Autowire(env: 'COINGECKO_API_KEY')]
-        protected string $apiKey,
+        protected string              $apiKey,
         protected HttpClientInterface $httpClient,
-        protected LoggerInterface $logger,
-        protected CoinRepository $coinRepository,
+        protected LoggerInterface     $logger,
+        protected CoinRepository      $coinRepository,
     )
     {
         parent::__construct($this->httpClient, $this->logger);
     }
 
-    public function getPriceByNetworkAndAddress(string $network, string $contractAddress) : float
+    public function getPriceByNetworkAndAddress(string $network, string $contractAddress): float
     {
         // todo вынести в базовый класс?
 //        https://api.coingecko.com/api/v3/simple/token_price/{network}?contract_addresses={contract_address}&vs_currencies=usd
@@ -56,7 +55,7 @@ class PriceService extends ClientService implements GetterPriceInterface
             throw $error;
         }
 
-        if ($response->getStatusCode() === Response::HTTP_OK && !empty($responseBody[$contractAddress])) {;
+        if ($response->getStatusCode() === Response::HTTP_OK && !empty($responseBody[$contractAddress])) {
             return floatval($responseBody[$contractAddress]['usd']);
         } else {
             $this->logger->error('coingecko [priceService] error', ['content' => $response->getContent(), 'status' => $response->getStatusCode()]);

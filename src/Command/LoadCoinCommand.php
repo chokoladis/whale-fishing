@@ -58,7 +58,7 @@ class LoadCoinCommand extends Command
         return Command::FAILURE;
     }
 
-    public function __invoke(LoadCoinBySymbolMessage $message)
+    public function __invoke(LoadCoinBySymbolMessage $message) : void
     {
         $coinDetailResponse = $this->priceService->getCoinDetailBySymbol($message->symbol);
 

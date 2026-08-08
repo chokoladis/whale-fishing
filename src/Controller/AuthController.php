@@ -102,7 +102,7 @@ final class AuthController extends AbstractController
         description: 'Ошибка валидации',
         content: new OA\JsonContent(ref: new Model(type: ValidationErrorResponse::class)),
     )]
-    public function passwordSendToken(
+    public function passwordRestoreSend(
         #[MapRequestPayload] PasswordRestoreSendToken $request,
     ): Response
     {
@@ -148,7 +148,7 @@ final class AuthController extends AbstractController
         description: 'Ошибка валидации',
         content: new OA\JsonContent(ref: new Model(type: ValidationErrorResponse::class)),
     )]
-    public function passwordRestore(
+    public function passwordRestoreConfirm(
         #[MapRequestPayload] PasswordRestoreConfirm $request,
     ): Response
     {

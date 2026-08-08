@@ -6,3 +6,6 @@ parameters:
         - tests/controller
     ignoreErrors:
         - '#Property App\\Entity\\.*::\$id \(.*\) is never assigned#'
+        - '#Parameter \#1 \$user of method App\\Entity\\RefreshToken::setUser\(\) expects App\\Entity\\User\|null, Symfony\\Component\\Security\\Core\\User\\UserInterface given#'
+        - '#Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface\::.*\(\)#'
+

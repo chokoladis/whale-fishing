@@ -89,8 +89,9 @@ class PasswordService
 
         $user = $row->getUser();
 
+        $conn = $this->entityManager->getConnection();
+
         try {
-            $conn = $this->entityManager->getConnection();
             $conn->beginTransaction();
 
             $user->setPassword($this->passwordHasher->hashPassword($user, $request->password));

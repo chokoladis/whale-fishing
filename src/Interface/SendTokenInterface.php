@@ -6,7 +6,7 @@ use App\Entity\User;
 
 interface SendTokenInterface
 {
-    public function setUser(User $user) : self;
+    public function setUser(User $user): self;
 
-    public function sendToken() : void;
+    public function sendToken(): void;
 }

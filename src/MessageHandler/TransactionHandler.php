@@ -18,16 +18,16 @@ class TransactionHandler
     const string CHECKER_RANGE_FROM = '50000';
 
     function __construct(
-        private CoinService $coinService,
-        private WalletService $walletService,
+        private CoinService           $coinService,
+        private WalletService         $walletService,
         protected MessageBusInterface $bus,
-        #[Autowire(service: 'monolog.logger.commands')]
-        private LoggerInterface $logger
+//        #[Autowire(service: 'monolog.logger.commands')]
+//        private LoggerInterface       $logger
     )
     {
     }
 
-    public function __invoke(TransactionMessage $transaction) : void
+    public function __invoke(TransactionMessage $transaction): void
     {
         $data = $transaction->dto;
 

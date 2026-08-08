@@ -15,13 +15,13 @@ class CoinDetailService
 {
     public function __construct(
         private CoinDetailRepository $coinDetailRepository,
-        private LoggerInterface      $logger,
+//        private LoggerInterface      $logger,
     )
     {
     }
 
 
-    public function updateByCoinDetailResponse(Coin $coin, CoinStatisticsResponse $statistics)
+    public function updateByCoinDetailResponse(Coin $coin, CoinStatisticsResponse $statistics) : void
     {
         $coinDetail = new CoinDetail();
         $coinDetail->setCoin($coin);

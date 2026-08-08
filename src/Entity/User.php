@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Enum\User\Role;
 use App\Enum\User\Status;
-use App\EventListener\User\PasswordUpdateListener;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -17,7 +18,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ORM\HasLifecycleCallbacks]
-#[ORM\EntityListeners([PasswordUpdateListener::class])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -146,9 +146,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->passwordRestores = new ArrayCollection(); // обязательно инициализировать в конструкторе
         $this->createdAt = new \DateTimeImmutable();
-        $this->udpatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
+    /**
+     * @return Collection<int, PasswordRestore>
+     */
     public function getPasswordRestores(): Collection
     {
         return $this->passwordRestores;

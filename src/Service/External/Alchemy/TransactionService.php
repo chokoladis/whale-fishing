@@ -17,10 +17,10 @@ class TransactionService extends ClientService
 
     public function __construct(
         #[Autowire(env: 'ALCHEMY_API_KEY')]
-        protected string $alchemyApiKey,
-        protected HttpClientInterface $httpClient,
-        protected LoggerInterface $logger,
-        protected CoinRepository $coinRepository,
+        protected string                $alchemyApiKey,
+        protected HttpClientInterface   $httpClient,
+        protected LoggerInterface       $logger,
+        protected CoinRepository        $coinRepository,
         protected TransactionRepository $transactionRepository,
     )
     {
@@ -38,12 +38,12 @@ class TransactionService extends ClientService
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public function getAssetTransferByTransactionDTO(TransactionDTO $transactionDTO) : mixed
+    public function getAssetTransferByTransactionDTO(TransactionDTO $transactionDTO): mixed
     {
         try {
             $response = $this->httpClient->request('POST',
-                sprintf('https://%s/v2/%s',self::BASE_URL, $this->alchemyApiKey),
-                [ 'json' => [
+                sprintf('https://%s/v2/%s', self::BASE_URL, $this->alchemyApiKey),
+                ['json' => [
                     'id' => 1,
                     'jsonrpc' => '2.0',
                     'method' => 'alchemy_getAssetTransfers',

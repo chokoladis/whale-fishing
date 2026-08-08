@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Wallet;
 use App\Entity\WalletCoin;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

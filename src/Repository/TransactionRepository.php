@@ -24,10 +24,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 class TransactionRepository extends ServiceEntityRepository
 {
     public function __construct(
-        ManagerRegistry $registry,
+        ManagerRegistry                $registry,
         private EntityManagerInterface $manager,
-        private ContainerBagInterface $params,
-        private TransactionResource $transactionResource,
+        private ContainerBagInterface  $params,
+        private TransactionResource    $transactionResource,
     )
     {
         parent::__construct($registry, Transaction::class);
@@ -79,8 +79,21 @@ class TransactionRepository extends ServiceEntityRepository
         $page = $listRequest->page ?? 1;
         $perPage = $listRequest->perPage ?? $this->params->get('listing.limit');
 
-        $builder = $this->createQueryBuilder('t')
-            ->orderBy('t.createdAt', 'DESC');
+        $sort = $listRequest->sort ?? 'createdAt';
+        $order = $listRequest->order ?? 'desc';
+
+        $builder = $this->createQueryBuilder('t');
+
+
+        if ($listRequest->filters) {
+            if ($listRequest->filters['coin']) { // temp
+                $builder->leftJoin('t.coin', 'c');
+                $builder->andWhere('c.symbol = :coin')
+                    ->setParameter('coin', strtoupper($listRequest->filters['coin']));
+            }
+        }
+
+        $builder->orderBy('t.' . $sort, $order);
 
         $paginator = $this->paginate($builder, $page, $perPage);
 
@@ -101,7 +114,7 @@ class TransactionRepository extends ServiceEntityRepository
      * @param int $perPage
      * @return Paginator<Transaction>
      */
-    protected function paginate(QueryBuilder $query, int $page, int $perPage) : Paginator
+    protected function paginate(QueryBuilder $query, int $page, int $perPage): Paginator
     {
         $paginator = new Paginator($query);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\WalletRepository;
@@ -61,7 +63,9 @@ class Wallet
     }
 
 
-
+    /**
+     * @return Collection<int, WalletCoin>
+     */
     public function getWalletCoins(): Collection
     {
         return $this->walletCoins;

@@ -20,7 +20,6 @@ final class TokenController extends AbstractController
 
     }
 
-//    todo tests
     #[RateLimit('token_refresher')]
     #[Route('refresh/', name: 'refresh', methods: ['POST'])]
     public function index(

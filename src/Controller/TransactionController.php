@@ -57,7 +57,7 @@ final class TransactionController extends AbstractController
     #[OA\Response(response: 401, description: 'Не авторизован')]
     public function list(
         #[MapQueryString] ?ListRequest $listRequest,
-    ) : JsonResponse
+    ): JsonResponse
     {
         try {
             return $this->json(['data' => $this->transactionService->getList($listRequest)], Response::HTTP_OK);

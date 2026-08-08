@@ -24,12 +24,12 @@ class TokenService
         private ContainerBagInterface    $params,
         private RefreshTokenRepository   $refreshTokenRepository,
         private JWTTokenManagerInterface $JWTTokenManager,
-        private LoggerInterface          $logger,
+//        private LoggerInterface          $logger,
     )
     {
     }
 
-    public function getNewAccessToken(RefreshRequest $request)
+    public function getNewAccessToken(RefreshRequest $request) : string
     {
         $tokenHash = hash('sha256', $request->refresh_token . $this->secret);
 
@@ -55,7 +55,7 @@ class TokenService
     }
 
     //todo limit
-    public function createRefreshToken(Request $request, UserInterface $user)
+    public function createRefreshToken(Request $request, UserInterface $user) : string
     {
         $lifetime = $this->params->get('jwt')['refresh_token']['lifetime'];
 
@@ -75,20 +75,8 @@ class TokenService
         return $token->hash();
     }
 
-//        boolean isDateCorrect = claims
-//        .getExpiration()
-//        .after(new Date());
-//        var type = claims.get("type");
-//
-//        if (!typeToken.equals(type)) {
-//            throw new JwtException("Некорректный тип токена");
-//        }
-//        if (!isDateCorrect) {
-//            throw new ExpiredJwtException(null, claims, "Действие токена авторизации истекло");
-//        }
-
 //    todo
-    public function revokeAll(User $user)
+    public function revokeAll(User $user) : void
     {
         /** @var RefreshToken[] $refreshTokens */
         $refreshTokens = $this->refreshTokenRepository->findBy([
