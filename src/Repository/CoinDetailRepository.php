@@ -16,7 +16,7 @@ class CoinDetailRepository extends ServiceEntityRepository
         parent::__construct($registry, CoinDetail::class);
     }
 
-    public function save(CoinDetail $coinDetail)
+    public function save(CoinDetail $coinDetail) : void
     {
         if (!$coinDetail->getId())
             $this->getEntityManager()->persist($coinDetail);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -33,7 +35,7 @@ class WalletCoin
 
     public function __construct()
     {
-        $this->createdAt   = new \DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
 
@@ -113,13 +115,13 @@ class WalletCoin
         $this->createdAt = $createdAt;
     }
 
-    public function getTotalValue(float $currentPrice): float
+    public function getTotalValue(string $currentPrice): string
     {
-        return (float)$this->balance * $currentPrice;
+        return bcmul($this->balance, $currentPrice);
     }
 
-    public function getPnl(float $currentPrice): float
+    public function getPnl(string $currentPrice): string
     {
-        return ($currentPrice - (float)$this->avgPrice) * (float)$this->balance;
+        return bcmul(bcsub($currentPrice, $this->avgPrice), $this->balance);
     }
 }

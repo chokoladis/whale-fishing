@@ -9,7 +9,9 @@ class WalletResource
 {
     public function __construct(
         private WalletCoinResource $walletCoinResource,
-    ){}
+    )
+    {
+    }
 
     /**
      * @param Wallet $wallet
@@ -25,6 +27,20 @@ class WalletResource
             'coins' => array_map(fn(WalletCoin $coin) => $this->walletCoinResource->get($coin),
                 $wallet->getWalletCoins()->toArray()
             ),
+        ];
+    }
+
+    /**
+     * @param Wallet $wallet
+     * @return array<string, string|int|null>
+     */
+    public function short(
+        Wallet $wallet,
+    ) : array
+    {
+        return [
+            'id' => $wallet->getId(),
+            'address' => $wallet->getAddress(),
         ];
     }
 }

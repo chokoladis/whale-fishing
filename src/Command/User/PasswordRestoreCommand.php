@@ -48,7 +48,7 @@ class PasswordRestoreCommand extends Command
         }
     }
 
-    public function __invoke(CleanPasswordRestoreMessage $message)
+    public function __invoke(CleanPasswordRestoreMessage $message) : void
     {
         $this->clear();
     }

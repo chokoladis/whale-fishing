@@ -40,7 +40,7 @@ class Coin
     private ?CoinDetail $coinDetail = null;
 
     /**
-     * @var Collection<CoinContract> $coinContract
+     * @var Collection<int, CoinContract> $coinContract
      */
     #[ORM\OneToMany(mappedBy: 'coin', targetEntity: CoinContract::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -162,6 +162,9 @@ class Coin
         return $this;
     }
 
+    /**
+     * @return Collection<int, CoinContract>
+     */
     public function getCoinContract(): Collection
     {
         return $this->coinContract;

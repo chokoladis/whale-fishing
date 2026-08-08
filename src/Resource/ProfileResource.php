@@ -23,6 +23,10 @@ class ProfileResource
         ];
     }
 
+    /**
+     * @param UserInterface $user
+     * @return array<string, mixed>
+     */
     public function fullData(UserInterface $user): array
     {
         return [
@@ -30,7 +34,7 @@ class ProfileResource
             'email' => $user->getEmail(),
             'roles' => $user->getRoles(),
             'createdAt' => $user->getCreatedAt(),
-            'udpatedAt' => $user->getUdpatedAt(),
+            'updatedAt' => $user->getUpdatedAt(),
             'status' => $user->getStatus()->value,
         ];
     }

@@ -18,6 +18,9 @@ class CoinDetail
     #[ORM\JoinColumn(nullable: false)]
     private ?Coin $coin = null;
 
+    /**
+     * @var array<int, mixed>|null $investors
+     */
     #[ORM\Column(nullable: true)]
     private ?array $investors = null;
 
@@ -56,11 +59,17 @@ class CoinDetail
         return $this;
     }
 
+    /**
+     * @return mixed[]|null
+     */
     public function getInvestors(): ?array
     {
         return $this->investors;
     }
 
+    /**
+     * @param mixed[]|null $investors
+     */
     public function setInvestors(?array $investors): static
     {
         $this->investors = $investors;

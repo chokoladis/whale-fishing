@@ -50,7 +50,7 @@ class CoinRepository extends ServiceEntityRepository
         return $coin;
     }
 
-    public function save(Coin $coin)
+    public function save(Coin $coin) : void
     {
         if (!$coin->getId())
             $this->getEntityManager()->persist($coin);

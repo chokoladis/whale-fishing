@@ -9,18 +9,20 @@ class WalletCoinResource
 {
     public function __construct(
         private CoinResource $coinResource,
-    ){}
+    )
+    {
+    }
 
     /**
      * @param WalletCoin $walletCoin
      * @return array<string, mixed>
      */
-    public function get(WalletCoin $walletCoin) : array
+    public function get(WalletCoin $walletCoin): array
     {
         $data = [
             'coin' => $this->coinResource->itemWithPrice($walletCoin->getCoin()),
-            'balance' => rtrim(rtrim($walletCoin->getBalance(), '0'),'.'),
-            'avgPrice' => rtrim(rtrim($walletCoin->getAvgPrice(),'0'),'.'), //todo
+            'balance' => rtrim(rtrim($walletCoin->getBalance(), '0'), '.'),
+            'avgPrice' => rtrim(rtrim($walletCoin->getAvgPrice(), '0'), '.'), //todo
         ];
 
         $price = $walletCoin->getCoin()->getAvgPrice();

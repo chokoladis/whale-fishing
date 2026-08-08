@@ -18,7 +18,7 @@ class PasswordRestoreRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param int $userId
+     * @param User $user
      * @return array<int, PasswordRestore>
      * @throws \DateMalformedStringException
      */
