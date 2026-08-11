@@ -23,32 +23,31 @@ class WalletService
     const float MIN_VALUE_TOP_HOLDER = 100000;
 
     public function __construct(
-        private WalletRepository                            $walletRepository,
-        private WalletCoinRepository                        $walletCoinRepository,
-        private TransactionRepository                       $transactionRepository,
-        private WalletResource $walletResource,
+        private WalletRepository      $walletRepository,
+        private WalletCoinRepository  $walletCoinRepository,
+        private TransactionRepository $transactionRepository,
+        private WalletResource        $walletResource,
     )
     {
     }
 
-    public function getTopHolders(string $coinName) : mixed
+    public function getTopHolders(string $coinName): mixed
     {
         $symbol = strtoupper(trim($coinName));
         if (!mb_strlen($symbol)) {
             throw new InvalidCoinSymbolException('Symbol cannot be empty.');
         }
 
-//        todo paginator
+        //        todo paginator
         $wallets = $this->walletRepository->findByTopHoldersBySymbol($symbol, self::MIN_VALUE_TOP_HOLDER);
         if (empty($wallets)) {
-//            todo
 //            $wallets = $this->alchemyService->getTopHolders($symbol);
         }
 
-        return array_map(fn (Wallet $wallet) => $this->walletResource->detail($wallet), $wallets);
+        return array_map(fn(Wallet $wallet) => $this->walletResource->detail($wallet), $wallets);
     }
 
-    public function addTransactions(TransactionDTO $transaction, CoinContract $coinContract) : void
+    public function addTransactions(TransactionDTO $transaction, CoinContract $coinContract): void
     {
         $walletFrom = $this->walletRepository->findOrCreateByAddress($transaction->from);
 
@@ -72,11 +71,11 @@ class WalletService
         $this->transactionRepository->save($walletTo, $transaction, $coinContract, TransactionType::IN);
     }
 
-    public function updateWalletCoin(Wallet $wallet, Coin $coin, string $amount, TransactionType $type) : void
+    public function updateWalletCoin(Wallet $wallet, Coin $coin, string $amount, TransactionType $type): void
     {
         $walletCoin = $this->walletCoinRepository->findOneBy([
             'wallet' => $wallet,
-            'coin'   => $coin,
+            'coin' => $coin,
         ]);
 
         if (!$walletCoin) {
@@ -96,7 +95,7 @@ class WalletService
         $this->walletCoinRepository->save($walletCoin);
     }
 
-    public function getDetail(string $address) : mixed
+    public function getDetail(string $address): mixed
     {
         $wallet = $this->walletRepository->findOneBy([
             'address' => $address,

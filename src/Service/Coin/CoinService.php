@@ -21,6 +21,8 @@ use App\Service\External\Alchemy\TransactionService;
 use Doctrine\ORM\EntityNotFoundException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class CoinService
 {
@@ -31,7 +33,8 @@ class CoinService
         private CoinResource           $coinResource,
         private TransactionService     $transactionService,
         private LoggerInterface        $logger,
-        private MessageBusInterface    $messageBus
+        private MessageBusInterface    $messageBus,
+        private CacheInterface $cache,
     )
     {
     }
@@ -55,12 +58,17 @@ class CoinService
 
         $coin = $this->coinRepository->findOneBy(['symbol' => $symbol]);
         if (empty($coin)) {
-            $this->messageBus->dispatch(new LoadCoinBySymbolMessage($symbol));
+
+            $this->messageBus->dispatch(
+                new LoadCoinBySymbolMessage($symbol),
+                [new DeduplicateStamp('coin.' . $symbol)]
+            );
+
             throw new EntityNotFoundException('Данной монеты нет в базе');
         }
 
         if (empty($coin->getAvgPrice())) {
-            $this->messageBus->dispatch(new LoadCoinBySymbolMessage($symbol));
+            $this->messageBus->dispatch(new LoadCoinBySymbolMessage($symbol), [new DeduplicateStamp('coin.' . $symbol)]);
         }
 
         return $this->coinResource->detail($coin);

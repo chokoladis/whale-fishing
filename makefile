@@ -1,7 +1,7 @@
 build:
 	docker-compose up --build -d
 up-base:
-	docker-compose up -d php nginx db
+	docker-compose up -d php nginx db redis
 up-full:
 	docker-compose up -d
 down:

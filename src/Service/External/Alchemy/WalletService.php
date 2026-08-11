@@ -10,11 +10,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WalletService extends ClientService
 {
-    protected const string BASE_URL = 'https://'.AlchemyConfig::ETH_MAINNET_DOMAIN;
+    protected const string BASE_URL = 'https://' . AlchemyConfig::ETH_MAINNET_DOMAIN;
 
     const ITEMS_PER_PAGE = 10;
 
-    public function getTopHolders(string $symbol) : void
+    public function getTopHolders(string $symbol): void
     {
         $symbol = trim($symbol);
         if (!mb_strlen($symbol)) {
@@ -26,8 +26,8 @@ class WalletService extends ClientService
             [
                 'json' => [
                     'jsonrpc' => '2.0',
-                    'method'  => 'alchemy_getTokenBalances',
-                    'params'  => [
+                    'method' => 'alchemy_getTokenBalances',
+                    'params' => [
                         $symbol,
                         'erc20',
                         ['maxCount' => self::ITEMS_PER_PAGE]
