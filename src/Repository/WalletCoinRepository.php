@@ -18,7 +18,9 @@ class WalletCoinRepository extends ServiceEntityRepository
 
     public function save(WalletCoin $walletCoin): void
     {
-        $this->getEntityManager()->persist($walletCoin);
+        if (!$walletCoin->getId())
+            $this->getEntityManager()->persist($walletCoin);
+
         $this->getEntityManager()->flush();
     }
 }

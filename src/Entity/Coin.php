@@ -169,4 +169,11 @@ class Coin
     {
         return $this->coinContract;
     }
+
+    public function setCoinContract(CoinContract $coinContract): Coin
+    {
+        $this->coinContract->add($coinContract);
+
+        return $this;
+    }
 }

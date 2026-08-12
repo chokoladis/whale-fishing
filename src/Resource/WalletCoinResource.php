@@ -3,6 +3,7 @@
 namespace App\Resource;
 
 use App\Entity\WalletCoin;
+use App\Helper\StrHelper;
 use App\Resource\Coin\CoinResource;
 
 class WalletCoinResource
@@ -21,8 +22,8 @@ class WalletCoinResource
     {
         $data = [
             'coin' => $this->coinResource->itemWithPrice($walletCoin->getCoin()),
-            'balance' => rtrim(rtrim($walletCoin->getBalance(), '0'), '.'),
-            'avgPrice' => rtrim(rtrim($walletCoin->getAvgPrice(), '0'), '.'), //todo
+            'balance' => StrHelper::trimZeros($walletCoin->getBalance()),
+            'avgPrice' => StrHelper::trimZeros($walletCoin->getAvgPrice())
         ];
 
         $price = $walletCoin->getCoin()->getAvgPrice();

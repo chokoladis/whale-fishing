@@ -9,6 +9,7 @@ use App\Entity\CoinContract;
 use App\Entity\Transaction;
 use App\Entity\Wallet;
 use App\Enum\Coin\TransactionType;
+use App\Helper\StrHelper;
 use App\Resource\TransactionResource;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -47,7 +48,7 @@ class TransactionRepository extends ServiceEntityRepository
         $newTransaction->setFrom($transaction->from);
         $newTransaction->setTo($transaction->to);
         $newTransaction->setType($type);
-        $newTransaction->setAmount($amount);
+        $newTransaction->setAmount(StrHelper::trimZeros($amount));
 
         $newTransaction->setWallet($wallet);
         $newTransaction->setCoin($coinContract->getCoin());

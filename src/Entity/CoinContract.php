@@ -54,6 +54,7 @@ class CoinContract
     public function setCoin(Coin $coin): static
     {
         $this->coin = $coin;
+        $coin->setCoinContract($this);
 
         return $this;
     }

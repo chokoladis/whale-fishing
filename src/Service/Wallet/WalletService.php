@@ -12,10 +12,13 @@ use App\Entity\WalletCoin;
 use App\Enum\Coin\TransactionType;
 use App\Exception\Coin\InvalidCoinSymbolException;
 use App\Helper\StrHelper;
+use App\Messages\SetWalletCoinWithActualPriceMessage;
 use App\Repository\TransactionRepository;
 use App\Repository\WalletCoinRepository;
 use App\Repository\WalletRepository;
 use App\Resource\WalletResource;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class WalletService
 {
@@ -27,6 +30,8 @@ class WalletService
         private WalletCoinRepository  $walletCoinRepository,
         private TransactionRepository $transactionRepository,
         private WalletResource        $walletResource,
+        private MessageBusInterface $messageBus,
+        private LoggerInterface $logger,
     )
     {
     }
@@ -93,6 +98,8 @@ class WalletService
         $walletCoin->setBalance(StrHelper::trimZeros($newBalance));
 
         $this->walletCoinRepository->save($walletCoin);
+
+        $this->messageBus->dispatch(new SetWalletCoinWithActualPriceMessage($walletCoin->getId(), new \DateTimeImmutable()));
     }
 
     public function getDetail(string $address): mixed
