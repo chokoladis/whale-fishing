@@ -17,6 +17,7 @@ use App\Repository\TransactionRepository;
 use App\Repository\WalletCoinRepository;
 use App\Repository\WalletRepository;
 use App\Resource\WalletResource;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -32,6 +33,7 @@ class WalletService
         private WalletResource        $walletResource,
         private MessageBusInterface $messageBus,
         private LoggerInterface $logger,
+        private EntityManagerInterface $entityManager,
     )
     {
     }
@@ -54,26 +56,36 @@ class WalletService
 
     public function addTransactions(TransactionDTO $transaction, CoinContract $coinContract): void
     {
-        $walletFrom = $this->walletRepository->findOrCreateByAddress($transaction->from);
+        // добавленно из за дублей, todo оптимизировать
+        $this->entityManager->beginTransaction();
 
-        $this->updateWalletCoin(
-            $walletFrom,
-            $coinContract->getCoin(),
-            $transaction->amountRaw,
-            TransactionType::OUT
-        );
+        try {
+            $walletFrom = $this->walletRepository->findOrCreateByAddress($transaction->from);
 
-        $this->transactionRepository->save($walletFrom, $transaction, $coinContract, TransactionType::OUT);
-        //
+            $this->updateWalletCoin(
+                $walletFrom,
+                $coinContract->getCoin(), //todo optimize
+                $transaction->amountRaw,
+                TransactionType::OUT
+            );
 
-        $walletTo = $this->walletRepository->findOrCreateByAddress($transaction->to);
-        $this->updateWalletCoin(
-            $walletTo,
-            $coinContract->getCoin(),
-            $transaction->amountRaw,
-            TransactionType::IN
-        );
-        $this->transactionRepository->save($walletTo, $transaction, $coinContract, TransactionType::IN);
+            $this->transactionRepository->save($walletFrom, $transaction, $coinContract, TransactionType::OUT);
+            //
+
+            $walletTo = $this->walletRepository->findOrCreateByAddress($transaction->to);
+            $this->updateWalletCoin(
+                $walletTo,
+                $coinContract->getCoin(),
+                $transaction->amountRaw,
+                TransactionType::IN
+            );
+            $this->transactionRepository->save($walletTo, $transaction, $coinContract, TransactionType::IN);
+            $this->entityManager->commit();
+        } catch (\Throwable $e) {
+            $this->logger->error('ошибка при добавлении транзакций', [$e->getMessage(), $e->getLine(), $e->getFile()]);
+            $this->entityManager->rollBack();
+            throw $e;
+        }
     }
 
     public function updateWalletCoin(Wallet $wallet, Coin $coin, string $amount, TransactionType $type): void

@@ -14,7 +14,7 @@ final class Version20260726111228 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'fix refresh_tokens';
     }
 
     public function up(Schema $schema): void

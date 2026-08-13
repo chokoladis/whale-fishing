@@ -70,7 +70,7 @@ class TransactionRepository extends ServiceEntityRepository
             ->andWhere('t.createdAt >= :dateFrom')
             ->setParameter('dateFrom', $dateFrom)
             ->orderBy('t.amount', 'DESC')
-            ->setMaxResults($this->params->get('listing.limit'))
+            ->setMaxResults($this->params->get('listing')['limit'])
             ->getQuery()
             ->getResult();
     }
@@ -78,7 +78,7 @@ class TransactionRepository extends ServiceEntityRepository
     public function getList(?ListRequest $listRequest): PageDTO
     {
         $page = $listRequest->page ?? 1;
-        $perPage = $listRequest->perPage ?? $this->params->get('listing.limit');
+        $perPage = $listRequest->perPage ?? $this->params->get('listing')['limit'];
 
         $sort = $listRequest->sort ?? 'createdAt';
         $order = $listRequest->order ?? 'desc';
@@ -86,7 +86,7 @@ class TransactionRepository extends ServiceEntityRepository
         $builder = $this->createQueryBuilder('t');
 
 
-        if ($listRequest->filters) {
+        if ($listRequest?->filters) {
             if ($listRequest->filters['coin']) { // temp
                 $builder->leftJoin('t.coin', 'c');
                 $builder->andWhere('c.symbol = :coin')

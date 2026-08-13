@@ -50,14 +50,14 @@ class LoadCoinCommand extends Command
             $coinDetailResponse = $this->priceService->getCoinDetailBySymbol($symbol);
             $this->updateCoin($coinDetailResponse);
 
-            $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+            $io->success('Монета успешно обновлена');
 
             return Command::SUCCESS;
         }
 
-        $io->error('Symbol of coin can\'t be empty');
+        $io->error('Symbol не может быть пустым');
 
-        return Command::FAILURE;
+        return Command::INVALID;
     }
 
     public function __invoke(LoadCoinBySymbolMessage $message) : void

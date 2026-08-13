@@ -133,13 +133,12 @@ class MobulaIOService extends BaseService
                 );
             }
         }
-//        $this->logger->debug('mobule response data by symbol', [$data]);
 
         return new \App\DTO\Http\Response\Coin\CoinDetailResponse(
             $data['name'],
             strtoupper($data['symbol']),
             $decimals,
-            StrHelper::trimZeros(bcadd(strval($data['price']), '0', $decimals)),
+            StrHelper::trimZeros(strval($data['price'])),
             new CoinStatisticsResponse(
                 $data['market_cap'],
                 strval($data['volume']),
