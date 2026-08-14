@@ -1,10 +1,10 @@
 <?php
 
-namespace App\MessageHandler;
+namespace App\MessageHandler\Coin;
 
 use App\Entity\Coin;
 use App\Entity\CoinContract;
-use App\Messages\UpdateCoinPriceMessage;
+use App\Messages\Coin\UpdateCoinPriceMessage;
 use App\Repository\CoinContractRepository;
 use App\Service\Coin\CoinService;
 use App\Service\External\CoinPrice\MobulaIOService;

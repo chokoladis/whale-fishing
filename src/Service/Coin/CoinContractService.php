@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace App\Service\Coin;
 
+use App\DTO\Http\Response\Coin\BatchPricesBody;
 use App\DTO\Http\Response\Coin\CoinDetailResponse;
 use App\Entity\Coin;
 use App\Entity\CoinContract;
+use App\Enum\External\ChainId;
+use App\Helper\StrHelper;
 use App\Repository\CoinContractRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class CoinContractService
 {
     public function __construct(
         private CoinContractRepository $coinContractRepository,
-//        private LoggerInterface        $logger,
+        private EntityManagerInterface $entityManager,
+        private LoggerInterface        $logger,
     )
     {
     }
@@ -55,5 +60,29 @@ class CoinContractService
                 $this->coinContractRepository->save($newContract);
             }
         }
+    }
+
+    public function updatePricesByBatchPrices(BatchPricesBody $batchPricesBody, array $coinContracts) : void
+    {
+        foreach ($batchPricesBody->payload as $item) {
+            if ($chain = ChainId::tryFrom($item->chainId)) {
+                $network = $chain->name;
+                /**
+                 * @var CoinContract $coinContract
+                 */
+                $coinContract = $coinContracts[strtolower($network.'_'.$item->address)];
+
+                if ($coinContract && $item->priceUSD) {
+                    $coinContract->setLocalPrice(
+                        StrHelper::trimZeros(StrHelper::toPlainDecimalString($item->priceUSD, $coinContract->getDecimal()))
+                    );
+                    if ($item->marketCapUSD)
+                        $coinContract->getCoin()->getCoinDetail()->setMarketCap($item->marketCapUSD); //todo separate full-update in schedule
+                    //todo? $coinContract->getCoin()->setAvgPrice()
+                }
+            }
+        }
+
+        $this->entityManager->flush();
     }
 }

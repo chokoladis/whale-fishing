@@ -4,12 +4,11 @@ namespace App\Command;
 
 use App\DTO\Http\Response\Coin\CoinDetailResponse;
 use App\Entity\Coin;
-use App\Messages\LoadCoinBySymbolMessage;
+use App\Messages\Coin\LoadCoinBySymbolMessage;
 use App\Repository\CoinRepository;
 use App\Service\Coin\CoinContractService;
 use App\Service\Coin\CoinDetailService;
 use App\Service\External\CoinPrice\MobulaIOService;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

@@ -3,12 +3,10 @@
 namespace App\MessageHandler;
 
 use App\Helper\StrHelper;
+use App\Messages\Coin\UpdateCoinPriceMessage;
 use App\Messages\TransactionMessage;
-use App\Messages\UpdateCoinPriceMessage;
 use App\Service\Coin\CoinService;
 use App\Service\Wallet\WalletService;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 

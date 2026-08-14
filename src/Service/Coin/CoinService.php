@@ -12,7 +12,7 @@ use App\Entity\CoinContract;
 use App\Entity\CoinDetail;
 use App\Exception\Coin\InvalidCoinSymbolException;
 use App\Helper\StrHelper;
-use App\Messages\LoadCoinBySymbolMessage;
+use App\Messages\Coin\LoadCoinBySymbolMessage;
 use App\Repository\CoinContractRepository;
 use App\Repository\CoinDetailRepository;
 use App\Repository\CoinRepository;

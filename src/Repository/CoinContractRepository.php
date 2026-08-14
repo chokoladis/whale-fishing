@@ -115,4 +115,21 @@ class CoinContractRepository extends ServiceEntityRepository
 
         $this->getEntityManager()->flush();
     }
+
+    /**
+     * @param \DateTimeImmutable $updatedAt
+     * @return array<int, CoinContract>
+     */
+    public function getByUpdatedAtBefore(\DateTimeImmutable $updatedAt)
+    {
+        return $this->createQueryBuilder('cc')
+            ->join('cc.coin', 'c')
+            ->join('c.coinDetail', 'cd')
+            ->where("cc.updatedAt < :updatedAt")
+            ->setParameter('updatedAt', $updatedAt)
+            ->orderBy('cc.updatedAt', 'ASC')
+            ->setMaxResults(50)
+            ->getQuery()
+            ->getResult();
+    }
 }
