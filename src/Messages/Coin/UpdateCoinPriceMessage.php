@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Messages;
+namespace App\Messages\Coin;
 
 use Symfony\Component\Messenger\Attribute\AsMessage;
 

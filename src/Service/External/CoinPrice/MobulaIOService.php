@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\External\CoinPrice;
 
 use App\Config\External\MobulaIOConfig;
+use App\DTO\Http\Response\Coin\BatchPricesBody;
 use App\DTO\Http\Response\Coin\CoinContractResponse;
 use App\DTO\Http\Response\Coin\CoinHistoryDataResponse;
 use App\DTO\Http\Response\Coin\CoinStatisticsResponse;
@@ -16,6 +17,7 @@ use App\Repository\CoinRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MobulaIOService extends BaseService
@@ -27,6 +29,7 @@ class MobulaIOService extends BaseService
         protected HttpClientInterface $httpClient,
         protected LoggerInterface     $logger,
         protected CoinRepository      $coinRepository,
+        protected SerializerInterface $serializer,
     )
     {
         parent::__construct($this->httpClient, $this->logger);
@@ -187,5 +190,49 @@ class MobulaIOService extends BaseService
             StrHelper::toPlainDecimalString($data['priceUSD']),
             strval($data['marketCapUSD']),
         );
+    }
+
+    /**
+     * @param array<string> $addresses
+     * @param array<string> $networks
+     * @return BatchPricesBody
+     * @throws RateLimitException
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     * @throws \Throwable
+     */
+    public function batchPrices(array $data)
+    {
+        try {
+
+            $response = $this->httpClient->request(
+                'POST',
+                sprintf('%s/api/2/token/price',
+                    MobulaIOConfig::BASE_URL
+                ),
+                [
+                    'headers' => ['Authorization' => $this->apiKey,],
+                    'json' => ['items' => $data]
+                ]
+            );
+
+            $this->logger->info('batch response', [$response->getContent()]);
+
+            return $this->serializer->deserialize($response->getContent(), BatchPricesBody::class, 'json');
+
+        } catch (\Throwable $error) {
+            $this->logger->error('mobulaIO get price by symbol error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
+
+            if ($error->getCode() === Response::HTTP_TOO_MANY_REQUESTS) {
+                throw new RateLimitException();
+            } else if ($error->getCode() === 0) {
+                // need reconnect
+                exit();
+            }
+
+            throw $error;
+        }
     }
 }
