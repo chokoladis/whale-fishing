@@ -23,7 +23,7 @@ class CoinDetailService
 
     public function updateByCoinDetailResponse(Coin $coin, CoinStatisticsResponse $statistics) : void
     {
-        $coinDetail = new CoinDetail();
+        $coinDetail = $coin->getCoinDetail() ?? new CoinDetail();
         $coinDetail->setCoin($coin);
         $coinDetail->setMarketCap($statistics->marketCap);
         $coinDetail->setVolume($statistics->volume);

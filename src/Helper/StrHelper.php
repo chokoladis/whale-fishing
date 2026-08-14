@@ -37,4 +37,9 @@ class StrHelper
 
         return $str;
     }
+
+    static function toPlainDecimalString(float|string $number, int $decimals = 0): string
+    {
+        return sprintf('%.' . $decimals . 'F', $number);
+    }
 }

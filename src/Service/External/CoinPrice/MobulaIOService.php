@@ -6,7 +6,9 @@ namespace App\Service\External\CoinPrice;
 
 use App\Config\External\MobulaIOConfig;
 use App\DTO\Http\Response\Coin\CoinContractResponse;
+use App\DTO\Http\Response\Coin\CoinHistoryDataResponse;
 use App\DTO\Http\Response\Coin\CoinStatisticsResponse;
+use App\Entity\CoinContract;
 use App\Enum\External\Network;
 use App\Exception\RateLimitException;
 use App\Helper\StrHelper;
@@ -16,7 +18,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class MobulaOService extends BaseService
+class MobulaIOService extends BaseService
 {
 
     public function __construct(
@@ -48,6 +50,7 @@ class MobulaOService extends BaseService
 
         } catch (\Throwable $error) {
             $this->logger->error('mobulaIO [priceService] error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
+            $this->logger->error('mobulaIO [priceService] class', [get_class($error)]);
 
             if ($error->getCode() === Response::HTTP_TOO_MANY_REQUESTS) {
                 throw new RateLimitException();
@@ -66,13 +69,15 @@ class MobulaOService extends BaseService
         //          "contracts":[
         //              {"address":"0x55d398326f99059ff775485246999027b3197955","blockchainId":"56","blockchain":"BNB Smart Chain (BEP20)","decimals":18},
         //          ],
+
         $data = $responseBody['data'];
+        $this->logger->debug('mobulaIO [priceService] price', [$data['price']]);
 
         return new \App\DTO\Http\Response\Coin\CoinDetailResponse(
             $data['name'],
             $data['symbol'],
             $data['decimals'],
-            StrHelper::trimZeros(bcadd(strval($data['price']), '0', $data['decimals'])),
+            StrHelper::trimZeros(bcadd(StrHelper::toPlainDecimalString($data['price'], $data['decimals']), '0', $data['decimals'])),
             new CoinStatisticsResponse(
                 $data['market_cap'],
                 strval($data['volume']),
@@ -128,13 +133,12 @@ class MobulaOService extends BaseService
                 );
             }
         }
-//        $this->logger->debug('mobule response data by symbol', [$data]);
 
         return new \App\DTO\Http\Response\Coin\CoinDetailResponse(
             $data['name'],
-            $data['symbol'],
+            strtoupper($data['symbol']),
             $decimals,
-            StrHelper::trimZeros(bcadd(strval($data['price']), '0', $decimals)),
+            StrHelper::trimZeros(strval($data['price'])),
             new CoinStatisticsResponse(
                 $data['market_cap'],
                 strval($data['volume']),
@@ -144,6 +148,44 @@ class MobulaOService extends BaseService
                 $data['max_supply']
             ),
             $contracts
+        );
+    }
+
+    public function getHistoryPrice(CoinContract $coinContract, \DateTimeImmutable $dateTime) : CoinHistoryDataResponse
+    {
+        try {
+            $response = $this->httpClient->request(
+                'GET',
+                sprintf('%s/api/2/token/price-at?chainId=%s&address=%s&timestamp=%d',
+                    MobulaIOConfig::BASE_URL, $coinContract->getNetwork(), $coinContract->getContractAddress(), $dateTime->getTimestamp()
+                ),
+                ['headers' => ['Authorization' => $this->apiKey,]]
+            );
+            $responseBody = json_decode($response->getContent(), true);
+            if (empty($responseBody['data']))
+                throw new \Exception('Пустой ответ');
+
+        } catch (\Throwable $error) {
+            $this->logger->error('mobulaIO get price by symbol error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
+
+            if ($error->getCode() === Response::HTTP_TOO_MANY_REQUESTS) {
+                throw new RateLimitException();
+            } else if ($error->getCode() === 0) {
+                // need reconnect
+                exit();
+            }
+
+            throw $error;
+        }
+
+        $this->logger->debug('moduleIO получение исторических данных', ['content' => $responseBody]);
+
+        $data = $responseBody['data'];
+
+        return new \App\DTO\Http\Response\Coin\CoinHistoryDataResponse(
+            $data['symbol'],
+            StrHelper::toPlainDecimalString($data['priceUSD']),
+            strval($data['marketCapUSD']),
         );
     }
 }

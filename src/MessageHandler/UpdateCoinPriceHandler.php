@@ -6,9 +6,8 @@ use App\Entity\Coin;
 use App\Entity\CoinContract;
 use App\Messages\UpdateCoinPriceMessage;
 use App\Repository\CoinContractRepository;
-use App\Service\Coin\CoinPriceService;
 use App\Service\Coin\CoinService;
-use App\Service\External\CoinPrice\MobulaOService;
+use App\Service\External\CoinPrice\MobulaIOService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -21,7 +20,7 @@ class UpdateCoinPriceHandler
     function __construct(
         private CoinContractRepository $coinContractRepository,
         protected LoggerInterface      $logger,
-        private MobulaOService         $mobulaPriceService,
+        private MobulaIOService        $mobulaPriceService,
         private CoinService            $coinService,
     )
     {

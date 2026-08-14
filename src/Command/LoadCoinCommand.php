@@ -8,7 +8,8 @@ use App\Messages\LoadCoinBySymbolMessage;
 use App\Repository\CoinRepository;
 use App\Service\Coin\CoinContractService;
 use App\Service\Coin\CoinDetailService;
-use App\Service\External\CoinPrice\MobulaOService;
+use App\Service\External\CoinPrice\MobulaIOService;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,10 +27,11 @@ class LoadCoinCommand extends Command
 {
     public function __construct(
         // for test
-        private MobulaOService      $priceService,
+        private MobulaIOService     $priceService,
         private CoinRepository      $coinRepository,
         private CoinContractService $coinContractService,
         private CoinDetailService   $coinDetailService,
+//        private LoggerInterface $logger,
     )
     {
         parent::__construct();
@@ -44,18 +46,18 @@ class LoadCoinCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        if ($symbol = $input->getArgument('symbol')) {
+        if ($symbol = strtoupper($input->getArgument('symbol'))) {
             $coinDetailResponse = $this->priceService->getCoinDetailBySymbol($symbol);
             $this->updateCoin($coinDetailResponse);
 
-            $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+            $io->success('Монета успешно обновлена');
 
             return Command::SUCCESS;
         }
 
-        $io->error('Symbol of coin can\'t be empty');
+        $io->error('Symbol не может быть пустым');
 
-        return Command::FAILURE;
+        return Command::INVALID;
     }
 
     public function __invoke(LoadCoinBySymbolMessage $message) : void
@@ -68,6 +70,7 @@ class LoadCoinCommand extends Command
     private function updateCoin(CoinDetailResponse $coinDetailResponse): void
     {
         $coin = $this->coinRepository->findOneBy(['symbol' => $coinDetailResponse->symbol]);
+
         if (empty($coin)) {
             $coin = new Coin();
             $coin->setSymbol($coinDetailResponse->symbol);

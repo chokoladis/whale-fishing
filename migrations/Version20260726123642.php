@@ -14,14 +14,14 @@ final class Version20260726123642 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'fixed table user';
     }
 
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE "user" ADD created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL');
-        $this->addSql('ALTER TABLE "user" ADD udpated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL');
+        $this->addSql('ALTER TABLE "user" ADD updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL');
         $this->addSql('ALTER TABLE "user" ADD status VARCHAR(10) NOT NULL');
     }
 
@@ -29,7 +29,7 @@ final class Version20260726123642 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE "user" DROP created_at');
-        $this->addSql('ALTER TABLE "user" DROP udpated_at');
+        $this->addSql('ALTER TABLE "user" DROP updated_at');
         $this->addSql('ALTER TABLE "user" DROP status');
     }
 }
