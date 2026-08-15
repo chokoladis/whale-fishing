@@ -2,7 +2,7 @@
 
 namespace App\Command\User;
 
-use App\Messages\CleanPasswordRestoreMessage;
+use App\Messages\User\CleanPasswordRestoreMessage;
 use App\Repository\PasswordRestoreRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;

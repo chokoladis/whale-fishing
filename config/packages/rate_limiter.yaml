@@ -12,6 +12,10 @@ framework:
             policy: 'sliding_window'
             limit: 2
             interval: '10 minutes'
+        user_delete_restore:
+            policy: 'sliding_window'
+            limit: 2
+            interval: '1 day'
         coin_get:
             policy: 'sliding_window'
             limit: 5

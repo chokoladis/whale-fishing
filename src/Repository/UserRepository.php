@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\DTO\Http\Request\Auth\RegisterRequest;
 use App\Entity\User;
+use App\Enum\User\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Schema\Exception\ColumnAlreadyExists;
 use Doctrine\ORM\EntityManagerInterface;
@@ -65,5 +66,22 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setParameter('email', $email)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function save(): void
+    {
+        $this->manager->flush();
+    }
+
+    public function forceDeleteUsers()
+    {
+        return $this->createQueryBuilder('u')
+            ->delete()
+            ->where('u.status != :status')
+            ->where('u.updated_at < :monthAgo')
+            ->setParameter('status', Status::ACTIVE)
+            ->setParameter('monthAgo', new \DateTimeImmutable('-1 month'))
+            ->getQuery()
+            ->execute();
     }
 }

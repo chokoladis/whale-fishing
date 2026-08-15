@@ -2,8 +2,8 @@
 
 namespace App;
 
-use App\Messages\CleanPasswordRestoreMessage;
 use App\Messages\Coin\ScheduleCoinsUpdaterMessage;
+use App\Messages\User\CleanPasswordRestoreMessage;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule as SymfonySchedule;
@@ -23,7 +23,7 @@ final class Schedule implements ScheduleProviderInterface
     {
         return (new SymfonySchedule())
             ->add(RecurringMessage::every('1 day', new CleanPasswordRestoreMessage()))
-            ->add(RecurringMessage::every('2 minutes', new ScheduleCoinsUpdaterMessage()))
+            ->add(RecurringMessage::every('5 minutes', new ScheduleCoinsUpdaterMessage()))
             ->stateful($this->cache)
             ->processOnlyLastMissedRun(true) // ensure only last missed task is run
             ;

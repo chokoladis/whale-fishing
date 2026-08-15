@@ -38,7 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [Role::USER->value];
 
     #[ORM\Column(length: 10)]
-    private Status $status = Status::INACTIVE;
+    private Status $status = Status::BLOCKED;
 
     /**
      * @var string The hashed password
@@ -56,7 +56,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, PasswordRestore>|null
      */
     #[OneToMany(mappedBy: 'user', targetEntity: PasswordRestore::class)]
-    private ?Collection $passwordRestores = null;
+    private ?Collection $passwordRestores;
 
     public function getId(): ?int
     {
@@ -144,7 +144,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->passwordRestores = new ArrayCollection(); // обязательно инициализировать в конструкторе
+        $this->passwordRestores = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
