@@ -3,6 +3,7 @@ monolog:
         - priceUpdater
         - senderToken
         - commands
+        - services
     handlers:
         priceUpdater:
             type: stream
@@ -19,6 +20,11 @@ monolog:
             path: '%kernel.logs_dir%/commands.log'
             level: debug
             channels: [ commands ]
+#        services:
+#            type: stream
+#            path: '%kernel.logs_dir%/services.log'
+#            level: debug
+#            channels: [ services ]
 
 when@dev: &monolog_dev
     monolog:

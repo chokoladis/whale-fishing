@@ -68,7 +68,7 @@ class TokenService
         $newRefreshToken->setIpAddress(SecureHelper::ipAddress());
         $newRefreshToken->setUser($user);
         $newRefreshToken->setDeviceFingerprint(SecureHelper::getDeviceFingerprint($request));
-        $newRefreshToken->setExpiredAt((new \DateTimeImmutable())->modify('+' . $lifetime . ' seconds'));
+        $newRefreshToken->setExpiredAt((new \DateTimeImmutable())->modify(sprintf('+%s seconds', $lifetime)));
 
         $this->refreshTokenRepository->save($newRefreshToken);
 

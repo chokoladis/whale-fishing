@@ -4,7 +4,9 @@ namespace App\Service\External\Alchemy;
 
 use App\Config\External\AlchemyConfig;
 use App\DTO\Http\Response\TransactionDTO;
+use App\Enum\External\Network;
 use App\Exception\External\IntegrationException;
+use App\Helper\NetworkHelper;
 use App\Repository\CoinRepository;
 use App\Repository\TransactionRepository;
 use Psr\Log\LoggerInterface;
@@ -40,9 +42,12 @@ class TransactionService extends ClientService
      */
     public function getAssetTransferByTransactionDTO(TransactionDTO $transactionDTO): mixed
     {
+        $network = Network::tryFrom($transactionDTO->network);
+        $domain = $network ? NetworkHelper::getDomainByNetwork($network) : self::BASE_URL;
+
         try {
             $response = $this->httpClient->request('POST',
-                sprintf('https://%s/v2/%s', self::BASE_URL, $this->alchemyApiKey),
+                sprintf('https://%s/v2/%s', $domain, $this->alchemyApiKey),
                 ['json' => [
                     'id' => 1,
                     'jsonrpc' => '2.0',

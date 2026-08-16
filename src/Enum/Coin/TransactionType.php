@@ -2,7 +2,7 @@
 
 namespace App\Enum\Coin;
 
-enum TransactionType : string
+enum TransactionType: string
 {
     case IN = 'in';
     case OUT = 'out';

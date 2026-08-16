@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Command\Alchemy;
 
-use App\Config\External\AlchemyConfig;
 use App\Enum\External\Network;
+use App\Helper\NetworkHelper;
 use App\Messages\TransactionMessage;
 use App\Tool\Alchemy\TransactionParser;
 use Psr\Log\LoggerInterface;
@@ -53,7 +53,7 @@ class AlchemyListenCommand extends Command
         )) {
             $this->network = $network->value;
 
-            $domain = self::getDomainByNetwork($network);
+            $domain = NetworkHelper::getDomainByNetwork($network);
 
             $output->writeln(sprintf('Connect to %s alchemy...', $domain));
 
@@ -115,17 +115,5 @@ class AlchemyListenCommand extends Command
             $output->writeln(sprintf('<error>Unknown network listener "%s"</error>', $input->getArgument('mainnet')));
             return Command::FAILURE;
         }
-    }
-
-    private static function getDomainByNetwork(Network $network)
-    {
-        return match ($network) {
-            Network::ETHEREUM => AlchemyConfig::ETH_MAINNET_DOMAIN,
-            Network::POLYGON => AlchemyConfig::POLYGON_MAINNET_DOMAIN,
-            Network::OPTIMISM => AlchemyConfig::OPTIMISM_MAINNET_DOMAIN,
-            Network::ARBITRUM => AlchemyConfig::ARBITRUM_MAINNET_DOMAIN,
-            Network::BASE => AlchemyConfig::BASE_MAINNET_DOMAIN,
-//            Network::SOLANA => AlchemyConfig::SOLANA_MAINNET_DOMAIN,
-        };
     }
 }

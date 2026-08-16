@@ -37,11 +37,6 @@ class UpdateCoinPriceHandler
         if (!$coinContract) {
             $this->logger->debug('Почему то не создался coin');
             return;
-//            $coin = new Coin();
-//            $coin->setName($message->symbol);
-//            $coin->setSymbol($message->symbol);
-//            $coin->setNetwork($message->contractAddress);
-//            $coin->setContractAddress($message->contractAddress);
         }
 
         $this->coinContract = $coinContract;

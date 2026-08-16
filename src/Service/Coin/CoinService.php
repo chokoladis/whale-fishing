@@ -94,6 +94,8 @@ class CoinService
             return $coin;// todo ?
         }
 
+//        $this->logger->debug('transaction dto', [$transactionDTO]);
+
         if ($transfer = $this->transactionService->getAssetTransferByTransactionDTO($transactionDTO)) {
             return $this->coinContractRepository->saveByDTO(
                 new CoinShortDTO(
@@ -112,7 +114,6 @@ class CoinService
 
     public function fullUpdateCoin(CoinContract $coinContract, \App\DTO\Http\Response\Coin\CoinDetailResponse $coinDetailResponse): void
     {
-        $this->logger->info('full update coin', ['response' => $coinDetailResponse]);
         //        todo in one transaction
         $this->coinContractRepository->updatePrice($coinContract, $coinDetailResponse->price);
 
@@ -132,11 +133,14 @@ class CoinService
         }
 
         $coinDetail->setMarketCap($stats->marketCap);
-        $coinDetail->setVolume($stats->volume);
         $coinDetail->setLiquidity($stats->liquidity);
         $coinDetail->setTotalSupply($stats->totalSupply);
         $coinDetail->setCirculationSupply($stats->circulationSupply);
 
+        if ($stats->volume)
+            $coinDetail->setVolume($stats->volume);
+        if ($stats->volume24)
+            $coinDetail->setVolume24($stats->volume24);
         if ($stats->maxSupply)
             $coinDetail->setMaxSupply($stats->maxSupply);
 

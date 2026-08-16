@@ -99,7 +99,7 @@ class PasswordService
             $this->entityManager->persist($user);
 
             $row->setExpiredAt(new \DateTimeImmutable());
-            $this->entityManager->persist($row);
+//            $this->entityManager->persist($row);
 
             $this->tokenService->revokeAll($user);
 

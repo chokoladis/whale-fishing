@@ -30,8 +30,11 @@ class CoinDetail
     #[ORM\Column(type: Types::DECIMAL, precision: 26, scale: 10)]
     private ?string $liquidity = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 24, scale: 10)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 24, scale: 10, nullable: true)]
     private ?string $volume = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 24, scale: 10, nullable: true)]
+    private ?string $volume24 = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 16, scale: 4)]
     private ?float $totalSupply = null;
@@ -147,5 +150,15 @@ class CoinDetail
         $this->maxSupply = $maxSupply;
 
         return $this;
+    }
+
+    public function getVolume24(): ?string
+    {
+        return $this->volume24;
+    }
+
+    public function setVolume24(?string $volume24): void
+    {
+        $this->volume24 = $volume24;
     }
 }

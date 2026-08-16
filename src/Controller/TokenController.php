@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\Http\Request\Token\RefreshRequest;
+use App\Exception\Auth\RefreshTokenInvalid;
 use App\Service\Auth\TokenService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,8 +27,15 @@ final class TokenController extends AbstractController
         #[MapRequestPayload] RefreshRequest $request,
     ): Response
     {
-        return $this->json([
-            'access_token' => $this->tokenService->getNewAccessToken($request),
-        ]);
+        try {
+            return $this->json([
+                'access_token' => $this->tokenService->getNewAccessToken($request),
+            ]);
+        } catch (RefreshTokenInvalid $e) {
+            return $this->json([
+                'errors' => [$e->getMessage()]
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
     }
 }

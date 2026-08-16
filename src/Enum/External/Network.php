@@ -2,7 +2,7 @@
 
 namespace App\Enum\External;
 
-enum Network : string
+enum Network: string
 {
     case ETHEREUM = 'ethereum';
     case POLYGON = 'polygon';
