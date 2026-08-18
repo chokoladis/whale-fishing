@@ -20,11 +20,11 @@ monolog:
             path: '%kernel.logs_dir%/commands.log'
             level: debug
             channels: [ commands ]
-#        services:
-#            type: stream
-#            path: '%kernel.logs_dir%/services.log'
-#            level: debug
-#            channels: [ services ]
+        services:
+            type: stream
+            path: '%kernel.logs_dir%/services.log'
+            level: debug
+            channels: [ services ]
 
 when@dev: &monolog_dev
     monolog:

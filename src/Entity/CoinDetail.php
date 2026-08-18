@@ -24,8 +24,8 @@ class CoinDetail
     #[ORM\Column(nullable: true)]
     private ?array $investors = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 18, scale: 4)]
-    private ?float $marketCap = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 30, scale: 8)]
+    private ?string $marketCap = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 26, scale: 10)]
     private ?string $liquidity = null;
@@ -80,12 +80,12 @@ class CoinDetail
         return $this;
     }
 
-    public function getMarketCap(): ?float
+    public function getMarketCap(): ?string
     {
         return $this->marketCap;
     }
 
-    public function setMarketCap(float $marketCap): static
+    public function setMarketCap(string $marketCap): static
     {
         $this->marketCap = $marketCap;
 

@@ -13,12 +13,14 @@ use App\Helper\StrHelper;
 use App\Repository\CoinContractRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class CoinContractService
 {
     public function __construct(
         private CoinContractRepository $coinContractRepository,
         private EntityManagerInterface $entityManager,
+        #[Autowire(service: 'monolog.logger.services')]
         private LoggerInterface        $logger,
     )
     {
@@ -74,10 +76,12 @@ class CoinContractService
 
                 if ($coinContract && $item->priceUSD) {
                     $coinContract->setLocalPrice(
-                        StrHelper::trimZeros(StrHelper::toPlainDecimalString($item->priceUSD, $coinContract->getDecimal()))
+                        StrHelper::trimZeros(StrHelper::toNormalNum($item->priceUSD))
                     );
                     if ($item->marketCapUSD)
-                        $coinContract->getCoin()->getCoinDetail()->setMarketCap($item->marketCapUSD); //todo separate full-update in schedule
+                        $coinContract->getCoin()
+                            ->getCoinDetail()
+                            ->setMarketCap(strval($item->marketCapUSD)); //todo separate full-update in schedule
                     //todo? $coinContract->getCoin()->setAvgPrice()
                 }
             }

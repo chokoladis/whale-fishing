@@ -38,8 +38,8 @@ class StrHelper
         return $str;
     }
 
-    static function toPlainDecimalString(float|string $number, int $decimals = 0): string
+    static function toNormalNum(float|string $number, ?int $decimal = 12): string
     {
-        return sprintf('%.' . $decimals . 'F', $number);
+        return sprintf('%.'.$decimal.'f', $number);
     }
 }

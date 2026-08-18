@@ -25,10 +25,10 @@ class CoinDetailService
     {
         $coinDetail = $coin->getCoinDetail() ?? new CoinDetail();
         $coinDetail->setCoin($coin);
-        $coinDetail->setMarketCap($statistics->marketCap);
+        $coinDetail->setMarketCap(strval($statistics->marketCap));
         $coinDetail->setVolume($statistics->volume);
         $coinDetail->setLiquidity($statistics->liquidity);
-        $coinDetail->setTotalSupply($statistics->totalSupply);
+        $coinDetail->setTotalSupply($statistics->totalSupply); //todo
         $coinDetail->setCirculationSupply($statistics->circulationSupply);
 
         if ($statistics->maxSupply)

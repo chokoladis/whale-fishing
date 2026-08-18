@@ -20,6 +20,7 @@ class WalletCoinResource
      */
     public function get(WalletCoin $walletCoin): array
     {
+        //todo optimize
         $data = [
             'coin' => $this->coinResource->itemWithPrice($walletCoin->getCoin()),
             'balance' => StrHelper::trimZeros($walletCoin->getBalance()),
@@ -27,10 +28,11 @@ class WalletCoinResource
         ];
 
         $price = $walletCoin->getCoin()->getAvgPrice();
+        $decimal = $walletCoin->getCoin()->getCoinContract()->current()->getDecimal();
 
         if ($price && $price != 0.0) {
-            $data['total'] = $walletCoin->getTotalValue($price);
-            $data['pnl'] = $walletCoin->getPnl($price);
+            $data['total'] = $walletCoin->getTotalValue($price, $decimal);
+            $data['pnl'] = $walletCoin->getPnl($price, $decimal);
         }
 
         return $data;
