@@ -22,7 +22,6 @@ use Doctrine\ORM\EntityNotFoundException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
-use Symfony\Contracts\Cache\CacheInterface;
 
 class CoinService
 {
@@ -34,7 +33,6 @@ class CoinService
         private TransactionService     $transactionService,
         private LoggerInterface        $logger,
         private MessageBusInterface    $messageBus,
-        private CacheInterface $cache,
     )
     {
     }
@@ -132,9 +130,9 @@ class CoinService
             $coinDetail = $coin->getCoinDetail();
         }
 
-        $coinDetail->setMarketCap($stats->marketCap);
+        $coinDetail->setMarketCap(strval($stats->marketCap));
         $coinDetail->setLiquidity($stats->liquidity);
-        $coinDetail->setTotalSupply($stats->totalSupply);
+        $coinDetail->setTotalSupply($stats->totalSupply);//todo
         $coinDetail->setCirculationSupply($stats->circulationSupply);
 
         if ($stats->volume)

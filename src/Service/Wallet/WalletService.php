@@ -19,6 +19,7 @@ use App\Repository\WalletRepository;
 use App\Resource\WalletResource;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class WalletService
@@ -31,7 +32,8 @@ class WalletService
         private TransactionRepository $transactionRepository,
         private WalletResource        $walletResource,
         private MessageBusInterface $messageBus,
-        private LoggerInterface $loggerService,
+        #[Autowire(service: 'monolog.logger.services')]
+        private LoggerInterface $logger,
         private EntityManagerInterface $entityManager,
     )
     {
@@ -69,7 +71,6 @@ class WalletService
             );
 
             $this->transactionRepository->save($walletFrom, $transaction, $coinContract, TransactionType::OUT);
-            //
 
             $walletTo = $this->walletRepository->findOrCreateByAddress($transaction->to);
             $this->updateWalletCoin(
@@ -81,7 +82,7 @@ class WalletService
             $this->transactionRepository->save($walletTo, $transaction, $coinContract, TransactionType::IN);
             $this->entityManager->commit();
         } catch (\Throwable $e) {
-            $this->loggerService->error('ошибка при добавлении транзакций', [$e->getMessage(), $e->getLine(), $e->getFile()]);
+            $this->logger->error('ошибка при добавлении транзакций', [$e->getMessage(), $e->getLine(), $e->getFile()]);
             $this->entityManager->rollBack();
             throw $e;
         }
@@ -103,19 +104,20 @@ class WalletService
             $currentBalance = $walletCoin->getBalance();
         }
 
-        $this->loggerService->debug('calc wallet coin', [$currentBalance, $amount]);
+        //todo optimize
+        $contract = $coin->getCoinContract()->current();
+
         $newBalance = $type === TransactionType::IN
             ? bcadd($currentBalance, $amount)
             : bcsub($currentBalance, $amount);
 
-        $walletCoin->setBalance(StrHelper::trimZeros($newBalance));
+        $amount = StrHelper::trimZeros(bcdiv($newBalance, bcpow('10', (string)$contract->getDecimal()), $contract->getDecimal()));
 
-        $this->loggerService->debug('calc wallet coin - $newBalance', [$newBalance, StrHelper::trimZeros($newBalance)]);
-
+        $walletCoin->setBalance($amount);
         $this->walletCoinRepository->save($walletCoin);
 
         // todo or update by cron?
-        $this->messageBus->dispatch(new SetWalletCoinWithActualPriceMessage($walletCoin->getId(), new \DateTimeImmutable()));
+        $this->messageBus->dispatch(new SetWalletCoinWithActualPriceMessage($walletCoin->getId(), new \DateTimeImmutable(), $type, $amount));
     }
 
     public function getDetail(string $address): mixed

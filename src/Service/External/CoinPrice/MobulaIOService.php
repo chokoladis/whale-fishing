@@ -28,12 +28,13 @@ class MobulaIOService extends BaseService
         #[Autowire(env: 'MOBULAIO_API_KEY')]
         protected string              $apiKey,
         protected HttpClientInterface $httpClient,
-        protected LoggerInterface     $loggerService,
+        #[Autowire(service: 'monolog.logger.services')]
+        protected LoggerInterface     $logger,
         protected CoinRepository      $coinRepository,
         protected SerializerInterface $serializer,
     )
     {
-        parent::__construct($this->httpClient, $this->loggerService);
+        parent::__construct($this->httpClient, $this->logger);
     }
 
     public function getCoinDetail(string $network, string $contractAddress): \App\DTO\Http\Response\Coin\CoinDetailResponse
@@ -52,10 +53,10 @@ class MobulaIOService extends BaseService
             $responseBody = json_decode($response->getContent(), true);
 
             if (empty($responseBody['data']))
-                throw new \Exception('Пустой ответ');
+                throw new \Exception('Пустой ответ', 404);
 
         } catch (\Throwable $error) {
-            $this->loggerService->error('mobulaIO [priceService] error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
+            $this->logger->error('mobulaIO [priceService] error getcoinDetail', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
 
             if ($error->getCode() === Response::HTTP_TOO_MANY_REQUESTS) {
                 throw new RateLimitException();
@@ -70,7 +71,7 @@ class MobulaIOService extends BaseService
         // todo save from all address? save logo
         $data = current($responseBody['data']);
 
-        $this->loggerService->info('MobulaIO response in market/data', [$data]);
+        $this->logger->info('MobulaIO response in market/data', [$data]);
 
         $actualData = $data['base']['address'] === $contractAddress ? $data['base'] : $data['quote'];
 
@@ -78,7 +79,7 @@ class MobulaIOService extends BaseService
             $actualData['name'],
             $actualData['symbol'],
             $actualData['decimals'],
-            StrHelper::trimZeros(bcadd(StrHelper::toPlainDecimalString($actualData['priceUSD'], $actualData['decimals']), '0', $actualData['decimals'])),
+            StrHelper::trimZeros(bcadd(StrHelper::toNormalNum($actualData['priceUSD']), '0', $actualData['decimals'])),
             new CoinStatisticsResponse(
                 marketCap: $actualData['marketCapUSD'],
                 liquidity: !empty($actualData['liquidityUSD']) ? strval($actualData['liquidityUSD']) : strval($data['liquidityUSD']) ?? '',
@@ -104,7 +105,7 @@ class MobulaIOService extends BaseService
                 throw new \Exception('Пустой ответ');
 
         } catch (\Throwable $error) {
-            $this->loggerService->error('mobulaIO get price by symbol error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
+            $this->logger->error('mobulaIO get coinDetail by symbol error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
 
             if ($error->getCode() === Response::HTTP_TOO_MANY_REQUESTS) {
                 throw new RateLimitException();
@@ -116,7 +117,7 @@ class MobulaIOService extends BaseService
             throw $error;
         }
 
-//        $this->loggerService->debug('moduleIO получение по символу response', ['content' => $responseBody]);
+        $this->logger->debug('moduleIO получение по символу response', ['content' => $responseBody]);
 
 //        todo save from all address? save logo
         $data = $responseBody['data'];
@@ -141,12 +142,12 @@ class MobulaIOService extends BaseService
             $decimals,
             StrHelper::trimZeros(strval($data['price'])),
             new CoinStatisticsResponse(
-                $data['market_cap'],
-                strval($data['volume']),
-                strval($data['liquidity']),
-                $data['total_supply'],
-                strval($data['circulating_supply']),
-                $data['max_supply']
+                marketCap: $data['market_cap'],
+                liquidity: strval($data['liquidity']),
+                totalSupply: $data['total_supply'],
+                circulationSupply: strval($data['circulating_supply']),
+                volume: strval($data['volume']),
+                maxSupply: $data['max_supply']
             ),
             $contracts
         );
@@ -163,11 +164,13 @@ class MobulaIOService extends BaseService
                 ['headers' => ['Authorization' => $this->apiKey,]]
             );
             $responseBody = json_decode($response->getContent(), true);
+            $this->logger->debug('get history response', [$response->getContent()]);
+
             if (empty($responseBody['data']))
                 throw new \Exception('Пустой ответ');
 
         } catch (\Throwable $error) {
-            $this->loggerService->error('mobulaIO get price by symbol error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
+            $this->logger->error('mobulaIO get history price by contract error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
 
             if ($error->getCode() === Response::HTTP_TOO_MANY_REQUESTS) {
                 throw new RateLimitException();
@@ -179,13 +182,17 @@ class MobulaIOService extends BaseService
             throw $error;
         }
 
-        $this->loggerService->debug('moduleIO получение исторических данных', ['content' => $responseBody]);
+        $this->logger->debug('moduleIO получение исторических данных', ['content' => $responseBody]);
 
         $data = $responseBody['data'];
 
+        $price = StrHelper::toNormalNum($data['priceUSD']);
+        $dotPos = stripos($price, '.');
+
         return new \App\DTO\Http\Response\Coin\CoinHistoryDataResponse(
             $data['symbol'],
-            StrHelper::toPlainDecimalString($data['priceUSD']),
+            $price,
+            strlen(substr($price, ++$dotPos)),
             strval($data['marketCapUSD']),
         );
     }
@@ -216,12 +223,12 @@ class MobulaIOService extends BaseService
                 ]
             );
 
-            $this->loggerService->info('batch response', [$response->getContent()]);
+            $this->logger->info('batch response', [$response->getContent()]);
 
             return $this->serializer->deserialize($response->getContent(), BatchPricesBody::class, 'json');
 
         } catch (\Throwable $error) {
-            $this->loggerService->error('mobulaIO get price by symbol error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
+            $this->logger->error('mobulaIO batch prices error', ['content' => $error->getMessage(), 'status' => $error->getCode()]);
 
             if ($error->getCode() === Response::HTTP_TOO_MANY_REQUESTS) {
                 throw new RateLimitException();
