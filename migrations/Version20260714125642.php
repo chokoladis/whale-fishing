@@ -20,9 +20,8 @@ final class Version20260714125642 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE coin ALTER avg_price TYPE VARCHAR(60)');
         $this->addSql('DROP INDEX idx_cointcontract_contractaddress_network');
-        $this->addSql('ALTER TABLE coin_contract ALTER local_price TYPE VARCHAR(255)');
+
         $this->addSql('ALTER TABLE coin_detail ALTER liquidity TYPE NUMERIC(26, 10)');
         $this->addSql('ALTER TABLE coin_detail ALTER volume TYPE NUMERIC(24, 10)');
         $this->addSql('ALTER TABLE coin_detail ALTER total_supply TYPE NUMERIC(16, 0)');
@@ -35,8 +34,6 @@ final class Version20260714125642 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE coin ALTER avg_price TYPE DOUBLE PRECISION');
-        $this->addSql('ALTER TABLE coin_contract ALTER local_price TYPE DOUBLE PRECISION');
         $this->addSql('CREATE UNIQUE INDEX idx_cointcontract_contractaddress_network ON coin_contract (contract_address, network)');
         $this->addSql('ALTER TABLE coin_detail ALTER liquidity TYPE NUMERIC(24, 10)');
         $this->addSql('ALTER TABLE coin_detail ALTER volume TYPE NUMERIC(22, 10)');

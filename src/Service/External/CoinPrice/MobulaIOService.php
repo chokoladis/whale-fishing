@@ -82,10 +82,10 @@ class MobulaIOService extends BaseService
             StrHelper::trimZeros(bcadd(StrHelper::toNormalNum($actualData['priceUSD']), '0', $actualData['decimals'])),
             new CoinStatisticsResponse(
                 marketCap: $actualData['marketCapUSD'],
-                liquidity: !empty($actualData['liquidityUSD']) ? strval($actualData['liquidityUSD']) : strval($data['liquidityUSD']) ?? '',
-                totalSupply:  $actualData['totalSupply'],
+                liquidity: !empty($actualData['liquidityUSD']) ? strval($actualData['liquidityUSD']) : strval($data['liquidityUSD']),
+                totalSupply: $actualData['totalSupply'],
                 circulationSupply: strval($actualData['circulatingSupply']),
-                volume24: !empty($actualData['volume24hUSD']) ? strval($actualData['volume24hUSD']) : strval($data['volume24hUSD']) ?? '',
+                volume24: !empty($actualData['volume24hUSD']) ? strval($actualData['volume24hUSD']) : strval($data['volume24hUSD']),
             )
         );
     }
@@ -153,7 +153,7 @@ class MobulaIOService extends BaseService
         );
     }
 
-    public function getHistoryPrice(CoinContract $coinContract, \DateTimeImmutable $dateTime) : CoinHistoryDataResponse
+    public function getHistoryPrice(CoinContract $coinContract, \DateTimeImmutable $dateTime): CoinHistoryDataResponse
     {
         try {
             $response = $this->httpClient->request(
@@ -194,12 +194,12 @@ class MobulaIOService extends BaseService
             $price,
             strlen(substr($price, ++$dotPos)),
             strval($data['marketCapUSD']),
+            $data['timestamp']
         );
     }
 
     /**
-     * @param array<string> $addresses
-     * @param array<string> $networks
+     * @param array<int, array{string, string}> $data
      * @return BatchPricesBody
      * @throws RateLimitException
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
@@ -208,7 +208,7 @@ class MobulaIOService extends BaseService
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      * @throws \Throwable
      */
-    public function batchPrices(array $data)
+    public function batchPrices(array $data): BatchPricesBody
     {
         try {
 

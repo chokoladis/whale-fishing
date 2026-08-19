@@ -7,7 +7,7 @@ use App\Enum\External\Network;
 
 class NetworkHelper
 {
-    static function getDomainByNetwork(Network $network)
+    static function getDomainByNetwork(Network $network): string
     {
         return match ($network) {
             Network::ETHEREUM => AlchemyConfig::ETH_MAINNET_DOMAIN,

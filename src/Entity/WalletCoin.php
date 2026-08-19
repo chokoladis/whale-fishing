@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Helper\StrHelper;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -23,10 +24,10 @@ class WalletCoin
     #[ORM\JoinColumn(nullable: false)]
     private Coin $coin;
 
-    #[ORM\Column(type: 'decimal', precision: 38, scale: 16)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 38, scale: 16)]
     private string $balance = '0';
 
-    #[ORM\Column(type: 'decimal', precision: 34, scale: 16)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 34, scale: 16)]
     private string $avgPrice = '0';
 
     #[ORM\Column]
@@ -118,11 +119,11 @@ class WalletCoin
 
     public function getTotalValue(string $currentPrice, int $decimal): string
     {
-        return StrHelper::trimZeros(bcmul($this->balance, $currentPrice, $decimal)) .' USD';
+        return StrHelper::trimZeros(bcmul($this->balance, $currentPrice, $decimal)) . ' USD';
     }
 
     public function getPnl(string $currentPrice, int $decimal): string
     {
-        return StrHelper::trimZeros(bcmul(bcsub($currentPrice, $this->avgPrice, $decimal), $this->balance, $decimal)) .' USD';
+        return StrHelper::trimZeros(bcmul(bcsub($currentPrice, $this->avgPrice, $decimal), $this->balance, $decimal)) . ' USD';
     }
 }

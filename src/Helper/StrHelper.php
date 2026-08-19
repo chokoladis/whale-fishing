@@ -40,6 +40,6 @@ class StrHelper
 
     static function toNormalNum(float|string $number, ?int $decimal = 12): string
     {
-        return sprintf('%.'.$decimal.'f', $number);
+        return sprintf('%.' . $decimal . 'f', $number);
     }
 }

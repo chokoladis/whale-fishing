@@ -9,7 +9,6 @@ use App\DTO\Http\Response\Coin\CoinStatisticsResponse;
 use App\Entity\Coin;
 use App\Entity\CoinDetail;
 use App\Repository\CoinDetailRepository;
-use Psr\Log\LoggerInterface;
 
 class CoinDetailService
 {
@@ -21,7 +20,7 @@ class CoinDetailService
     }
 
 
-    public function updateByCoinDetailResponse(Coin $coin, CoinStatisticsResponse $statistics) : void
+    public function updateByCoinDetailResponse(Coin $coin, CoinStatisticsResponse $statistics): void
     {
         $coinDetail = $coin->getCoinDetail() ?? new CoinDetail();
         $coinDetail->setCoin($coin);

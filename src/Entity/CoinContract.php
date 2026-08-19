@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CoinRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CoinRepository::class)]
@@ -20,7 +21,7 @@ class CoinContract
     #[ORM\Column(length: 50)]
     private string $network = 'native';
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 34, scale: 14, nullable: true)]
     private ?string $localPrice = null;
 
     #[ORM\Column]

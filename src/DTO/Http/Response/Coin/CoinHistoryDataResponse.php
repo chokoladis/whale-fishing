@@ -7,8 +7,9 @@ readonly final class CoinHistoryDataResponse
     function __construct(
         public string $symbol,
         public string $price,
-        public int $decimal,
+        public int    $decimal,
         public string $marketCap,
+        public int    $timestamp
     )
     {
     }

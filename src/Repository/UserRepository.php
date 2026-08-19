@@ -73,7 +73,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->manager->flush();
     }
 
-    public function forceDeleteUsers()
+    public function forceDeleteUsers(): mixed
     {
         return $this->createQueryBuilder('u')
             ->delete()

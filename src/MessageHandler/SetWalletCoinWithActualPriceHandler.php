@@ -17,12 +17,13 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class SetWalletCoinWithActualPriceHandler
 {
     public function __construct(
-        private WalletCoinRepository $walletCoinRepository,
-        private MobulaIOService  $mobulaIOService,
+        private WalletCoinRepository   $walletCoinRepository,
+        private MobulaIOService        $mobulaIOService,
         #[Autowire(service: 'monolog.logger.services')]
-        private LoggerInterface $logger,
+        private LoggerInterface        $logger,
         private EntityManagerInterface $em,
-    ){
+    )
+    {
     }
 
     public function __invoke(SetWalletCoinWithActualPriceMessage $message): void
@@ -36,16 +37,19 @@ class SetWalletCoinWithActualPriceHandler
             $coin = $walletCoin->getCoin();
             $stableCoin = StableCoins::tryFrom($coin->getSymbol());
 
-            $coinContract = $coin->getCoinContract()->current();
+            $coinContract = $coin->getCoinContract()->first();
             $decimal = $coinContract->getDecimal();
 
             if ($stableCoin) {
                 $price = 1;
             } else {
-                $coinContract = $coin->getCoinContract()->first();
                 $coinHistoryData = $this->mobulaIOService->getHistoryPrice($coinContract, $message->dataTime);
 
                 $price = $coinHistoryData->price;
+
+                if ($coin->getAvgPrice() == '0' || $coinHistoryData->timestamp > $coin->getUpdatedAt()) {
+                    $coin->setAvgPrice($price);
+                }
             }
 
             $currentBalance = StrHelper::trimZeros($walletCoin->getBalance());
@@ -58,6 +62,7 @@ class SetWalletCoinWithActualPriceHandler
                 return;
             }
             $oldAvgPrice = $walletCoin->getAvgPrice() ?: '0';
+
             $oldBalance = bcsub($currentBalance, $message->amount, $decimal);
 
             $numerator = bcadd(

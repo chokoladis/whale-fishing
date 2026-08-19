@@ -2,7 +2,7 @@
 
 namespace App\Enum\External;
 
-enum ChainId : string
+enum ChainId: string
 {
     case ETHEREUM = 'evm:1';
     case OPTIMISM = 'evm:10';
@@ -10,10 +10,11 @@ enum ChainId : string
     case POLYGON = 'evm:137';
     case ARBITRUM = 'evm:42161';
     case BASE = 'evm:8453';
+
 //    case Avalanche = 'evm:43114';
 
 
-    public static function getByNetwork(Network $network)
+    public static function getByNetwork(Network $network): self
     {
         return match ($network) {
             Network::ETHEREUM => ChainId::ETHEREUM,

@@ -9,7 +9,6 @@ use App\Exception\Auth\RefreshTokenInvalid;
 use App\Helper\SecureHelper;
 use App\Repository\RefreshTokenRepository;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +28,7 @@ class TokenService
     {
     }
 
-    public function getNewAccessToken(RefreshRequest $request) : string
+    public function getNewAccessToken(RefreshRequest $request): string
     {
         $tokenHash = hash('sha256', $request->refresh_token . $this->secret);
 
@@ -55,7 +54,7 @@ class TokenService
     }
 
     //todo limit
-    public function createRefreshToken(Request $request, UserInterface $user) : string
+    public function createRefreshToken(Request $request, UserInterface $user): string
     {
         $lifetime = $this->params->get('jwt')['refresh_token']['lifetime'];
 
@@ -76,7 +75,7 @@ class TokenService
     }
 
 //    todo
-    public function revokeAll(User $user) : void
+    public function revokeAll(User $user): void
     {
         /** @var RefreshToken[] $refreshTokens */
         $refreshTokens = $this->refreshTokenRepository->findBy([

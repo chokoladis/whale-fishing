@@ -15,7 +15,9 @@ class DeleteUsersHandler
     {
 
     }
-    public function __invoke(DeleteUsersMessage $message) {
+
+    public function __invoke(DeleteUsersMessage $message): void
+    {
         $this->userRepository->forceDeleteUsers();
     }
 }

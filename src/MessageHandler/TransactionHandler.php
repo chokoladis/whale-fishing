@@ -3,7 +3,7 @@
 namespace App\MessageHandler;
 
 use App\Helper\StrHelper;
-use App\Messages\Coin\UpdateCoinPriceMessage;
+use App\Messages\Coin\UpdateCoinByAddressAndNetworkMessage;
 use App\Messages\TransactionMessage;
 use App\Service\Coin\CoinService;
 use App\Service\Wallet\WalletService;
@@ -35,7 +35,7 @@ class TransactionHandler
         if (!$coinContract) return;
 
         $this->bus->dispatch(
-            new UpdateCoinPriceMessage(
+            new UpdateCoinByAddressAndNetworkMessage(
                 $data->network,
                 $data->contractAddress,
             )

@@ -44,6 +44,8 @@ abstract class BaseControllerTest extends WebTestCase
 
         $this->client = $this->createClient();
 
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
         $this->em->getConnection()->beginTransaction();
     }

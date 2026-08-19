@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Enum\Coin\TransactionType;
 use App\Repository\TransactionRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
@@ -28,13 +29,13 @@ class Transaction
 
     #[ORM\Column(name: "`from`", length: 64)]
     private string $from;
-    #[ORM\Column(name: "`to`",length: 64)]
+    #[ORM\Column(name: "`to`", length: 64)]
     private string $to;
 
     #[ORM\Column(enumType: TransactionType::class)]
     private TransactionType $type;
 
-    #[ORM\Column(type: 'decimal', precision: 45, scale: 25)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 45, scale: 25)]
     private string $amount;
 
     #[ORM\Column]

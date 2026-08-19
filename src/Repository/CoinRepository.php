@@ -50,7 +50,7 @@ class CoinRepository extends ServiceEntityRepository
         return $coin;
     }
 
-    public function save(Coin $coin) : void
+    public function save(Coin $coin): void
     {
         if (!$coin->getId())
             $this->getEntityManager()->persist($coin);
@@ -70,7 +70,7 @@ class CoinRepository extends ServiceEntityRepository
     public function paginate(QueryBuilder $dql, ?int $page = 1, ?int $perPage = null): PageDTO
     {
         $page = $page ?? 1;
-        $perPage = $perPage ?? $this->params->get('listing.limit');
+        $perPage = $perPage ?? $this->params->get('listing')['limit'];
 
         $paginator = new Paginator($dql);
 
@@ -87,5 +87,27 @@ class CoinRepository extends ServiceEntityRepository
             $perPage,
             $paginator->count()
         );
+    }
+
+    //todo
+
+    /**
+     * @param \DateTimeImmutable $updatedAtBefore
+     * @return array<>
+     */
+    public function getByUpdatedAtBefore(\DateTimeImmutable $updatedAtBefore): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.coinContract', 'cc')
+            ->where("c.updatedAt < :updatedAt")
+            ->andWhere('cc.localPrice != :localPrice')
+            ->setParameter('updatedAt', $updatedAtBefore)
+            ->setParameter('localPrice', 0)
+            ->addSelect('AVG(cc.localPrice) as avgPrice')
+            ->groupBy('c.id')
+            ->orderBy('c.updatedAt', 'ASC')
+            ->setMaxResults(50)
+            ->getQuery()
+            ->getResult();
     }
 }

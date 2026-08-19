@@ -12,22 +12,20 @@ use App\Enum\External\ChainId;
 use App\Helper\StrHelper;
 use App\Repository\CoinContractRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class CoinContractService
 {
     public function __construct(
         private CoinContractRepository $coinContractRepository,
         private EntityManagerInterface $entityManager,
-        #[Autowire(service: 'monolog.logger.services')]
-        private LoggerInterface        $logger,
+//        #[Autowire(service: 'monolog.logger.services')]
+//        private LoggerInterface        $logger,
     )
     {
     }
 
 
-    public function updateByCoinDetailResponse(Coin $coin, CoinDetailResponse $coinDetailResponse) : void
+    public function updateByCoinDetailResponse(Coin $coin, CoinDetailResponse $coinDetailResponse): void
     {
         if ($coin->getCoinContract()->isEmpty()) {
             foreach ($coinDetailResponse->coinContracts as $coinContract) {
@@ -64,15 +62,17 @@ class CoinContractService
         }
     }
 
-    public function updatePricesByBatchPrices(BatchPricesBody $batchPricesBody, array $coinContracts) : void
+    /**
+     * @param BatchPricesBody $batchPricesBody
+     * @param array<string, CoinContract|null> $coinContracts
+     * @return void
+     */
+    public function updatePricesByBatchPrices(BatchPricesBody $batchPricesBody, array $coinContracts): void
     {
         foreach ($batchPricesBody->payload as $item) {
             if ($chain = ChainId::tryFrom($item->chainId)) {
                 $network = $chain->name;
-                /**
-                 * @var CoinContract $coinContract
-                 */
-                $coinContract = $coinContracts[strtolower($network.'_'.$item->address)];
+                $coinContract = $coinContracts[strtolower($network . '_' . $item->address)];
 
                 if ($coinContract && $item->priceUSD) {
                     $coinContract->setLocalPrice(

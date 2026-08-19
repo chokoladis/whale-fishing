@@ -4,7 +4,7 @@ namespace App\MessageHandler\Coin;
 
 use App\Entity\Coin;
 use App\Entity\CoinContract;
-use App\Messages\Coin\UpdateCoinPriceMessage;
+use App\Messages\Coin\UpdateCoinByAddressAndNetworkMessage;
 use App\Repository\CoinContractRepository;
 use App\Service\Coin\CoinService;
 use App\Service\External\CoinPrice\MobulaIOService;
@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-class UpdateCoinPriceHandler
+class UpdateCoinByAddressAndNetworkHandler
 {
     private ?Coin $coin = null;
     private ?CoinContract $coinContract = null;
@@ -26,7 +26,7 @@ class UpdateCoinPriceHandler
     {
     }
 
-    public function __invoke(UpdateCoinPriceMessage $message): void
+    public function __invoke(UpdateCoinByAddressAndNetworkMessage $message): void
     {
         /** @var ?CoinContract $coinContract */
         $coinContract = $this->coinContractRepository->findOneBy([

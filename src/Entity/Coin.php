@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CoinRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CoinRepository::class)]
@@ -22,8 +23,8 @@ class Coin
     #[ORM\Column(length: 64)]
     private string $name;
 
-    #[ORM\Column(nullable: true, length: 60)]
-    private ?string $avgPrice = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 34, scale: 14, nullable: true)]
+    private ?string $avgPrice = '0';
 
     /**
      * @var Collection<int, CoinLink>
