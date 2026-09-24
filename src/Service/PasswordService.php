@@ -4,11 +4,11 @@ namespace App\Service;
 
 use App\DTO\Http\Request\Auth\PasswordRestoreConfirm;
 use App\DTO\Http\Request\Auth\PasswordRestoreSendToken;
-use App\Entity\User;
+use App\Entity\User\User;
 use App\Exception\RateLimitException;
-use App\Interface\SendTokenInterface;
-use App\Repository\PasswordRestoreRepository;
-use App\Repository\UserRepository;
+//use App\Interface\Notification\PasswordRestoreSender;
+use App\Repository\User\PasswordRestoreRepository;
+use App\Repository\User\UserRepository;
 use App\Service\Auth\TokenService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 class PasswordService
 {
     public function __construct(
-        private SendTokenInterface          $senderToken,
+//        private PasswordRestoreSender       $senderToken,
         private UserRepository              $userRepository,
         private PasswordRestoreRepository   $passwordRestoreRepository,
         private UserPasswordHasherInterface $passwordHasher,
@@ -44,9 +44,9 @@ class PasswordService
 
         $this->checkQtyRequests($user);
 
-        $this->senderToken
-            ->setUser($user)
-            ->sendToken();
+//        $this->senderToken
+//            ->setUser($user)
+//            ->sendToken();
     }
 
     private function checkQtyRequests(User $user): void

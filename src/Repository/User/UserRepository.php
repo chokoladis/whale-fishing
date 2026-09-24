@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\User;
 
 use App\DTO\Http\Request\Auth\RegisterRequest;
-use App\Entity\User;
+use App\Entity\User\User;
 use App\Enum\User\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Schema\Exception\ColumnAlreadyExists;

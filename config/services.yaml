@@ -10,6 +10,17 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    _instanceof:
+        App\Interface\VerificationCodeSender:
+            tags: [ 'app.verification_sender' ]
+
+    App\Notification\VerificationCode\EmailSender:
+        tags:
+            - {name: 'app.verification_sender', tag: 'email'}
+    App\Notification\VerificationCode\TelegramSender:
+        tags:
+            - {name: 'app.verification_sender', tag: 'telegram'}
+
     App\:
         resource: '../src/'
 
@@ -21,10 +32,10 @@ services:
 #                ALCHEMY: '@App\Service\External\Alchemy\PriceService'
 #                COINGECKO: '@App\Service\External\CoinGecko\PriceService'
 
-    App\Tool\Notification\EmailSenderToken: ~
+    App\Tool\Notificator\EmailNotificator: ~
 
     App\Interface\SendTokenInterface:
-        class: App\Tool\Notification\EmailSenderToken
+        class: App\Tool\Notificator\EmailNotificator
 
     App\EventListener\ApiRateLimitListener:
         arguments:

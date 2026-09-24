@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Tool\Notification;
+namespace App\Tool\Notificator;
 
-use App\Entity\PasswordRestore;
-use App\Entity\User;
-use App\Interface\SendTokenInterface;
+use App\Entity\User\PasswordRestore;
+use App\Entity\User\User;
+use App\Interface\Notification\PasswordRestoreSender;
 use Doctrine\ORM\EntityManagerInterface;
 
-abstract class BaseSenderToken implements SendTokenInterface
+abstract class BaseNotificator implements PasswordRestoreSender
 {
 
     protected User $user;
@@ -33,18 +33,7 @@ abstract class BaseSenderToken implements SendTokenInterface
         return $this;
     }
 
-    protected function getSubject(): string
-    {
-        return 'Сброс пароля';
-    }
-
-    protected function getHtmlMessage(): string
-    {
-        return sprintf('<b>Для сброса пароля вам потребуется ввести следующий код</b>
-            <br/><h3>%s</h3><br/><br/>
-            <i>Код действует в течении 30минут</i>', $this->token);
-    }
-
+    // todo passwordRestoreSave
     public function save(): void
     {
         $newPasswordRestore = new PasswordRestore;

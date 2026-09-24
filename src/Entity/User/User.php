@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Entity\User;
 
 use App\Enum\User\Role;
 use App\Enum\User\Status;
-use App\Repository\UserRepository;
+use App\Repository\User\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -57,6 +57,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[OneToMany(mappedBy: 'user', targetEntity: PasswordRestore::class)]
     private ?Collection $passwordRestores;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $telegramChatId;
 
     public function getId(): ?int
     {
@@ -185,5 +188,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setStatus(Status $status): void
     {
         $this->status = $status;
+    }
+
+    public function setTelegramChatId(string $telegramChatId): self
+    {
+        $this->telegramChatId = $telegramChatId;
+
+        return $this;
+    }
+
+    public function getTelegramChatId()
+    {
+        return $this->telegramChatId;
     }
 }

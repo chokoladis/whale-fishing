@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\Http\Request\VerificationSendRequest;
 use App\Exception\User\UserStatusException;
 use App\OpenApi\Schema\ProfileResponse;
 use App\Resource\ProfileResource;
@@ -10,6 +11,7 @@ use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -24,7 +26,7 @@ final class ProfileController extends AbstractController
     {
     }
 
-    #[Route('', name: 'index', methods: ['GET'])]
+    #[Route('', 'index', methods: ['GET'])]
     #[OA\Get(
         operationId: 'profileGet',
         summary: 'Профиль текущего пользователя',
@@ -44,7 +46,7 @@ final class ProfileController extends AbstractController
     }
 
     #[RateLimit('user_delete_restore')]
-    #[Route('', name: 'delete', methods: ['DELETE'])]
+    #[Route('', 'delete', methods: ['DELETE'])]
     public function delete() : Response
     {
         try {
@@ -60,11 +62,27 @@ final class ProfileController extends AbstractController
     }
 
     #[RateLimit('user_delete_restore')]
-    #[Route('restore/', name: 'restore', methods: ['POST'])]
+    #[Route('restore/', 'restore', methods: ['POST'])]
     public function restore() : Response
     {
         $this->userService->restore($this->getUser());
 
         return $this->json([]);
+    }
+
+    #[RateLimit('verify')]
+    #[Route('verify/send/', 'verification.send', methods: ['POST'])]
+    public function sendVerification(
+        #[MapRequestPayload] VerificationSendRequest $request
+    )
+    {
+        $this->userService->verify($request, $this->getUser());
+    }
+
+    #[RateLimit('verify')]
+    #[Route('verify/confirm/', 'verification.confirm', methods: ['POST'])]
+    public function confirmVerification()
+    {
+
     }
 }

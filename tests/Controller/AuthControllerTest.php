@@ -2,7 +2,7 @@
 
 namespace App\Tests\Controller;
 
-use App\Repository\PasswordRestoreRepository;
+use App\Repository\User\PasswordRestoreRepository;
 use Symfony\Component\HttpFoundation\Response;
 
 final class AuthControllerTest extends BaseControllerTest
