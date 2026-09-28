@@ -3,9 +3,8 @@
 namespace App\Repository\User;
 
 use App\Entity\User\User;
-use App\Entity\UserVerification;
+use App\Entity\User\UserVerification;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 

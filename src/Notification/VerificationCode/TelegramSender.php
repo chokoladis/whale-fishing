@@ -2,6 +2,7 @@
 
 namespace App\Notification\VerificationCode;
 
+use App\Enum\User\TypeVerify;
 use App\Interface\Notification\VerificationCodeSender;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
 use Symfony\Component\Notifier\ChatterInterface;
@@ -29,5 +30,10 @@ class TelegramSender implements VerificationCodeSender
         );
 
         $this->chatter->send($message);
+    }
+
+    public function support(TypeVerify $type): bool
+    {
+        return $type === TypeVerify::TELEGRAM;
     }
 }

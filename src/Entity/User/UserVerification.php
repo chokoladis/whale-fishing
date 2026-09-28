@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\User;
 
-use App\Entity\User\User;
 use App\Enum\User\TypeVerify;
 use App\Repository\User\UserVerificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserVerificationRepository::class)]
+#[ORM\Table(name: 'user_verification')]
+#[ORM\HasLifecycleCallbacks]
 class UserVerification
 {
     #[ORM\Id]
@@ -21,10 +22,10 @@ class UserVerification
     #[ORM\Column(length: 36)]
     private ?string $code = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    #[ORM\Column(updatable: false)]
+    private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $verifiedAt = null;
 
     #[ORM\ManyToOne]
@@ -60,7 +61,7 @@ class UserVerification
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -94,5 +95,10 @@ class UserVerification
         $this->user = $user;
 
         return $this;
+    }
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\Http\Request\VerificationSendRequest;
+use App\Exception\RateLimitException;
 use App\Exception\User\UserStatusException;
 use App\OpenApi\Schema\ProfileResponse;
 use App\Resource\ProfileResource;
@@ -14,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 
 #[Route('/api/v1/profile/', name: 'api.v1.profile.')]
 #[OA\Tag(name: 'Profile')]
@@ -76,7 +79,14 @@ final class ProfileController extends AbstractController
         #[MapRequestPayload] VerificationSendRequest $request
     )
     {
-        $this->userService->verify($request, $this->getUser());
+        try {
+            $this->userService->verify($request, $this->getUser());
+            return $this->json([], Response::HTTP_CREATED);
+        } catch (UnsupportedException|RateLimitException|NotFoundResourceException $e) {
+            return $this->json([
+                'errors' => [$e->getMessage()],
+            ]);
+        }
     }
 
     #[RateLimit('verify')]

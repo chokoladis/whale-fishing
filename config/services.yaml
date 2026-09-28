@@ -11,15 +11,8 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
     _instanceof:
-        App\Interface\VerificationCodeSender:
+        App\Interface\Notification\VerificationCodeSender:
             tags: [ 'app.verification_sender' ]
-
-    App\Notification\VerificationCode\EmailSender:
-        tags:
-            - {name: 'app.verification_sender', tag: 'email'}
-    App\Notification\VerificationCode\TelegramSender:
-        tags:
-            - {name: 'app.verification_sender', tag: 'telegram'}
 
     App\:
         resource: '../src/'

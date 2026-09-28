@@ -3,26 +3,28 @@
 namespace App\Dispatcher;
 
 use App\Enum\User\TypeVerify;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 
 class VerificationCodeDispatcher
 {
     public function __construct(
-        #[Autowire(tag: 'app.verification_sender')]
-        private readonly ServiceLocator $serviceLocator
+        #[AutowireLocator('app.verification_sender')]
+        private readonly iterable $senders
     )
     {
     }
 
     public function send(TypeVerify $type, UserInterface $user, string $code)
     {
-        if (!$this->serviceLocator->has($type->value)) {
-            throw new UnsupportedException(sprintf('Сервис %s неподдерживается', $type->value), $type);
+        foreach ($this->senders as $raw) {
+            if ($raw->support($type)) {
+                $raw->send($user, $code);
+                return;
+            }
         }
 
-        $this->serviceLocator->get($type->value)->send($type, $code);
+        throw new UnsupportedException(sprintf('Сервис %s неподдерживается или отключен', $type->value), $type);
     }
 }

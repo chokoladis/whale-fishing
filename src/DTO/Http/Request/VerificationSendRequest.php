@@ -9,6 +9,7 @@ readonly class VerificationSendRequest
 {
     function __construct(
         #[NotBlank]
+//        #[Type(TypeVerify::class, 'Неподдерживаемый тип верификации')] // todo
         public TypeVerify $typeVerify
     )
     {

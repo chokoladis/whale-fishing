@@ -8,7 +8,7 @@ use App\Dispatcher\VerificationCodeDispatcher;
 use App\DTO\Http\Request\Auth\RegisterRequest;
 use App\DTO\Http\Request\VerificationSendRequest;
 use App\DTO\Http\Response\Auth\RegisterDTO;
-use App\Entity\UserVerification;
+use App\Entity\User\UserVerification;
 use App\Enum\User\Status;
 use App\Exception\RateLimitException;
 use App\Exception\User\UserStatusException;
@@ -19,14 +19,11 @@ use App\Service\Auth\TokenService;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
-use Symfony\Component\Mailer\Exception\TransportException;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\Uid\Uuid;
 
 class UserService
@@ -38,7 +35,8 @@ class UserService
         private TokenService             $tokenService,
         private UserVerificationRepository $userVerificationRepository,
         private EntityManagerInterface           $manager,
-        private VerificationCodeDispatcher $verificationCodeDispatcher
+        private VerificationCodeDispatcher $verificationCodeDispatcher,
+        private LoggerInterface $logger
     )
     {
     }
@@ -82,6 +80,14 @@ class UserService
         $this->userRepository->save();
     }
 
+    /**
+     * @param VerificationSendRequest $request
+     * @param UserInterface $userInterface
+     * @return void
+     * @throws RateLimitException
+     * @throws \Doctrine\DBAL\Exception
+     * @throws UnsupportedException|RateLimitException|NotFoundResourceException
+     */
     public function verify(VerificationSendRequest $request, UserInterface $userInterface)
     {
         $user = $this->userRepository->getByEmail($userInterface->getUserIdentifier());
@@ -120,9 +126,10 @@ class UserService
             $this->userVerificationRepository->save($userVerification, $this->manager);
             $this->verificationCodeDispatcher->send($request->typeVerify, $user, $code);
         } catch (\Throwable $e) {
-            // todo write to log
+            $this->logger->error($e->getMessage(), [$e->getFile(), $e->getLine()]);
             $connection->rollBack();
             throw $e;
         }
+        $connection->commit();
     }
 }
