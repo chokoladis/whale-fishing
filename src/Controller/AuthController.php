@@ -15,6 +15,7 @@ use App\Service\UserService;
 use Doctrine\DBAL\Schema\Exception\ColumnAlreadyExists;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
+use App\Service\TelegramService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,6 +33,7 @@ final class AuthController extends AbstractController
     function __construct(
         private UserService     $userService,
         private PasswordService $passwordService,
+        private TelegramService $telegramService
     )
     {
     }
@@ -109,7 +111,7 @@ final class AuthController extends AbstractController
         try {
             $this->passwordService->sendToken($request);
 
-            return $this->json([])->setStatusCode(Response::HTTP_NO_CONTENT);
+            return $this->json([], status: Response::HTTP_NO_CONTENT);
         } catch (RateLimitException $e) {
             return $this->json([
                 'errors' => [$e->getMessage()]
@@ -154,7 +156,7 @@ final class AuthController extends AbstractController
     {
         try {
             $this->passwordService->restore($request);
-            return $this->json([])->setStatusCode(Response::HTTP_NO_CONTENT);
+            return $this->json([], Response::HTTP_NO_CONTENT);
         } catch (ValidatorException|NotFoundResourceException $e) {
             return $this->json([
                 'errors' => [
@@ -162,5 +164,29 @@ final class AuthController extends AbstractController
                 ]
             ], Response::HTTP_BAD_REQUEST);
         }
+    }
+
+    #[RateLimit('telegram_request')]
+    #[Route('telegram/')]
+    public function telegramAuth(
+        Request $request,
+    )
+    {
+        $res = $this->telegramService->getLinkRequest($request->getClientIp());
+
+        return $this->json($res, $res->isNewCode ? Response::HTTP_CREATED : Response::HTTP_OK);
+    }
+
+    #[Route('telegram/webhook/', methods: ['POST'])]
+    public function webhookTelegram(
+        Request $request
+    )
+    {
+        $this->telegramService->handleWebhook($request);
+
+        return $this->json([], Response::HTTP_NO_CONTENT);
+
+        // ссылка на телегу - бота с кодом, роут с запросом и ответом на эту таблицу
+        // затем открыть ссылку в браузере и нажать в браузере протестить, получить вебхук, затем привязать или создать юзера и верифицировать
     }
 }

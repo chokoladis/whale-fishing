@@ -19,6 +19,10 @@ services:
 
     App\OpenApi\OpenApiSpec: ~
 
+    App\Service\TelegramService:
+        arguments:
+            $telegramBotSecretToken: '%env(TELEGRAM_BOT_SECRET_TOKEN)%'
+
 #    App\MessageHandler\CoinPriceHandler:
 #        arguments:
 #            $apiServiceProviders:
