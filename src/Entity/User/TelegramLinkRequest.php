@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\User;
 
-use App\Entity\User\User;
-use App\Repository\TelegramLinkRequestRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\User\TelegramLinkRequestRepository;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: TelegramLinkRequestRepository::class)]
@@ -20,20 +19,16 @@ class TelegramLinkRequest
     private ?Uuid $uuid = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?User $userId = null;
-
-
-    #[ORM\Column(nullable: true)]
-    private ?int $chatId = null;
+    private ?User $user = null;
 
     #[ORM\Column]
+    private int $chatId;
+
+    #[ORM\Column(length: 32)]
     private string $ipAddress;
 
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $activatedAt = null;
 
     #[ORM\Column]
     private \DateTimeImmutable $expiredAt;
@@ -55,14 +50,14 @@ class TelegramLinkRequest
         return $this;
     }
 
-    public function getUserId(): ?User
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(?User $userId): static
+    public function setUser(?User $user): static
     {
-        $this->userId = $userId;
+        $this->user = $user;
 
         return $this;
     }
@@ -79,24 +74,12 @@ class TelegramLinkRequest
         return $this;
     }
 
-    public function getActivatedAt(): ?\DateTimeImmutable
-    {
-        return $this->activatedAt;
-    }
-
-    public function setActivatedAt(?\DateTimeImmutable $activatedAt): static
-    {
-        $this->activatedAt = $activatedAt;
-
-        return $this;
-    }
-
-    public function getChatId(): ?int
+    public function getChatId(): int
     {
         return $this->chatId;
     }
 
-    public function setChatId(?int $chatId): static
+    public function setChatId(int $chatId): static
     {
         $this->chatId = $chatId;
 
@@ -130,5 +113,11 @@ class TelegramLinkRequest
     {
         $this->ipAddress = $ipAddress;
         return $this;
+    }
+
+    // todo
+    public function isVerified()//: bool
+    {
+        return $this->getUser()->getUserVerifications();
     }
 }

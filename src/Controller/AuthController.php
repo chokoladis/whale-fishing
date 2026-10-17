@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\DTO\Http\Request\Auth\PasswordRestoreConfirm;
 use App\DTO\Http\Request\Auth\PasswordRestoreSendToken;
 use App\DTO\Http\Request\Auth\RegisterRequest;
+use App\Exception\External\IntegrationException;
+use App\Exception\External\TelegramAlreadyConnectedException;
 use App\Exception\RateLimitException;
 use App\OpenApi\Schema\FieldErrorResponse;
 use App\OpenApi\Schema\RateLimitErrorResponse;
@@ -16,6 +18,7 @@ use Doctrine\DBAL\Schema\Exception\ColumnAlreadyExists;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use App\Service\TelegramService;
+use PHPUnit\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -166,27 +169,29 @@ final class AuthController extends AbstractController
         }
     }
 
-    #[RateLimit('telegram_request')]
-    #[Route('telegram/')]
-    public function telegramAuth(
-        Request $request,
-    )
-    {
-        $res = $this->telegramService->getLinkRequest($request->getClientIp());
-
-        return $this->json($res, $res->isNewCode ? Response::HTTP_CREATED : Response::HTTP_OK);
-    }
+//    #[RateLimit('telegram_request')]
+//    #[Route('telegram/')]
+//    public function telegramAuth(
+//        Request $request,
+//    )
+//    {
+//
+//    }
 
     #[Route('telegram/webhook/', methods: ['POST'])]
     public function webhookTelegram(
         Request $request
     )
     {
-        $this->telegramService->handleWebhook($request);
+        try {
+            $res = $this->telegramService->handleWebhook($request, $this->getUser());
 
-        return $this->json([], Response::HTTP_NO_CONTENT);
+            return $this->json($res, $res->isNewCode ? Response::HTTP_CREATED : Response::HTTP_OK);
 
-        // ссылка на телегу - бота с кодом, роут с запросом и ответом на эту таблицу
-        // затем открыть ссылку в браузере и нажать в браузере протестить, получить вебхук, затем привязать или создать юзера и верифицировать
+        } catch (IntegrationException $e) {
+            return $this->json(['errors' => ['Не валидные параметры']], Response::HTTP_BAD_REQUEST);
+        } catch (TelegramAlreadyConnectedException|\Exception $e) { // todo убрать
+            return $this->json(['data' => [$e->getMessage()]], Response::HTTP_OK);
+        }
     }
 }

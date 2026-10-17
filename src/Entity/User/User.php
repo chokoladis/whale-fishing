@@ -58,8 +58,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[OneToMany(mappedBy: 'user', targetEntity: PasswordRestore::class)]
     private ?Collection $passwordRestores;
 
-    #[ORM\OneToOne(mappedBy: 'userId', cascade: ['persist', 'remove'])]
-    private ?UserTelegram $userTelegram = null;
+    #[ORM\OneToMany(mappedBy: 'userId', cascade: ['persist', 'remove'], targetEntity: UserVerification::class)]
+    private ?Collection $userVerifications = null;
 
     public function getId(): ?int
     {
@@ -195,19 +195,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getUserTelegram(): ?UserTelegram
+    public function getUserVerifications(): ?Collection
     {
-        return $this->userTelegram;
+        return $this->userVerifications;
     }
 
-    public function setUserTelegram(UserTelegram $userTelegram): static
+    public function setUserVerification(?UserVerification $userVerification): static
     {
-        // set the owning side of the relation if necessary
-        if ($userTelegram->getUserId() !== $this) {
-            $userTelegram->setUserId($this);
-        }
-
-        $this->userTelegram = $userTelegram;
+        $this->userVerifications->add($userVerification);
 
         return $this;
     }
