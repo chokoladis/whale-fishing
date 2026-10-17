@@ -3,14 +3,13 @@
 namespace App\Tests\Service\Auth;
 
 use App\DTO\Http\Request\Token\RefreshRequest;
-use App\Entity\RefreshToken;
-use App\Entity\User;
+use App\Entity\User\RefreshToken;
+use App\Entity\User\User;
 use App\Exception\Auth\RefreshTokenInvalid;
-use App\Repository\RefreshTokenRepository;
+use App\Repository\User\RefreshTokenRepository;
 use App\Service\Auth\TokenService;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 class TokenServiceTest extends TestCase

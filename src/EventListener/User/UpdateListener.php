@@ -2,7 +2,7 @@
 
 namespace App\EventListener\User;
 
-use App\Entity\User;
+use App\Entity\User\User;
 use App\Enum\User\Status;
 use App\Exception\User\UserStatusException;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;

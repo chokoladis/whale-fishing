@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Entity\User;
 
 use App\Enum\User\Role;
 use App\Enum\User\Status;
-use App\Repository\UserRepository;
+use App\Repository\User\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -57,6 +57,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[OneToMany(mappedBy: 'user', targetEntity: PasswordRestore::class)]
     private ?Collection $passwordRestores;
+
+    #[ORM\OneToMany(mappedBy: 'userId', cascade: ['persist', 'remove'], targetEntity: UserVerification::class)]
+    private ?Collection $userVerifications = null;
 
     public function getId(): ?int
     {
@@ -137,9 +140,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->name;
     }
 
-    public function setName(?string $name): void
+    public function setName(?string $name) : static
     {
         $this->name = $name;
+
+        return $this;
     }
 
     public function __construct()
@@ -162,9 +167,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): void
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getUpdatedAt(): \DateTimeImmutable
@@ -172,9 +178,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): void
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     public function getStatus(): Status
@@ -182,8 +189,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->status;
     }
 
-    public function setStatus(Status $status): void
+    public function setStatus(Status $status): static
     {
         $this->status = $status;
+        return $this;
+    }
+
+    public function getUserVerifications(): ?Collection
+    {
+        return $this->userVerifications;
+    }
+
+    public function setUserVerification(?UserVerification $userVerification): static
+    {
+        $this->userVerifications->add($userVerification);
+
+        return $this;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Resource;
 
-use App\Entity\User;
+use App\Entity\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class ProfileResource

@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ final class ExceptionListener
 {
     public function __construct(
         private TranslatorInterface $translator,
+        private LoggerInterface $logger,
     )
     {
     }
@@ -50,8 +52,10 @@ final class ExceptionListener
             ? $exception->getStatusCode()
             : Response::HTTP_INTERNAL_SERVER_ERROR;
 
+        $this->logger->debug('Ошибка в глобальном обработчике', [$exception->getMessage(), $statusCode, $exception->getFile(), $exception->getLine()]);
+
         $response = new JsonResponse([
-            'errors' => [$exception->getMessage()],
+            'errors' => ['Произошла непредвиденная ошибка'],
         ], $statusCode);
 
         $event->setResponse($response);

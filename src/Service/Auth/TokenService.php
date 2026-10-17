@@ -3,11 +3,11 @@
 namespace App\Service\Auth;
 
 use App\DTO\Http\Request\Token\RefreshRequest;
-use App\Entity\RefreshToken;
-use App\Entity\User;
+use App\Entity\User\RefreshToken;
+use App\Entity\User\User;
 use App\Exception\Auth\RefreshTokenInvalid;
 use App\Helper\SecureHelper;
-use App\Repository\RefreshTokenRepository;
+use App\Repository\User\RefreshTokenRepository;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
