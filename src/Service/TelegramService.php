@@ -4,67 +4,64 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Entity\User\TelegramRequest;
+use App\Entity\User\User;
+use App\Entity\User\UserVerification;
+use App\Enum\User\TypeVerify;
 use App\Exception\External\IntegrationException;
-use App\Exception\External\TelegramAlreadyConnectedException;
+use App\Repository\User\TelegramRequestRepository;
 use App\Repository\User\UserRepository;
-use DTO\Http\Response\Auth\TelegramLinkRequestResponse;
-use App\Entity\User\TelegramLinkRequest;
+use App\Repository\User\UserVerificationRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
+use Exception;
 use Psr\Log\LoggerInterface;
-use App\Repository\User\TelegramLinkRequestRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\Button\KeyboardButton;
+use Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\ReplyKeyboardMarkup;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\String\ByteString;
 use Symfony\Component\Uid\Uuid;
 
 class TelegramService
 {
     public function __construct(
-        private TelegramLinkRequestRepository $telegramLinkRequestRepository,
-        private UserRepository $userRepository,
-        private LoggerInterface $logger,
-        private string $telegramBotSecretToken,
-        private ChatterInterface $chatter,
+        private TelegramRequestRepository   $telegramRequestRepository,
+        private UserRepository              $userRepository,
+        private LoggerInterface             $logger,
+        private string                      $telegramBotSecretToken,
+        private ChatterInterface            $chatter,
+        private UserPasswordHasherInterface $passwordHasher,
+        private UserService                 $userService,
+        private UserVerificationRepository  $userVerificationRepository,
+        protected EntityManagerInterface    $manager
     )
     {
 
     }
 
-    private function getLinkRequest(string $ipAddress, int $telegramChatId, ?string $userEmail) : TelegramLinkRequestResponse
+    private function saveRequest(Request $request, array $message)
     {
-        if ($this->telegramLinkRequestRepository->findRowWithUserByTelegramChatId($telegramChatId)) {
-            throw new TelegramAlreadyConnectedException;
+        $telegramChatId = $message['from']['id'];
+        $ipAddress = $request->getClientIp(); // todo ?
+
+        $telegramRequest = $this->telegramRequestRepository->findByChatId($telegramChatId);
+
+        if ($telegramRequest) {
+            $this->logger->debug('created tg requests', [$telegramRequest]);
+//            throw new TelegramAlreadyConnectedException;
+        } else {
+            $newRequest = new TelegramRequest();
+            $newRequest->setIpAddress($ipAddress)->setChatId($telegramChatId);
+
+            $this->telegramRequestRepository->save($newRequest);
         }
-
-        $collection = $this->telegramLinkRequestRepository->findNoExpiredByChatId($telegramChatId);
-
-        $newRequest = new TelegramLinkRequest();
-        $newRequest->setIpAddress($ipAddress)->setUuid(Uuid::v7())->setChatId($telegramChatId);
-
-        if ($userEmail) {
-            $newRequest->setUser($this->userRepository->getByEmail($userEmail));
-        }
-
-        if (count($collection)) {
-            if (count($collection) === 1) {
-                $row = current($collection);
-                $diff = (new \DateTimeImmutable())->getTimestamp() - $row->getCreatedAt()->getTimestamp();
-                if ($diff > 360) {
-                    $this->telegramLinkRequestRepository->save($newRequest);
-
-                    return new TelegramLinkRequestResponse($newRequest->getUuid()->toString());
-                }
-            }
-            return new TelegramLinkRequestResponse(current($collection)->getUuid()->toString(), false);
-        }
-
-        $this->telegramLinkRequestRepository->save($newRequest);
-
-        return new TelegramLinkRequestResponse($newRequest->getUuid()->toString());
     }
 
-    public function handleWebhook(Request $request, ?UserInterface $user)
+    public function handleWebhook(Request $request)
     {
         if ($this->telegramBotSecretToken !== $request->headers->get('x-telegram-bot-api-secret-token')) {
             throw new IntegrationException('Not valid telegram bot token');
@@ -72,32 +69,96 @@ class TelegramService
 
         // todo роверка update_id с блокировкой - update_id\":468465099
         //        $request->getPayload()->get('update_id')
-        //            $message['from']['username']
+
+        $this->logger->debug('tg webhook check2', [$request->getPayload()->all()]);
 
         $message = $request->getPayload()->all('message');
-        if ($message['text'] === '/start') {
+        if (!empty($message['text'])) {
+            if ($message['text'] === '/start') {
 
-            // generation and saving code with relation to user|null
-            // -> send code to telegram
-            // -> user getting a code and send him to | front interface / current service API |
+                $this->saveRequest($request, $message);
 
-            $res = $this->getLinkRequest($request->getClientIp(), $message['from']['id'], $user?->getUserIdentifier());
+                $this->chatter->send(new ChatMessage(
+                    'Предоставьте доступ к телефону для верификации',
+                    (new TelegramOptions())
+                        ->chatId((string)$message['from']['id'])
+                        ->replyMarkup(
+                            (new ReplyKeyboardMarkup())
+                                ->oneTimeKeyboard(true)
+                                ->resizeKeyboard(true)
+                                ->keyboard([
+                                    (new KeyboardButton('Подключиться'))->requestContact(true)
+                                ])
+                        )),
+                );
 
-            $this->chatter->send(new ChatMessage(
-                sprintf('Ваш код: %s', $res->code),
-                (new TelegramOptions())->chatId((string)$message['from']['id']),
-            ));
-
-            return $res;
+                return null;
+            } else {
+                $this->chatter->send(new ChatMessage(
+                    'Неизвестная команда',
+                    (new TelegramOptions())->chatId((string)$message['from']['id']),
+                ));
+            }
+        } else if (!empty($message['contact'])) {
+            return $this->confirm($request, $message['from'], $message['contact']);
         }
 
-        throw new \Exception('test');
+        return null;
     }
 
-    private function confirmTelegramChatId(int $chatId, string $uuid) : void
+    public function confirm(
+        Request $request,
+        array   $from,
+        array   $contact,
+    )
     {
-        //todo
-//         if (Uuid::isValid($message['text'])) {
-//            $this->confirmTelegramChatId($message['from']['id'], $message['text']);
+        $phone = $contact['phone_number'];
+
+        $telegramRequest = $this->telegramRequestRepository->findByChatId($contact['user_id']);
+        if (!$telegramRequest) {
+            throw new EntityNotFoundException('Telegram request not found');
+        } elseif ($user = $telegramRequest->getUser()) {
+            // todo check phone and do what ?
+            return $this->userService->getTokenDataByUser($request, $user);
+        } else {
+            $user = $this->userRepository->findOneBy([
+                'phone' => $phone,
+            ]);
+
+            //todo transaction
+
+            $connection = $this->manager->getConnection();
+            $connection->setAutoCommit(false);
+            $connection->beginTransaction();
+
+            $this->logger->info('verififcation data', [$user->getUserVerifications()]);
+
+            try {
+                if (!$user) {
+                    $user = new User();
+                    $user->setPhone($phone)
+                        ->setName(trim(sprintf('%s %s', $from['first_name'], $from['last_name'])))
+                        ->setPassword($this->passwordHasher->hashPassword($user, ByteString::fromRandom()->toString()));
+                    $this->userRepository->save($user, $this->manager);
+                }
+
+                $telegramRequest->setUser($user);
+
+                $this->logger->debug('in confirm tg - verifications', [$user->getUserVerifications()]);
+                //            $newRequest->setUser($this->userRepository->getByEmail($userEmail));
+
+                $userVerification = new UserVerification();
+                $userVerification->setUser($user)->setCode(Uuid::v7()->toString())->setType(TypeVerify::TELEGRAM);
+
+                $this->userVerificationRepository->save($userVerification, $this->manager);
+
+                $connection->commit();
+            } catch (Exception $e) {
+                $connection->rollback();
+                throw $e;
+            }
+
+            return $this->userService->getTokenDataByUser($request, $user);
+        }
     }
 }

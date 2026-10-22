@@ -8,6 +8,7 @@ use App\Dispatcher\VerificationCodeDispatcher;
 use App\DTO\Http\Request\Auth\RegisterRequest;
 use App\DTO\Http\Request\VerificationSendRequest;
 use App\DTO\Http\Response\Auth\RegisterDTO;
+use App\Entity\User\User;
 use App\Entity\User\UserVerification;
 use App\Enum\User\Status;
 use App\Exception\RateLimitException;
@@ -46,11 +47,7 @@ class UserService
     {
         $user = $this->userRepository->add($registerRequest);
 
-        return new RegisterDTO(
-            $this->profileResource->profile($user),
-            $this->JWTTokenManager->create($user),
-            $this->tokenService->createRefreshToken($request, $user)
-        );
+        return $this->getTokenDataByUser($request, $user);
     }
 
     public function delete(UserInterface $userInterface) : void
@@ -62,10 +59,10 @@ class UserService
             throw new UserStatusException('Ваш аккаунт заблокирован');
         }
 
-        $user->setStatus(Status::DELETED);
-        $user->setUpdatedAt(new \DateTimeImmutable());
+        $user->setStatus(Status::DELETED)
+            ->setUpdatedAt(new \DateTimeImmutable());
 
-        $this->userRepository->save();
+        $this->userRepository->save($user);
     }
 
     public function restore(UserInterface $userInterface) : void
@@ -74,10 +71,10 @@ class UserService
         if ($user->getStatus() === Status::BLOCKED) // todo middleware
             throw new UserStatusException('Ваш аккаунт заблокирован');
 
-        $user->setStatus(Status::ACTIVE);
-        $user->setUpdatedAt(new \DateTimeImmutable());
+        $user->setStatus(Status::ACTIVE)
+            ->setUpdatedAt(new \DateTimeImmutable());
 
-        $this->userRepository->save();
+        $this->userRepository->save($user);
     }
 
     /**
@@ -90,7 +87,7 @@ class UserService
      */
     public function verify(VerificationSendRequest $request, UserInterface $userInterface)
     {
-        $user = $this->userRepository->getByEmail($userInterface->getUserIdentifier());
+        $user = $this->userRepository->getByPhone($userInterface->getUserIdentifier());
         if (!$user) // todo middleware
             throw new NotFoundResourceException("Пользователь с таким email не был найден");
 
@@ -131,5 +128,14 @@ class UserService
             throw $e;
         }
         $connection->commit();
+    }
+
+    public function getTokenDataByUser(Request $request, User $user): RegisterDTO
+    {
+        return new RegisterDTO(
+            $this->profileResource->profile($user),
+            $this->JWTTokenManager->create($user),
+            $this->tokenService->createRefreshToken($request, $user)
+        );
     }
 }

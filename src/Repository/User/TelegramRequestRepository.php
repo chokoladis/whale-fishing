@@ -4,33 +4,30 @@ namespace App\Repository\User;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Entity\User\TelegramLinkRequest;
+use App\Entity\User\TelegramRequest;
 
 /**
- * @extends ServiceEntityRepository<TelegramLinkRequest>
+ * @extends ServiceEntityRepository<TelegramRequest>
  */
-class TelegramLinkRequestRepository extends ServiceEntityRepository
+class TelegramRequestRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, TelegramLinkRequest::class);
+        parent::__construct($registry, TelegramRequest::class);
     }
 
-    public function findNoExpiredByChatId(int $chatId): array
+    public function findByChatId(int $chatId): ?TelegramRequest
     {
+        //todo create index chatid
         return $this->createQueryBuilder('t')
             ->andWhere('t.chatId = :chatId')
-            ->andWhere('t.expiredAt > :now')
             ->setParameter('chatId', $chatId)
-            ->setParameter('now', new \DateTimeImmutable())
-            ->orderBy('t.id', 'ASC')
-            ->setMaxResults(2)
             ->getQuery()
-            ->getResult()
+            ->getOneOrNullResult()
         ;
     }
 
-    public function findRowWithUserByTelegramChatId(int $chatId) : ?TelegramLinkRequest
+    public function findRowWithUserByTelegramChatId(int $chatId) : ?TelegramRequest
     {
         // todo create index?
         return $this->createQueryBuilder('t')
@@ -51,7 +48,7 @@ class TelegramLinkRequestRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-    public function save(TelegramLinkRequest $telegramLinkRequest)
+    public function save(TelegramRequest $telegramLinkRequest)
     {
         if (!$telegramLinkRequest->getId())
             $this->getEntityManager()->persist($telegramLinkRequest);

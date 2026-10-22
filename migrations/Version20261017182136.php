@@ -25,11 +25,13 @@ final class Version20261017182136 extends AbstractMigration
         $this->addSql('ALTER TABLE telegram_link_request DROP CONSTRAINT fk_2f47951c9d86650f');
         $this->addSql('DROP INDEX uniq_2f47951c9d86650f');
         $this->addSql('ALTER TABLE telegram_link_request DROP activated_at');
-        $this->addSql('ALTER TABLE telegram_link_request ALTER chat_id SET NOT NULL');
+        $this->addSql('ALTER TABLE telegram_link_request ALTER chat_id SET TYPE BIGINT NOT NULL');
         $this->addSql('ALTER TABLE telegram_link_request RENAME COLUMN user_id_id TO user_id');
         $this->addSql('ALTER TABLE telegram_link_request ADD CONSTRAINT FK_2F47951CA76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id)');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_2F47951CA76ED395 ON telegram_link_request (user_id)');
         $this->addSql('ALTER TABLE "user" DROP telegram_chat_id');
+        $this->addSql('ALTER TABLE telegram_link_request ADD payload JSON DEFAULT NULL');
+        $this->addSql('ALTER TABLE telegram_link_request ALTER ip_address TYPE VARCHAR(32)');
     }
 
     public function down(Schema $schema): void

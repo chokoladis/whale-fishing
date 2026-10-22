@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_PHONE', fields: ['phone'])]
 #[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -28,8 +28,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(length: 180, nullable: true)]
     private ?string $email = null;
+
+    #[ORM\Column(length: 15)]
+    private string $phone;
 
     /**
      * @var list<string> The user roles
@@ -60,6 +63,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'userId', cascade: ['persist', 'remove'], targetEntity: UserVerification::class)]
     private ?Collection $userVerifications = null;
+
+//    #[ORM\OneToOne(mappedBy: 'userId', targetEntity: TelegramRequest::class)]
 
     public function getId(): ?int
     {
@@ -204,6 +209,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->userVerifications->add($userVerification);
 
+        return $this;
+    }
+
+    public function getPhone(): string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $phone): static
+    {
+        $this->phone = $phone;
         return $this;
     }
 }

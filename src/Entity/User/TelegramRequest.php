@@ -2,27 +2,23 @@
 
 namespace App\Entity\User;
 
+use App\Repository\User\TelegramRequestRepository;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\User\TelegramLinkRequestRepository;
-use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: TelegramLinkRequestRepository::class)]
+#[ORM\Entity(repositoryClass: TelegramRequestRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class TelegramLinkRequest
+class TelegramRequest
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'uuid')]
-    private ?Uuid $uuid = null;
+    #[ORM\Column(type: 'bigint')]
+    private int $chatId;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?User $user = null;
-
-    #[ORM\Column]
-    private int $chatId;
 
     #[ORM\Column(length: 32)]
     private string $ipAddress;
@@ -30,24 +26,9 @@ class TelegramLinkRequest
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column]
-    private \DateTimeImmutable $expiredAt;
-
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getUuid(): ?Uuid
-    {
-        return $this->uuid;
-    }
-
-    public function setUuid(Uuid $uuid): static
-    {
-        $this->uuid = $uuid;
-
-        return $this;
     }
 
     public function getUser(): ?User
@@ -86,22 +67,9 @@ class TelegramLinkRequest
         return $this;
     }
 
-    public function getExpiredAt(): ?\DateTimeImmutable
-    {
-        return $this->expiredAt;
-    }
-
-    public function setExpiredAt(\DateTimeImmutable $expiredAt): static
-    {
-        $this->expiredAt = $expiredAt;
-
-        return $this;
-    }
-
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
-        $this->expiredAt = new \DateTimeImmutable('+1 hour');
     }
 
     public function getIpAddress(): string
@@ -118,6 +86,8 @@ class TelegramLinkRequest
     // todo
     public function isVerified()//: bool
     {
+        // если верифицирован просто входит
+        // с проверкой по телеге
         return $this->getUser()->getUserVerifications();
     }
 }

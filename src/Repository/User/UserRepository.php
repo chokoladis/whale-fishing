@@ -68,9 +68,23 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getOneOrNullResult();
     }
 
-    public function save(): void
+    public function getByPhone(string $phone): ?User
     {
-        $this->manager->flush();
+        return $this->createQueryBuilder('u')
+            ->where('u.phone = :phone')
+            ->setParameter('phone', $phone)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+
+    public function save(User $user, ?EntityManagerInterface $manager = null): void
+    {
+        $manager = $manager ?: $this->getEntityManager();
+        if (!$user->getId())
+            $manager->persist($user);
+
+        $manager->flush();
     }
 
     public function forceDeleteUsers(): mixed
