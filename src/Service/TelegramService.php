@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Entity\User\TelegramRequest;
 use App\Entity\User\User;
 use App\Entity\User\UserVerification;
+use App\Enum\User\Status;
 use App\Enum\User\TypeVerify;
 use App\Exception\External\IntegrationException;
 use App\Repository\User\TelegramRequestRepository;
@@ -70,8 +71,6 @@ class TelegramService
         // todo роверка update_id с блокировкой - update_id\":468465099
         //        $request->getPayload()->get('update_id')
 
-        $this->logger->debug('tg webhook check2', [$request->getPayload()->all()]);
-
         $message = $request->getPayload()->all('message');
         if (!empty($message['text'])) {
             if ($message['text'] === '/start') {
@@ -119,6 +118,13 @@ class TelegramService
             throw new EntityNotFoundException('Telegram request not found');
         } elseif ($user = $telegramRequest->getUser()) {
             // todo check phone and do what ?
+            // todo не генерить несколько раз
+            // генерить ссылку в бот на сайт-фронт с полезной нагрузкой
+            $this->chatter->send(new ChatMessage(
+                'Успешная авторизация',
+                (new TelegramOptions())->chatId((string)$contact['user_id']),
+            ));
+
             return $this->userService->getTokenDataByUser($request, $user);
         } else {
             $user = $this->userRepository->findOneBy([
@@ -131,32 +137,38 @@ class TelegramService
             $connection->setAutoCommit(false);
             $connection->beginTransaction();
 
-            $this->logger->info('verififcation data', [$user->getUserVerifications()]);
-
             try {
                 if (!$user) {
                     $user = new User();
                     $user->setPhone($phone)
-                        ->setName(trim(sprintf('%s %s', $from['first_name'], $from['last_name'])))
+                        ->setName(trim(sprintf('%s %s', $from['first_name'] ?? '', $from['last_name'] ?? '')))
+                        ->setStatus(Status::ACTIVE)
                         ->setPassword($this->passwordHasher->hashPassword($user, ByteString::fromRandom()->toString()));
                     $this->userRepository->save($user, $this->manager);
                 }
 
                 $telegramRequest->setUser($user);
 
-                $this->logger->debug('in confirm tg - verifications', [$user->getUserVerifications()]);
-                //            $newRequest->setUser($this->userRepository->getByEmail($userEmail));
+                if (!$user->isTelegramVerified()){
+                    $userVerification = new UserVerification();
+                    $userVerification->setUser($user)
+                        ->setCode(Uuid::v7()->toString())
+                        ->setType(TypeVerify::TELEGRAM)
+                        ->setVerifiedAt(new \DateTimeImmutable());
 
-                $userVerification = new UserVerification();
-                $userVerification->setUser($user)->setCode(Uuid::v7()->toString())->setType(TypeVerify::TELEGRAM);
-
-                $this->userVerificationRepository->save($userVerification, $this->manager);
+                    $this->userVerificationRepository->save($userVerification, $this->manager);
+                }
 
                 $connection->commit();
             } catch (Exception $e) {
                 $connection->rollback();
                 throw $e;
             }
+
+            $this->chatter->send(new ChatMessage(
+                'Успешная авторизация',
+                (new TelegramOptions())->chatId((string)$contact['user_id']),
+            ));
 
             return $this->userService->getTokenDataByUser($request, $user);
         }

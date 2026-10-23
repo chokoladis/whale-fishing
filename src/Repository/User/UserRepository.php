@@ -44,17 +44,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function add(RegisterRequest $request): User
     {
-        if ($this->getByEmail($request->email)) {
+        if ($this->getByPhone($request->phone)) {
             throw new ColumnAlreadyExists('User already exists.');
         }
 
         $user = new User();
         $user->setName($request->name)
+            ->setPhone($request->phone)
             ->setEmail($request->email)
             ->setPassword($this->passwordHasher->hashPassword($user, $request->password));
 
-        $this->manager->persist($user);
-        $this->manager->flush();
+        $this->save($user);
 
         return $user;
     }

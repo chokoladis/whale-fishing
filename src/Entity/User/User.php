@@ -6,6 +6,7 @@ namespace App\Entity\User;
 
 use App\Enum\User\Role;
 use App\Enum\User\Status;
+use App\Enum\User\TypeVerify;
 use App\Repository\User\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -31,8 +32,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 15)]
-    private string $phone;
+    #[ORM\Column(length: 15, type: 'bigint', unique: true)]
+    private int $phone;
 
     /**
      * @var list<string> The user roles
@@ -61,10 +62,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[OneToMany(mappedBy: 'user', targetEntity: PasswordRestore::class)]
     private ?Collection $passwordRestores;
 
-    #[ORM\OneToMany(mappedBy: 'userId', cascade: ['persist', 'remove'], targetEntity: UserVerification::class)]
+    #[ORM\OneToMany(mappedBy: 'user', cascade: ['persist', 'remove'], targetEntity: UserVerification::class)]
     private ?Collection $userVerifications = null;
-
-//    #[ORM\OneToOne(mappedBy: 'userId', targetEntity: TelegramRequest::class)]
 
     public function getId(): ?int
     {
@@ -207,7 +206,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setUserVerification(?UserVerification $userVerification): static
     {
-        $this->userVerifications->add($userVerification);
+        if (!$this->userVerifications->contains($userVerification)) {
+            $this->userVerifications->add($userVerification);
+            $userVerification->setUser($this);
+        }
 
         return $this;
     }
@@ -221,5 +223,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->phone = $phone;
         return $this;
+    }
+
+    // как вариант сделать запрос в репе
+    public function isTelegramVerified(): bool
+    {
+        return $this->getUserVerifications()->exists(
+            static fn (int $key, UserVerification $userVerification): bool
+                => $userVerification->getType() === TypeVerify::TELEGRAM && $userVerification->getVerifiedAt()
+        );
     }
 }

@@ -18,6 +18,7 @@ class ProfileResource
     {
         return [
             'name' => $user->getName(),
+            'phone' => $user->getPhone(),
             'email' => $user->getEmail(),
             'roles' => $user->getRoles(),
         ];
@@ -31,6 +32,7 @@ class ProfileResource
     {
         return [
             'name' => $user->getName(),
+            'phone' => $user->getPhone(),
             'email' => $user->getEmail(),
             'roles' => $user->getRoles(),
             'createdAt' => $user->getCreatedAt(),

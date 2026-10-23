@@ -28,8 +28,8 @@ class UserVerification
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $verifiedAt = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'userVerifications')]
+    #[ORM\JoinColumn(name: 'userId', referencedColumnName: 'id', nullable: false)]
     private ?User $user = null;
 
     public function getId(): ?int
