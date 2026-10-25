@@ -22,5 +22,3 @@
 /.phpunit.cache/
 
 /config/jwt/*.pem
-
-*.twig

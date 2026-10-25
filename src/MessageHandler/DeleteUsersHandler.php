@@ -3,7 +3,7 @@
 namespace App\MessageHandler;
 
 use App\Messages\User\DeleteUsersMessage;
-use App\Repository\UserRepository;
+use App\Repository\User\UserRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]

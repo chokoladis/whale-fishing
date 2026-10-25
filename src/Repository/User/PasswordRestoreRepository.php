@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\User;
 
-use App\Entity\PasswordRestore;
-use App\Entity\User;
+use App\Entity\User\PasswordRestore;
+use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -28,7 +28,7 @@ class PasswordRestoreRepository extends ServiceEntityRepository
             ->andWhere('p.user = :user')
             ->andWhere('p.expiredAt > :now')
             ->setParameter('user', $user)
-            ->setParameter('now', new \DateTime('now')->modify('-1day'))
+            ->setParameter('now', (new \DateTime('now'))->modify('-1day'))
             ->getQuery()
             ->getResult();
     }
@@ -91,7 +91,7 @@ class PasswordRestoreRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->addSelect('p.id')
             ->andWhere(':twoDayAgo > p.createdAt')
-            ->setParameter('twoDayAgo', new \DateTime('now')->modify('-2day'))
+            ->setParameter('twoDayAgo', (new \DateTime('now'))->modify('-2day'))
             ->getQuery()
             ->getResult();
     }

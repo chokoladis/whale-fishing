@@ -10,10 +10,18 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    _instanceof:
+        App\Interface\Notification\SendCodeDispatcher:
+            tags: [ 'app.sender_code' ]
+
     App\:
         resource: '../src/'
 
     App\OpenApi\OpenApiSpec: ~
+
+    App\Service\TelegramService:
+        arguments:
+            $telegramBotSecretToken: '%env(TELEGRAM_BOT_SECRET_TOKEN)%'
 
 #    App\MessageHandler\CoinPriceHandler:
 #        arguments:
@@ -21,10 +29,10 @@ services:
 #                ALCHEMY: '@App\Service\External\Alchemy\PriceService'
 #                COINGECKO: '@App\Service\External\CoinGecko\PriceService'
 
-    App\Tool\Notification\EmailSenderToken: ~
+    App\Tool\Notificator\EmailNotificator: ~
 
     App\Interface\SendTokenInterface:
-        class: App\Tool\Notification\EmailSenderToken
+        class: App\Tool\Notificator\EmailNotificator
 
     App\EventListener\ApiRateLimitListener:
         arguments:

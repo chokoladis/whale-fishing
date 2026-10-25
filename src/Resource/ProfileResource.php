@@ -2,7 +2,7 @@
 
 namespace App\Resource;
 
-use App\Entity\User;
+use App\Entity\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class ProfileResource
@@ -18,6 +18,7 @@ class ProfileResource
     {
         return [
             'name' => $user->getName(),
+            'phone' => $user->getPhone(),
             'email' => $user->getEmail(),
             'roles' => $user->getRoles(),
         ];
@@ -31,6 +32,7 @@ class ProfileResource
     {
         return [
             'name' => $user->getName(),
+            'phone' => $user->getPhone(),
             'email' => $user->getEmail(),
             'roles' => $user->getRoles(),
             'createdAt' => $user->getCreatedAt(),

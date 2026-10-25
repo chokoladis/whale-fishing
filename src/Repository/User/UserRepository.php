@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\User;
 
 use App\DTO\Http\Request\Auth\RegisterRequest;
-use App\Entity\User;
+use App\Entity\User\User;
 use App\Enum\User\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Schema\Exception\ColumnAlreadyExists;
@@ -44,33 +44,30 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function add(RegisterRequest $request): User
     {
-        if ($this->getByEmail($request->email)) {
+        if ($this->findOneBy([
+            'phone' => $request->phone
+            ])) {
             throw new ColumnAlreadyExists('User already exists.');
         }
 
         $user = new User();
-        $user->setName($request->name);
-        $user->setEmail($request->email);
-        $user->setPassword($this->passwordHasher->hashPassword($user, $request->password));
+        $user->setName($request->name)
+            ->setPhone($request->phone)
+            ->setEmail($request->email)
+            ->setPassword($this->passwordHasher->hashPassword($user, $request->password));
 
-        $this->manager->persist($user);
-        $this->manager->flush();
+        $this->save($user);
 
         return $user;
     }
 
-    public function getByEmail(string $email): ?User
+    public function save(User $user, ?EntityManagerInterface $manager = null): void
     {
-        return $this->createQueryBuilder('u')
-            ->where('u.email = :email')
-            ->setParameter('email', $email)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
+        $manager = $manager ?: $this->getEntityManager();
+        if (!$user->getId())
+            $manager->persist($user);
 
-    public function save(): void
-    {
-        $this->manager->flush();
+        $manager->flush();
     }
 
     public function forceDeleteUsers(): mixed

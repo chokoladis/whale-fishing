@@ -7,9 +7,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 class PasswordRestoreSendToken
 {
     public function __construct(
-        #[Assert\NotBlank(allowNull: false)]
         #[Assert\Email(message: 'Необходимо ввести валидный email')]
-        public string $email
+        public ?string $email = null,
+        // todo regexp
+        public ?string $phone = null,
     )
     {
     }
