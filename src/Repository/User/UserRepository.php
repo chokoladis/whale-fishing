@@ -44,7 +44,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function add(RegisterRequest $request): User
     {
-        if ($this->getByPhone($request->phone)) {
+        if ($this->findOneBy([
+            'phone' => $request->phone
+            ])) {
             throw new ColumnAlreadyExists('User already exists.');
         }
 
@@ -58,25 +60,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         return $user;
     }
-
-    public function getByEmail(string $email): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->where('u.email = :email')
-            ->setParameter('email', $email)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
-    public function getByPhone(string $phone): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->where('u.phone = :phone')
-            ->setParameter('phone', $phone)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
 
     public function save(User $user, ?EntityManagerInterface $manager = null): void
     {

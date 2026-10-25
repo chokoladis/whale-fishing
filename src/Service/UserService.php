@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Dispatcher\VerificationCodeDispatcher;
+use App\Dispatcher\SendCodeDispatcher;
 use App\DTO\Http\Request\Auth\RegisterRequest;
 use App\DTO\Http\Request\VerificationSendRequest;
 use App\DTO\Http\Response\Auth\RegisterDTO;
@@ -30,14 +30,14 @@ use Symfony\Component\Uid\Uuid;
 class UserService
 {
     public function __construct(
-        private UserRepository           $userRepository,
-        private ProfileResource          $profileResource,
-        private JWTTokenManagerInterface $JWTTokenManager,
-        private TokenService             $tokenService,
+        private UserRepository             $userRepository,
+        private ProfileResource            $profileResource,
+        private JWTTokenManagerInterface   $JWTTokenManager,
+        private TokenService               $tokenService,
         private UserVerificationRepository $userVerificationRepository,
-        private EntityManagerInterface           $manager,
-        private VerificationCodeDispatcher $verificationCodeDispatcher,
-        private LoggerInterface $logger
+        private EntityManagerInterface     $manager,
+        private SendCodeDispatcher         $senderCodeDispatcher,
+        private LoggerInterface            $logger
     )
     {
     }
@@ -52,7 +52,9 @@ class UserService
 
     public function delete(UserInterface $userInterface) : void
     {
-        $user = $this->userRepository->getByEmail($userInterface->getUserIdentifier());
+        $user = $this->userRepository->findOneBy([
+            User::IDENTITY_FIELD => $userInterface->getUserIdentifier()
+        ]);
         if ($user->getStatus() === Status::DELETED) {
             throw new UserStatusException('Ваш аккаунт уже удален');
         } else if ($user->getStatus() === Status::BLOCKED) {
@@ -67,7 +69,9 @@ class UserService
 
     public function restore(UserInterface $userInterface) : void
     {
-        $user = $this->userRepository->getByEmail($userInterface->getUserIdentifier());
+        $user = $this->userRepository->findOneBy([
+            User::IDENTITY_FIELD => $userInterface->getUserIdentifier()
+        ]);
         if ($user->getStatus() === Status::BLOCKED) // todo middleware
             throw new UserStatusException('Ваш аккаунт заблокирован');
 
@@ -87,7 +91,9 @@ class UserService
      */
     public function verify(VerificationSendRequest $request, UserInterface $userInterface)
     {
-        $user = $this->userRepository->getByPhone($userInterface->getUserIdentifier());
+        $user = $this->userRepository->findOneBy([
+            User::IDENTITY_FIELD => $userInterface->getUserIdentifier()
+        ]);
         if (!$user) // todo middleware
             throw new NotFoundResourceException("Пользователь с таким email не был найден");
 
@@ -121,7 +127,7 @@ class UserService
         $connection->beginTransaction();
         try {
             $this->userVerificationRepository->save($userVerification, $this->manager);
-            $this->verificationCodeDispatcher->send($request->typeVerify, $user, $code);
+            $this->senderCodeDispatcher->send($request->typeVerify, $user, $code, 'верификации');
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage(), [$e->getFile(), $e->getLine()]);
             $connection->rollBack();

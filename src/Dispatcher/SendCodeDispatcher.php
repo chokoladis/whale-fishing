@@ -1,26 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dispatcher;
 
-use App\Enum\User\TypeVerify;
+use App\Enum\User\Channel;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 
-class VerificationCodeDispatcher
+class SendCodeDispatcher
 {
     public function __construct(
-        #[AutowireLocator('app.verification_sender')]
-        private readonly iterable $senders
+        /**
+         * @var array<int, \App\Interface\Notification\SendCodeDispatcher> $senders
+         */
+        #[AutowireLocator('app.sender_code')]
+        private readonly iterable $senders,
     )
     {
     }
 
-    public function send(TypeVerify $type, UserInterface $user, string $code)
+    public function send(Channel $type, UserInterface $user, string $code, string $nameOperation)
     {
         foreach ($this->senders as $raw) {
             if ($raw->support($type)) {
-                $raw->send($user, $code);
+                $raw->send($user, $code, $nameOperation);
                 return;
             }
         }

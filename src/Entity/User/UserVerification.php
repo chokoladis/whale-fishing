@@ -2,7 +2,7 @@
 
 namespace App\Entity\User;
 
-use App\Enum\User\TypeVerify;
+use App\Enum\User\Channel;
 use App\Repository\User\UserVerificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,8 +16,8 @@ class UserVerification
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(enumType: TypeVerify::class)]
-    private ?TypeVerify $type = null;
+    #[ORM\Column(enumType: Channel::class)]
+    private ?Channel $type = null;
 
     #[ORM\Column(length: 36)]
     private ?string $code = null;
@@ -37,12 +37,12 @@ class UserVerification
         return $this->id;
     }
 
-    public function getType(): ?TypeVerify
+    public function getType(): ?Channel
     {
         return $this->type;
     }
 
-    public function setType(TypeVerify $type): static
+    public function setType(Channel $type): static
     {
         $this->type = $type;
 

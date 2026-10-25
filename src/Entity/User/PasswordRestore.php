@@ -17,7 +17,7 @@ class PasswordRestore
     #[ORM\JoinColumn(name: 'user_id', nullable: false, onDelete: 'CASCADE')]
     private User $user;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 64)]
     private ?string $token = null;
 
     #[ORM\Column]

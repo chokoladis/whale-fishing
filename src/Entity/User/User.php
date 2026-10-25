@@ -6,7 +6,7 @@ namespace App\Entity\User;
 
 use App\Enum\User\Role;
 use App\Enum\User\Status;
-use App\Enum\User\TypeVerify;
+use App\Enum\User\Channel;
 use App\Repository\User\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,6 +21,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    const IDENTITY_FIELD = 'phone';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -32,8 +34,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 15, type: 'bigint', unique: true)]
-    private int $phone;
+    // todo check by regexp \d{11,15}
+    #[ORM\Column(length: 15, unique: true)]
+    private string $phone;
 
     /**
      * @var list<string> The user roles
@@ -65,6 +68,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', cascade: ['persist', 'remove'], targetEntity: UserVerification::class)]
     private ?Collection $userVerifications = null;
 
+    #[ORM\OneToOne(targetEntity: TelegramRequest::class, mappedBy: 'user')]
+    private ?TelegramRequest $telegramRequest = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -89,7 +95,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string)$this->email;
+        return $this->phone;
     }
 
     /**
@@ -230,7 +236,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->getUserVerifications()->exists(
             static fn (int $key, UserVerification $userVerification): bool
-                => $userVerification->getType() === TypeVerify::TELEGRAM && $userVerification->getVerifiedAt()
+                => $userVerification->getType() === Channel::TELEGRAM && $userVerification->getVerifiedAt()
         );
+    }
+
+    public function getTelegramRequest(): ?TelegramRequest
+    {
+        return $this->telegramRequest;
     }
 }

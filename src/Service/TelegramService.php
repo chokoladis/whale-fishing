@@ -8,7 +8,7 @@ use App\Entity\User\TelegramRequest;
 use App\Entity\User\User;
 use App\Entity\User\UserVerification;
 use App\Enum\User\Status;
-use App\Enum\User\TypeVerify;
+use App\Enum\User\Channel;
 use App\Exception\External\IntegrationException;
 use App\Repository\User\TelegramRequestRepository;
 use App\Repository\User\UserRepository;
@@ -153,7 +153,7 @@ class TelegramService
                     $userVerification = new UserVerification();
                     $userVerification->setUser($user)
                         ->setCode(Uuid::v7()->toString())
-                        ->setType(TypeVerify::TELEGRAM)
+                        ->setType(Channel::TELEGRAM)
                         ->setVerifiedAt(new \DateTimeImmutable());
 
                     $this->userVerificationRepository->save($userVerification, $this->manager);

@@ -17,7 +17,8 @@ class TelegramRequest
     #[ORM\Column(type: 'bigint')]
     private int $chatId;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(targetEntity: User::class, inversedBy: 'user', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn]
     private ?User $user = null;
 
     #[ORM\Column(length: 32)]

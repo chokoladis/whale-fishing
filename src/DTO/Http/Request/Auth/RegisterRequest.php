@@ -8,8 +8,9 @@ readonly class RegisterRequest
 {
     public function __construct(
         #[Assert\NotBlank]
+        // todo check
         #[Assert\Length(min: 6, max: 15)]
-        public int $phone,
+        public string $phone,
         #[Assert\NotBlank]
         #[Assert\PasswordStrength(minScore: 1)]
         public string  $password,

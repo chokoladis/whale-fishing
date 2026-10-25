@@ -11,8 +11,8 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
     _instanceof:
-        App\Interface\Notification\VerificationCodeSender:
-            tags: [ 'app.verification_sender' ]
+        App\Interface\Notification\SendCodeDispatcher:
+            tags: [ 'app.sender_code' ]
 
     App\:
         resource: '../src/'

@@ -11,8 +11,8 @@ class PasswordRestoreConfirm
 {
     public function __construct(
         #[NotBlank]
-        #[Length(min: 64, max: 64)]
-        public string $token,
+        #[Length(min: 16, max: 64)]
+        public string $code,
         #[NotBlank]
         #[PasswordStrength(minScore: 1)]
         public string $password,
