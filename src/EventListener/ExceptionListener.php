@@ -41,7 +41,7 @@ final class ExceptionListener
         } else if ($exception instanceof TooManyRequestsHttpException) {
             $event->setResponse(new JsonResponse([
                 'errors' => [
-                    $exception->getMessage() ? $exception->getMessage() : $this->translator->trans('error.many_requests'),
+                    $exception->getMessage() ?: $this->translator->trans('error.many_requests'),
                 ],
             ], $exception->getStatusCode()));
 

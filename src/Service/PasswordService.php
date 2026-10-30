@@ -30,8 +30,6 @@ class PasswordService
         private UserPasswordHasherInterface $passwordHasher,
         private TokenService                $tokenService,
         private EntityManagerInterface      $entityManager,
-        #[Autowire(env: 'APP_SECRET')]
-        private string                      $secret,
         private LoggerInterface             $servicesLogger
     )
     {
@@ -112,9 +110,6 @@ class PasswordService
     public function restore(PasswordRestoreConfirm $request): void
     {
         //todo rate limit на уровне мидлы или просто фреймворка/сервера
-
-        if (!$request->code)
-            throw new ValidatorException('Не указан токен');
 
         $tokenHash = hash('sha256', $request->code);
 

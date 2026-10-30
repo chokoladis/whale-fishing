@@ -83,7 +83,7 @@ final class AuthController extends AbstractController
     }
 
     #[RateLimit('password_restore')]
-    #[Route('password/send/', name: 'password.sendCode', methods: ['POST'])]
+    #[Route('password/send/', name: 'password.send', methods: ['POST'])]
     #[OA\Post(
         operationId: 'authPasswordSendCode',
         summary: 'Отправка кода восстановления пароля',

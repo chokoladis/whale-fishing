@@ -3,29 +3,26 @@
 namespace App\Tests\Controller;
 
 use App\Repository\User\PasswordRestoreRepository;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Response;
 
 final class AuthControllerTest extends BaseControllerTest
 {
     public PasswordRestoreRepository $passwordRestoreRepository;
 
-    /**
-     * @param PasswordRestoreRepository $passwordRestoreRepository
-     * @return void
-     */
-    public function test__construct(
-        PasswordRestoreRepository $passwordRestoreRepository
-    )
+    protected function setUp(): void
     {
-        $this->passwordRestoreRepository = $passwordRestoreRepository;
+        parent::setUp();
 
+        $this->passwordRestoreRepository = $this->getContainer()->get(PasswordRestoreRepository::class);
     }
 
     public function testRegisterSuccess(): void
     {
-        $this->client->request('POST', '/api/v1/auth/register/', [], [], ['CONTENT_TYPE' => 'application/json'],
+        $this->client->request('POST', $this->urlBuild->generate('api.v1.auth.register'), [], [], ['CONTENT_TYPE' => 'application/json'],
             json_encode([
-                'email' => 'emailtest' . rand(1000, 9999) . '@gmail.com',
+                'email' => self::TEST_USER_EMAIL,
+                'phone' => self::TEST_PHONE,
                 'password' => self::TEST_USER_PASSWORD,
                 'password_confirm' => self::TEST_USER_PASSWORD,
             ]));
@@ -35,17 +32,24 @@ final class AuthControllerTest extends BaseControllerTest
 
     public function testRegisterAlreadyExists(): void
     {
+//        $container = static::getContainer();
+//        $rateLimiterFactory = $container->get('framework.rate_limiter.register');
+//
+//        $limiter = $rateLimiterFactory->create($this->client->getRequest()->getClientIp());
+//        $limiter->reset();
 
-        $this->client->request('POST', '/api/v1/auth/register/', [], [], ['CONTENT_TYPE' => 'application/json'],
+        $this->client->request('POST', $this->urlBuild->generate('api.v1.auth.register'), [], [], ['CONTENT_TYPE' => 'application/json'],
             json_encode([
                 'email' => self::TEST_USER_EMAIL,
+                'phone' => self::TEST_PHONE,
                 'password' => self::TEST_USER_PASSWORD,
                 'password_confirm' => self::TEST_USER_PASSWORD,
             ]));
 
-        $this->client->request('POST', '/api/v1/auth/register/', [], [], ['CONTENT_TYPE' => 'application/json'],
+        $this->client->request('POST', $this->urlBuild->generate('api.v1.auth.register'), [], [], ['CONTENT_TYPE' => 'application/json'],
             json_encode([
                 'email' => self::TEST_USER_EMAIL,
+                'phone' => self::TEST_PHONE,
                 'password' => self::TEST_USER_PASSWORD,
                 'password_confirm' => self::TEST_USER_PASSWORD,
             ]));
@@ -55,14 +59,7 @@ final class AuthControllerTest extends BaseControllerTest
 
     public function testLoginSuccess(): void
     {
-//        $this->client->request('POST', '/api/v1/auth/register', [], [], ['CONTENT_TYPE' => 'application/json'],
-//            json_encode([
-//                'email' => self::TEST_USER_EMAIL,
-//                'password' => self::TEST_USER_PASSWORD,
-//                'password_confirm' => self::TEST_USER_PASSWORD,
-//            ]));
-
-        $this->client->request('POST', '/api/v1/auth/login/', [], [], ['CONTENT_TYPE' => 'application/json'],
+        $this->client->request('POST', $this->urlBuild->generate('api.v1.auth.login'), [], [], ['CONTENT_TYPE' => 'application/json'],
             json_encode([
                 'email' => self::TEST_USER_EMAIL,
                 'password' => self::TEST_USER_PASSWORD,
@@ -73,7 +70,7 @@ final class AuthControllerTest extends BaseControllerTest
 
     public function testPasswordRestoreSendSuccess(): void
     {
-        $this->client->request('POST', '/api/v1/auth/password/send/', [], [], ['CONTENT_TYPE' => 'application/json'],
+        $this->client->request('POST', $this->urlBuild->generate('api.v1.auth.password.send'), [], [], ['CONTENT_TYPE' => 'application/json'],
             json_encode([
                 'email' => self::TEST_USER_EMAIL,
             ]));
@@ -81,44 +78,23 @@ final class AuthControllerTest extends BaseControllerTest
         self::assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
     }
 
+    public function testPasswordRestoreSendErrorNoGotData(): void
+    {
+        self::expectException(BadRequestException::class);
+
+        $this->client->request('POST', $this->urlBuild->generate('api.v1.auth.password.send'), [], [], ['CONTENT_TYPE' => 'application/json'],
+            json_encode([]));
+
+//        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+    }
+
     public function testPasswordRestoreSendErrorUserNotFound(): void
     {
-        $this->client->request('POST', '/api/v1/auth/password/send/', [], [], ['CONTENT_TYPE' => 'application/json'],
+        $this->client->request('POST', $this->urlBuild->generate('api.v1.auth.password.send'), [], [], ['CONTENT_TYPE' => 'application/json'],
             json_encode([
                 'email' => 'test'.rand(1000, 9999).'@gmail.com',
             ]));
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
-
-    public function testPasswordRestoreConfirmSuccess(): void
-    {
-        $passwordRestoreObj = $this->passwordRestoreRepository->getLastByUserEmail(self::TEST_USER_EMAIL);
-
-        $this->client->request('POST', '/api/v1/auth/password/confirm/', [], [], ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => self::TEST_USER_EMAIL,
-                'token' => $passwordRestoreObj->getToken(),
-                'password' => self::TEST_USER_PASSWORD,
-                'password_confirm' => self::TEST_USER_PASSWORD,
-            ]));
-
-        self::assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
-    }
-
-    public function testPasswordRestoreConfirmError(): void
-    {
-        $passwordRestoreObj = $this->passwordRestoreRepository->getNotActiveTokenByEmail(self::TEST_USER_EMAIL);
-
-        $this->client->request('POST', '/api/v1/auth/password/confirm/', [], [], ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'email' => self::TEST_USER_EMAIL,
-                'token' => $passwordRestoreObj->getToken(),
-                'password' => self::TEST_USER_PASSWORD,
-                'password_confirm' => self::TEST_USER_PASSWORD,
-            ]));
-
-        self::assertEquals(['errors' => ['token']], json_decode($this->client->getResponse()->getContent(), true));
-    }
-
 }

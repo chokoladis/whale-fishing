@@ -29,11 +29,6 @@ services:
 #                ALCHEMY: '@App\Service\External\Alchemy\PriceService'
 #                COINGECKO: '@App\Service\External\CoinGecko\PriceService'
 
-    App\Tool\Notificator\EmailNotificator: ~
-
-    App\Interface\SendTokenInterface:
-        class: App\Tool\Notificator\EmailNotificator
-
     App\EventListener\ApiRateLimitListener:
         arguments:
             $apiListener: '@limiter.api'
